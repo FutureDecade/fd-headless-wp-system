@@ -50,6 +50,8 @@
 - push 到 `main` 会生成对应 zip workflow artifact
 - 发布 GitHub Release 时可以自动上传对应 zip asset
 - 四个核心仓库都已发布首个正式版本 `v1.0.0`
+- 交付仓库已具备内部 staging 资产拉取脚本：`scripts/fetch-wordpress-assets.sh`
+- 交付仓库已具备对应挂载文件：`compose/wordpress-assets.override.yml`
 
 优点：
 
@@ -78,6 +80,7 @@
 当前最稳的是：
 
 - 短期先用 zip 制品把 WordPress 资产来源固定住
+- 当前内部 staging 路径：GitHub Release zip -> `runtime/wp-content` -> compose override bind mount
 - 中期再决定交付仓库到底是“下载 zip 安装”还是“构建自定义 WordPress 镜像”
 - 长期再把 WordPress runtime 做成正式交付镜像
 
@@ -95,9 +98,10 @@
 - 核心主题/插件具备基础 zip 打包能力
 - 核心主题/插件具备首个正式 release
 - 交付仓库文档明确下一步接入方向
+- 交付仓库具备 staging 级别的 release zip 消费能力
 
 之后再做：
 
-- 交付仓库对 release zip 的消费方式
+- WordPress 首次安装与启用流程固化
 - WordPress 自定义镜像
 - 自动安装

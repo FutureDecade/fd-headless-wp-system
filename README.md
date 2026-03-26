@@ -86,13 +86,14 @@
 - 一份可参数化的 Nginx 模板
 - 基础脚本
 - 基础 CI 校验
+- WordPress release zip 接入骨架
 
 它当前还不提供：
 
 - 可直接用于生产的一键安装
 - 完整的 TLS/证书自动化
 - 自定义 WordPress 镜像
-- 主题/插件打包产物
+- 最终的客户交付分发方案
 
 ## 快速开始
 
@@ -100,13 +101,16 @@
 cp .env.example .env
 bash scripts/bootstrap-env.sh
 bash scripts/preflight-check.sh
+# 如果需要 WordPress release 资产，先把 .env 里的 WORDPRESS_FETCH_RELEASE_ASSETS 改成 true
+bash scripts/fetch-wordpress-assets.sh
 docker compose --env-file .env config
 ```
 
 注意：
 
 - 当前 `FRONTEND_IMAGE` 可以直接替换成真实前端镜像
-- 当前 `WEBSOCKET_IMAGE` 还是占位设计，后续需要补正式镜像发布
+- 当前 `WEBSOCKET_IMAGE` 已可直接使用正式 GHCR 镜像
+- 如果要在内部 staging 拉取私有 WordPress release 资产，需要把 `WORDPRESS_FETCH_RELEASE_ASSETS=true`
 - 这版仓库的目标是先固定系统边界，不是立即完成生产可用的一键部署
 
 ## 下一步路线
