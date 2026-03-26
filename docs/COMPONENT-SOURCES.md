@@ -48,9 +48,11 @@
   - `https://github.com/FutureDecade/fd-member`
   - `https://github.com/FutureDecade/fd-payment`
   - `https://github.com/FutureDecade/fd-commerce`
+- 四个核心仓库都已具备基础 PHP CI
+- 四个核心仓库都已具备 zip 打包 workflow artifact
 - 线上也有运行中的副本
 - 其余 `fd-*` 组件仍未完全独立治理
-- 还没有完成制品化和交付打包
+- 还没有完成版本标签治理与交付接入
 
 未来方向：
 

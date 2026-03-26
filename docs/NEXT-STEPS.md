@@ -32,6 +32,7 @@
 - `fd-member` 已独立成仓库
 - `fd-payment` 已独立成仓库
 - `fd-commerce` 已独立成仓库
+- 四个核心仓库都已具备 zip 打包 workflow artifact
 
 重点不是整个 `wp-content` 打包，而是先区分：
 
@@ -47,6 +48,12 @@
 4. `fd-commerce`
 5. 其余关键 `fd-*`
 6. ACF 配置
+
+接下来目标：
+
+- 约定主题/插件的 tag 与 release 规则
+- 决定交付仓库是消费 zip 制品还是消费自定义 WordPress 镜像构建
+- 先把 staging 方案跑通，再做正式 install 流程
 
 ## 4. 设计 staging 运行方式
 
@@ -69,6 +76,13 @@
 当前已经具备一个真实来源示例：
 
 - `ghcr.io/futuredecade/fd-websocket:latest`
+
+当前也已经具备一个真实制品示例方向：
+
+- `fd-theme.zip`
+- `fd-member.zip`
+- `fd-payment.zip`
+- `fd-commerce.zip`
 
 ## 6. 最后才做 install.sh 增强
 
