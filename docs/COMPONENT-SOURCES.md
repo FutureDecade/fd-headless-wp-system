@@ -50,9 +50,10 @@
   - `https://github.com/FutureDecade/fd-commerce`
 - 四个核心仓库都已具备基础 PHP CI
 - 四个核心仓库都已具备 zip 打包 workflow artifact
+- 四个核心仓库都已具备首个正式 release `v1.0.0`
 - 线上也有运行中的副本
 - 其余 `fd-*` 组件仍未完全独立治理
-- 还没有完成版本标签治理与交付接入
+- 还没有完成交付层接入
 
 未来方向：
 

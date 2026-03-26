@@ -49,6 +49,7 @@
 - 四个仓库都已具备 GitHub Actions 打包流程
 - push 到 `main` 会生成对应 zip workflow artifact
 - 发布 GitHub Release 时可以自动上传对应 zip asset
+- 四个核心仓库都已发布首个正式版本 `v1.0.0`
 
 优点：
 
@@ -92,10 +93,11 @@
 
 - 核心主题/插件来源独立
 - 核心主题/插件具备基础 zip 打包能力
+- 核心主题/插件具备首个正式 release
 - 交付仓库文档明确下一步接入方向
 
 之后再做：
 
-- 版本标签策略
+- 交付仓库对 release zip 的消费方式
 - WordPress 自定义镜像
 - 自动安装

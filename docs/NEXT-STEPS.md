@@ -33,6 +33,8 @@
 - `fd-payment` 已独立成仓库
 - `fd-commerce` 已独立成仓库
 - 四个核心仓库都已具备 zip 打包 workflow artifact
+- 四个核心仓库都已发布首个正式版本 `v1.0.0`
+- 四个核心仓库的 GitHub Release 都已挂载 zip asset
 
 重点不是整个 `wp-content` 打包，而是先区分：
 
@@ -51,8 +53,8 @@
 
 接下来目标：
 
-- 约定主题/插件的 tag 与 release 规则
-- 决定交付仓库是消费 zip 制品还是消费自定义 WordPress 镜像构建
+- 让交付仓库能够固定消费 `v1.0.0` 这类 release 制品
+- 决定 staging 阶段是“下载 zip 安装”还是“构建自定义 WordPress 镜像”
 - 先把 staging 方案跑通，再做正式 install 流程
 
 ## 4. 设计 staging 运行方式
