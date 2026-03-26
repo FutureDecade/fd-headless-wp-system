@@ -115,3 +115,10 @@ docker compose --env-file .env config
 2. 明确每个组件未来从哪里来
 3. 再逐步做 staging 部署
 4. 最后才做正式的一键安装与迁移
+
+## 关键文档
+
+- `docs/PROJECT-MANAGEMENT.md`
+- `docs/MINIMAL-INTEGRATION-STRATEGY.md`
+- `docs/COMPONENT-SOURCES.md`
+- `docs/NEXT-STEPS.md`
