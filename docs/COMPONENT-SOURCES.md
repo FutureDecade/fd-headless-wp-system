@@ -42,9 +42,14 @@
 
 当前状态：
 
-- 本地有代码目录
+- 已有独立 Git 仓库来源：
+  - `https://github.com/FutureDecade/fd-theme`
+  - `https://github.com/FutureDecade/fd-member`
+  - `https://github.com/FutureDecade/fd-payment`
+  - `https://github.com/FutureDecade/fd-commerce`
 - 线上也有运行中的副本
-- 大部分未独立 Git 管理
+- 其余 `fd-*` 组件仍未完全独立治理
+- 还没有完成制品化和交付打包
 
 未来方向：
 

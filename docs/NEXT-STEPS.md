@@ -25,6 +25,13 @@
 
 ## 3. 梳理 WordPress 可交付资产
 
+已完成的前置工作：
+
+- `fd-theme` 已独立成仓库
+- `fd-member` 已独立成仓库
+- `fd-payment` 已独立成仓库
+- `fd-commerce` 已独立成仓库
+
 重点不是整个 `wp-content` 打包，而是先区分：
 
 - 必须进入交付版的
