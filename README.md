@@ -122,3 +122,5 @@ docker compose --env-file .env config
 - `docs/MINIMAL-INTEGRATION-STRATEGY.md`
 - `docs/COMPONENT-SOURCES.md`
 - `docs/NEXT-STEPS.md`
+- `docs/COMPOSE-V2-PLAN.md`
+- `docs/WORDPRESS-ASSET-INTEGRATION.md`

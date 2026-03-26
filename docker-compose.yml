@@ -10,13 +10,13 @@ services:
     volumes:
       - db_data:/var/lib/mysql
     networks:
-      - backend
+      - core
 
   redis:
     image: ${REDIS_IMAGE}
     restart: unless-stopped
     networks:
-      - backend
+      - core
 
   wordpress:
     image: ${WORDPRESS_IMAGE}
@@ -37,7 +37,7 @@ services:
     volumes:
       - wordpress_data:/var/www/html
     networks:
-      - backend
+      - core
       - edge
 
   frontend:
@@ -68,6 +68,7 @@ services:
       PORT: 8080
       PUSH_SECRET: ${PUSH_SECRET}
       JWT_SECRET: ${JWT_SECRET}
+      ALLOWED_ORIGINS: https://${FRONTEND_DOMAIN},https://${ADMIN_DOMAIN}
     networks:
       - edge
 
@@ -102,5 +103,5 @@ volumes:
   wordpress_data:
 
 networks:
-  backend:
+  core:
   edge:
