@@ -2,7 +2,7 @@
 
 ## 结论
 
-`/Users/admin/Desktop/fd-headless-wp-system` 应该作为独立的交付仓库使用。
+`/Users/admin/Projects/FutureDecade/fd-headless-wp-system` 应该作为独立的交付仓库使用。
 
 不要把它做成一个“把所有源码复制一份进来”的总目录。
 
