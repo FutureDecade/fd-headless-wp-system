@@ -17,11 +17,12 @@
 - `fd-websocket` 已整理为独立仓库
 - 已补基础文档
 - 已补基础 CI
+- 已补 GHCR 镜像发布
 
 接下来目标：
 
-- 为 `fd-websocket` 补镜像发布能力
-- 让交付层引用明确的镜像来源
+- 让交付层固定引用明确的镜像来源
+- 约定版本标签策略
 
 ## 3. 梳理 WordPress 可交付资产
 
@@ -64,6 +65,10 @@
 
 第二版 compose 的目标不是更复杂，
 而是更贴近现有组件真实来源。
+
+当前已经具备一个真实来源示例：
+
+- `ghcr.io/futuredecade/fd-websocket:latest`
 
 ## 6. 最后才做 install.sh 增强
 

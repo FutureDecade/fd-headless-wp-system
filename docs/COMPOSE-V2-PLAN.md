@@ -98,7 +98,7 @@
 
 ## 第二版之后的顺序
 
-1. 为 `fd-websocket` 增加镜像发布
+1. 固定 `fd-websocket` 的 GHCR 镜像引用策略
 2. 设计 WordPress 主题/插件进入交付系统的制品方式
 3. 设计 staging 验证方案
 4. 再做第三版 compose

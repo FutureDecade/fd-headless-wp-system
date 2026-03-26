@@ -17,10 +17,11 @@
 - 组件名：`fd-websocket`
 - 当前来源：独立 Git 仓库
 - 当前仓库：`https://github.com/FutureDecade/fd-websocket`
-- 当前状态：已独立入 Git，并具备基础 CI
+- 当前状态：已独立入 Git，并具备基础 CI 与 GHCR 镜像发布
 - 未来在交付仓库中的引用方式：
-  - 短期先保留镜像占位
-  - 中期补正式镜像发布
+  - 短期直接引用 GHCR 镜像
+  - 中期补版本标签治理
+  - 当前镜像：`ghcr.io/futuredecade/fd-websocket:latest`
 
 ### WordPress
 
