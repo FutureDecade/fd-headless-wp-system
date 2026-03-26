@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  validate:
+    name: Validate Delivery Repo
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare env file
+        run: cp .env.example .env
+
+      - name: Validate shell scripts
+        run: |
+          bash -n scripts/bootstrap-env.sh
+          bash -n scripts/preflight-check.sh
+          bash -n scripts/install.sh
+
+      - name: Generate bootstrap env
+        run: |
+          rm -f .env
+          bash scripts/bootstrap-env.sh
+
+      - name: Validate docker compose
+        run: docker compose --env-file .env config >/dev/null
