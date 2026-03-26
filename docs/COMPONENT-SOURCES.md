@@ -15,11 +15,12 @@
 ### WebSocket
 
 - 组件名：`fd-websocket`
-- 当前来源：本地代码目录
-- 当前状态：未独立入 Git
+- 当前来源：独立 Git 仓库
+- 当前仓库：`https://github.com/FutureDecade/fd-websocket`
+- 当前状态：已独立入 Git，并具备基础 CI
 - 未来在交付仓库中的引用方式：
-  - 短期可用镜像占位
-  - 中期应补独立 Git 仓库和镜像发布
+  - 短期先保留镜像占位
+  - 中期补正式镜像发布
 
 ### WordPress
 
