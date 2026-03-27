@@ -62,7 +62,7 @@ wait_for_database() {
   local delay=3
 
   for ((i = 1; i <= attempts; i++)); do
-    if run_wp db check >/dev/null 2>&1; then
+    if "${compose_base[@]}" exec -T wordpress php -r '$host = getenv("WORDPRESS_DB_HOST") ?: "db"; $db = getenv("WORDPRESS_DB_NAME"); $user = getenv("WORDPRESS_DB_USER"); $pass = getenv("WORDPRESS_DB_PASSWORD"); [$hostname, $port] = array_pad(explode(":", $host, 2), 2, 3306); $mysqli = @new mysqli($hostname, $user, $pass, $db, (int) $port); if ($mysqli->connect_errno) { fwrite(STDERR, $mysqli->connect_error . PHP_EOL); exit(1); } $mysqli->close();' >/dev/null 2>&1; then
       return 0
     fi
     sleep "${delay}"
