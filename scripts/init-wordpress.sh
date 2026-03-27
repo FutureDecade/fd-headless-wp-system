@@ -127,6 +127,24 @@ ensure_permalink_structure() {
   run_wp rewrite flush --hard >/dev/null
 }
 
+flush_graphql_schema_cache() {
+  echo "Flushing GraphQL schema cache..."
+  run_wp eval 'global $wpdb;
+if ( function_exists( "do_graphql_request" ) ) {
+    do_action( "graphql_flush_schema_cache" );
+}
+$queries = [
+    "DELETE FROM {$wpdb->options} WHERE option_name LIKE \"_transient_graphql%\" OR option_name LIKE \"_transient_timeout_graphql%\" OR option_name LIKE \"_transient_wpgraphql%\" OR option_name LIKE \"_transient_timeout_wpgraphql%\"",
+    "DELETE FROM {$wpdb->options} WHERE option_name LIKE \"_transient_acf_graphql%\" OR option_name LIKE \"_transient_timeout_acf_graphql%\"",
+];
+foreach ( $queries as $query ) {
+    $wpdb->query( $query );
+}
+delete_option( "graphql_schema_version" );
+delete_option( "wpgraphql_schema_entry_point" );
+wp_cache_flush();' >/dev/null
+}
+
 wait_for_wp_config
 wait_for_database
 
@@ -164,5 +182,6 @@ if [[ "${WORDPRESS_ACTIVATE_CORE_PLUGINS}" == "true" ]]; then
 fi
 
 ensure_permalink_structure "${WORDPRESS_PERMALINK_STRUCTURE}"
+flush_graphql_schema_cache
 
 echo "WordPress init completed."

@@ -191,11 +191,12 @@ validate_http_endpoints() {
   echo "Checking websocket..."
   curl -fsS -H "Host: ${WS_DOMAIN}" "http://127.0.0.1:${HTTP_PORT}/health" >/dev/null
 
-  echo "Checking GraphQL schema..."
-  graphql_response="$(curl -fsS --get -H "Host: ${ADMIN_DOMAIN}" --data-urlencode 'query={__type(name:"RootQuery"){fields{name}}}' "http://127.0.0.1:${HTTP_PORT}/graphql")"
+  echo "Checking GraphQL route mapping..."
+  graphql_response="$(curl -fsS --get -H "Host: ${ADMIN_DOMAIN}" --data-urlencode 'query={slugMappingTable{slug type id}}' "http://127.0.0.1:${HTTP_PORT}/graphql")"
 
-  if [[ "${graphql_response}" != *'"resolveSinglePathSlug"'* ]]; then
-    echo "Expected GraphQL field is missing: resolveSinglePathSlug"
+  if [[ "${graphql_response}" == *'"errors"'* ]]; then
+    echo "GraphQL route mapping check failed."
+    printf '%s\n' "${graphql_response}"
     exit 1
   fi
 }
