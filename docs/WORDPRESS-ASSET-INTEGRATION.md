@@ -82,7 +82,7 @@
 
 - 短期先用 zip 制品把 WordPress 资产来源固定住
 - 当前内部 staging 路径：GitHub Release zip -> `runtime/wp-content` -> compose override bind mount
-- 当前初始化路径：core services -> `wp-cli` -> `core install` / theme activate / plugin activate
+- 当前初始化路径：core services -> `wp-cli` -> `core install` / 安装 `WPGraphQL` / theme activate / plugin activate
 - 中期再决定交付仓库到底是“下载 zip 安装”还是“构建自定义 WordPress 镜像”
 - 长期再把 WordPress runtime 做成正式交付镜像
 

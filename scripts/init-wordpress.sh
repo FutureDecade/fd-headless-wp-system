@@ -18,6 +18,8 @@ WORDPRESS_RUN_INIT="${WORDPRESS_RUN_INIT:-false}"
 WORDPRESS_FETCH_RELEASE_ASSETS="${WORDPRESS_FETCH_RELEASE_ASSETS:-false}"
 WORDPRESS_ACTIVATE_THEME="${WORDPRESS_ACTIVATE_THEME:-true}"
 WORDPRESS_ACTIVATE_CORE_PLUGINS="${WORDPRESS_ACTIVATE_CORE_PLUGINS:-true}"
+WORDPRESS_INSTALL_WPGRAPHQL="${WORDPRESS_INSTALL_WPGRAPHQL:-true}"
+WORDPRESS_WPGRAPHQL_SOURCE="${WORDPRESS_WPGRAPHQL_SOURCE:-wp-graphql}"
 PUBLIC_SCHEME="${PUBLIC_SCHEME:-http}"
 
 if [[ "${WORDPRESS_RUN_INIT}" != "true" ]]; then
@@ -76,7 +78,7 @@ activate_plugin_if_present() {
   local plugin_slug="$1"
 
   if ! run_wp plugin is-installed "${plugin_slug}" >/dev/null 2>&1; then
-    echo "Plugin not found in runtime assets: ${plugin_slug}"
+    echo "Plugin not installed: ${plugin_slug}"
     return 0
   fi
 
@@ -87,6 +89,19 @@ activate_plugin_if_present() {
 
   echo "Activating plugin: ${plugin_slug}"
   run_wp plugin activate "${plugin_slug}" >/dev/null
+}
+
+install_plugin_if_missing() {
+  local plugin_slug="$1"
+  local plugin_source="$2"
+
+  if run_wp plugin is-installed "${plugin_slug}" >/dev/null 2>&1; then
+    echo "Plugin already installed: ${plugin_slug}"
+    return 0
+  fi
+
+  echo "Installing plugin: ${plugin_slug} (source: ${plugin_source})"
+  run_wp plugin install "${plugin_source}" >/dev/null
 }
 
 wait_for_wp_config
@@ -112,6 +127,11 @@ if [[ "${WORDPRESS_ACTIVATE_THEME}" == "true" ]] && run_wp theme is-installed fd
   else
     echo "Theme already active: fd-theme"
   fi
+fi
+
+if [[ "${WORDPRESS_INSTALL_WPGRAPHQL}" == "true" ]]; then
+  install_plugin_if_missing "wp-graphql" "${WORDPRESS_WPGRAPHQL_SOURCE}"
+  activate_plugin_if_present "wp-graphql"
 fi
 
 if [[ "${WORDPRESS_ACTIVATE_CORE_PLUGINS}" == "true" ]]; then
