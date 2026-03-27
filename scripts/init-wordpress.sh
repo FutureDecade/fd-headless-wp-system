@@ -18,6 +18,7 @@ WORDPRESS_RUN_INIT="${WORDPRESS_RUN_INIT:-false}"
 WORDPRESS_FETCH_RELEASE_ASSETS="${WORDPRESS_FETCH_RELEASE_ASSETS:-false}"
 WORDPRESS_ACTIVATE_THEME="${WORDPRESS_ACTIVATE_THEME:-true}"
 WORDPRESS_ACTIVATE_CORE_PLUGINS="${WORDPRESS_ACTIVATE_CORE_PLUGINS:-true}"
+PUBLIC_SCHEME="${PUBLIC_SCHEME:-http}"
 
 if [[ "${WORDPRESS_RUN_INIT}" != "true" ]]; then
   echo "WORDPRESS_RUN_INIT is not enabled. Skipping WordPress init."
@@ -96,7 +97,7 @@ if run_wp core is-installed >/dev/null 2>&1; then
 else
   echo "Running initial WordPress install..."
   run_wp core install \
-    --url="https://${ADMIN_DOMAIN}" \
+    --url="${PUBLIC_SCHEME}://${ADMIN_DOMAIN}" \
     --title="${WORDPRESS_TITLE}" \
     --admin_user="${WORDPRESS_ADMIN_USER}" \
     --admin_password="${WORDPRESS_ADMIN_PASSWORD}" \

@@ -112,6 +112,7 @@ docker compose --env-file .env config
 
 - 当前 `FRONTEND_IMAGE` 可以直接替换成真实前端镜像
 - 当前 `WEBSOCKET_IMAGE` 已可直接使用正式 GHCR 镜像
+- 测试环境建议使用 `PUBLIC_SCHEME=http` 和 `WEBSOCKET_PUBLIC_SCHEME=ws`
 - 如果要在内部 staging 拉取私有 WordPress release 资产，需要把 `WORDPRESS_FETCH_RELEASE_ASSETS=true`
 - 这版仓库的目标是先固定系统边界，不是立即完成生产可用的一键部署
 
