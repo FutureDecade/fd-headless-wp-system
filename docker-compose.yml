@@ -33,6 +33,7 @@ services:
       WORDPRESS_CONFIG_EXTRA: |
         define('WP_HOME', '${PUBLIC_SCHEME}://${ADMIN_DOMAIN}');
         define('WP_SITEURL', '${PUBLIC_SCHEME}://${ADMIN_DOMAIN}');
+        define('FD_FRONTEND_URL', '${PUBLIC_SCHEME}://${FRONTEND_DOMAIN}');
         define('WP_REDIS_HOST', 'redis');
     volumes:
       - wordpress_data:/var/www/html
@@ -60,6 +61,7 @@ services:
       WORDPRESS_CONFIG_EXTRA: |
         define('WP_HOME', '${PUBLIC_SCHEME}://${ADMIN_DOMAIN}');
         define('WP_SITEURL', '${PUBLIC_SCHEME}://${ADMIN_DOMAIN}');
+        define('FD_FRONTEND_URL', '${PUBLIC_SCHEME}://${FRONTEND_DOMAIN}');
         define('WP_REDIS_HOST', 'redis');
     volumes:
       - wordpress_data:/var/www/html

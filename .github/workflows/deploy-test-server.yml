@@ -26,6 +26,12 @@ on:
       fd_commerce_release_tag:
         description: fd-commerce release tag, blank means keep current value
         required: false
+      frontend_image:
+        description: full frontend image reference, blank means keep current value
+        required: false
+      websocket_image:
+        description: full websocket image reference, blank means keep current value
+        required: false
 
 concurrency:
   group: fd-headless-wp-system-test-server
@@ -47,6 +53,8 @@ jobs:
       FD_MEMBER_RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.fd_member_release_tag || '' }}
       FD_PAYMENT_RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.fd_payment_release_tag || '' }}
       FD_COMMERCE_RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.fd_commerce_release_tag || '' }}
+      FRONTEND_IMAGE: ${{ github.event_name == 'workflow_dispatch' && inputs.frontend_image || '' }}
+      WEBSOCKET_IMAGE: ${{ github.event_name == 'workflow_dispatch' && inputs.websocket_image || '' }}
       ACR_USERNAME: ${{ secrets.ACR_USERNAME }}
       ACR_PASSWORD: ${{ secrets.ACR_PASSWORD }}
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
@@ -81,13 +89,20 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
-          envs: ACR_USERNAME,ACR_PASSWORD,GH_TOKEN,FORCE_WORDPRESS_ASSET_FETCH,FD_THEME_RELEASE_TAG,FD_MEMBER_RELEASE_TAG,FD_PAYMENT_RELEASE_TAG,FD_COMMERCE_RELEASE_TAG
+          envs: ACR_USERNAME,ACR_PASSWORD,GH_TOKEN,FORCE_WORDPRESS_ASSET_FETCH,FD_THEME_RELEASE_TAG,FD_MEMBER_RELEASE_TAG,FD_PAYMENT_RELEASE_TAG,FD_COMMERCE_RELEASE_TAG,FRONTEND_IMAGE,WEBSOCKET_IMAGE
           command_timeout: 40m
           script: |
             set -e
             cd /opt/fd-headless-wp-system
             git fetch origin main
             git reset --hard origin/main
+
+            if [ -n "$FRONTEND_IMAGE" ] || [ -n "$WEBSOCKET_IMAGE" ]; then
+              ENV_FILE=.env \
+              FRONTEND_IMAGE="$FRONTEND_IMAGE" \
+              WEBSOCKET_IMAGE="$WEBSOCKET_IMAGE" \
+              bash scripts/update-runtime-images.sh
+            fi
 
             if [ -n "$FD_THEME_RELEASE_TAG" ] || [ -n "$FD_MEMBER_RELEASE_TAG" ] || [ -n "$FD_PAYMENT_RELEASE_TAG" ] || [ -n "$FD_COMMERCE_RELEASE_TAG" ]; then
               ENV_FILE=.env \
