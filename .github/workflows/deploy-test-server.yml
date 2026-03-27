@@ -1,13 +1,6 @@
 name: Deploy Test Server
 
 on:
-  workflow_run:
-    workflows:
-      - CI
-    types:
-      - completed
-    branches:
-      - main
   workflow_dispatch:
     inputs:
       force_wordpress_asset_fetch:
@@ -41,26 +34,19 @@ jobs:
   deploy:
     name: Update Test Server
     runs-on: ubuntu-latest
-    if: >
-      github.event_name == 'workflow_dispatch' ||
-      (
-        github.event.workflow_run.conclusion == 'success' &&
-        github.event.workflow_run.event == 'push'
-      )
     env:
-      FORCE_WORDPRESS_ASSET_FETCH: ${{ github.event_name == 'workflow_dispatch' && inputs.force_wordpress_asset_fetch || 'false' }}
-      FD_THEME_RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.fd_theme_release_tag || '' }}
-      FD_MEMBER_RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.fd_member_release_tag || '' }}
-      FD_PAYMENT_RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.fd_payment_release_tag || '' }}
-      FD_COMMERCE_RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.fd_commerce_release_tag || '' }}
-      FRONTEND_IMAGE: ${{ github.event_name == 'workflow_dispatch' && inputs.frontend_image || '' }}
-      WEBSOCKET_IMAGE: ${{ github.event_name == 'workflow_dispatch' && inputs.websocket_image || '' }}
+      FORCE_WORDPRESS_ASSET_FETCH: ${{ inputs.force_wordpress_asset_fetch || 'false' }}
+      FD_THEME_RELEASE_TAG: ${{ inputs.fd_theme_release_tag || '' }}
+      FD_MEMBER_RELEASE_TAG: ${{ inputs.fd_member_release_tag || '' }}
+      FD_PAYMENT_RELEASE_TAG: ${{ inputs.fd_payment_release_tag || '' }}
+      FD_COMMERCE_RELEASE_TAG: ${{ inputs.fd_commerce_release_tag || '' }}
+      FRONTEND_IMAGE: ${{ inputs.frontend_image || '' }}
+      WEBSOCKET_IMAGE: ${{ inputs.websocket_image || '' }}
       ACR_USERNAME: ${{ secrets.ACR_USERNAME }}
       ACR_PASSWORD: ${{ secrets.ACR_PASSWORD }}
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
     steps:
       - name: Validate requested release tags
-        if: github.event_name == 'workflow_dispatch'
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
