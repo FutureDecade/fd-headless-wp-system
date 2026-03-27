@@ -121,6 +121,8 @@ docker compose --env-file .env config
 - 如果 WordPress 资产版本没有变化，`scripts/update-stack.sh` 会自动跳过重复下载；只有需要强制重拉时，才把 `FORCE_WORDPRESS_ASSET_FETCH=true`
 - 测试服务器更新建议直接运行 `bash scripts/update-stack.sh`
 - 如果前端或推送服务镜像在阿里云 ACR 私有仓库，第一次更新时可这样运行：`ACR_USERNAME=你的账号 ACR_PASSWORD=你的密码 bash scripts/update-stack.sh`
+- 如果只想更新 `fd-theme`、`fd-member`、`fd-payment`、`fd-commerce` 的 release tag，可以运行 `FD_THEME_RELEASE_TAG=v1.0.3 bash scripts/update-wordpress-release-tags.sh`
+- GitHub Actions 里的 `Deploy Test Server` 现在支持手动填写这些 release tag，服务器会先改 `.env`，再自动重拉并更新
 - 这版仓库的目标是先固定系统边界，不是立即完成生产可用的一键部署
 
 ## 下一步路线

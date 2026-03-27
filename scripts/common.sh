@@ -27,3 +27,35 @@ load_env_file() {
     export "${key}=${value}"
   done < "${env_file}"
 }
+
+set_env_value() {
+  local env_file="$1"
+  local key="$2"
+  local value="$3"
+  local tmp_file=""
+
+  tmp_file="$(mktemp "${env_file}.XXXXXX")"
+
+  awk -v key="${key}" -v value="${value}" '
+    BEGIN {
+      updated = 0
+    }
+    $0 ~ ("^" key "=") {
+      if (!updated) {
+        print key "=" value
+        updated = 1
+      }
+      next
+    }
+    {
+      print
+    }
+    END {
+      if (!updated) {
+        print key "=" value
+      }
+    }
+  ' "${env_file}" > "${tmp_file}"
+
+  mv "${tmp_file}" "${env_file}"
+}

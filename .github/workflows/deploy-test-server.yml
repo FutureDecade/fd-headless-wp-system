@@ -14,6 +14,18 @@ on:
         description: Force re-download WordPress release assets
         required: true
         default: "false"
+      fd_theme_release_tag:
+        description: fd-theme release tag, blank means keep current value
+        required: false
+      fd_member_release_tag:
+        description: fd-member release tag, blank means keep current value
+        required: false
+      fd_payment_release_tag:
+        description: fd-payment release tag, blank means keep current value
+        required: false
+      fd_commerce_release_tag:
+        description: fd-commerce release tag, blank means keep current value
+        required: false
 
 concurrency:
   group: fd-headless-wp-system-test-server
@@ -31,23 +43,62 @@ jobs:
       )
     env:
       FORCE_WORDPRESS_ASSET_FETCH: ${{ github.event_name == 'workflow_dispatch' && inputs.force_wordpress_asset_fetch || 'false' }}
+      FD_THEME_RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.fd_theme_release_tag || '' }}
+      FD_MEMBER_RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.fd_member_release_tag || '' }}
+      FD_PAYMENT_RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.fd_payment_release_tag || '' }}
+      FD_COMMERCE_RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.fd_commerce_release_tag || '' }}
       ACR_USERNAME: ${{ secrets.ACR_USERNAME }}
       ACR_PASSWORD: ${{ secrets.ACR_PASSWORD }}
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
     steps:
+      - name: Validate requested release tags
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          set -e
+
+          validate_release() {
+            local repo="$1"
+            local tag="$2"
+
+            if [ -z "$tag" ]; then
+              return 0
+            fi
+
+            echo "Checking $repo $tag"
+            gh release view "$tag" -R "FutureDecade/$repo" >/dev/null
+          }
+
+          validate_release fd-theme "$FD_THEME_RELEASE_TAG"
+          validate_release fd-member "$FD_MEMBER_RELEASE_TAG"
+          validate_release fd-payment "$FD_PAYMENT_RELEASE_TAG"
+          validate_release fd-commerce "$FD_COMMERCE_RELEASE_TAG"
+
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
-          envs: ACR_USERNAME,ACR_PASSWORD,GH_TOKEN,FORCE_WORDPRESS_ASSET_FETCH
+          envs: ACR_USERNAME,ACR_PASSWORD,GH_TOKEN,FORCE_WORDPRESS_ASSET_FETCH,FD_THEME_RELEASE_TAG,FD_MEMBER_RELEASE_TAG,FD_PAYMENT_RELEASE_TAG,FD_COMMERCE_RELEASE_TAG
           command_timeout: 40m
           script: |
             set -e
             cd /opt/fd-headless-wp-system
             git fetch origin main
             git reset --hard origin/main
+
+            if [ -n "$FD_THEME_RELEASE_TAG" ] || [ -n "$FD_MEMBER_RELEASE_TAG" ] || [ -n "$FD_PAYMENT_RELEASE_TAG" ] || [ -n "$FD_COMMERCE_RELEASE_TAG" ]; then
+              ENV_FILE=.env \
+              FD_THEME_RELEASE_TAG="$FD_THEME_RELEASE_TAG" \
+              FD_MEMBER_RELEASE_TAG="$FD_MEMBER_RELEASE_TAG" \
+              FD_PAYMENT_RELEASE_TAG="$FD_PAYMENT_RELEASE_TAG" \
+              FD_COMMERCE_RELEASE_TAG="$FD_COMMERCE_RELEASE_TAG" \
+              bash scripts/update-wordpress-release-tags.sh
+              FORCE_WORDPRESS_ASSET_FETCH=true
+            fi
+
             ACR_USERNAME="$ACR_USERNAME" \
             ACR_PASSWORD="$ACR_PASSWORD" \
             GH_TOKEN="$GH_TOKEN" \
