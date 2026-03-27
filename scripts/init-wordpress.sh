@@ -39,7 +39,7 @@ compose_base=(docker compose "${compose_files[@]}" --env-file "${ENV_FILE}")
 compose_wpcli=(docker compose "${compose_files[@]}" --profile tools --env-file "${ENV_FILE}")
 
 run_wp() {
-  "${compose_wpcli[@]}" run --rm -T wpcli "$@" --allow-root
+  "${compose_wpcli[@]}" run --rm -T wpcli wp "$@" --allow-root
 }
 
 wait_for_wp_config() {
