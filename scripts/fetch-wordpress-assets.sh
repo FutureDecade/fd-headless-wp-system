@@ -15,9 +15,66 @@ fi
 load_env_file "${ENV_FILE}"
 
 WORDPRESS_FETCH_RELEASE_ASSETS="${WORDPRESS_FETCH_RELEASE_ASSETS:-false}"
+FORCE_WORDPRESS_ASSET_FETCH="${FORCE_WORDPRESS_ASSET_FETCH:-false}"
 
 if [[ "${WORDPRESS_FETCH_RELEASE_ASSETS}" != "true" ]]; then
   echo "WORDPRESS_FETCH_RELEASE_ASSETS is not enabled. Skipping fetch."
+  exit 0
+fi
+
+WORDPRESS_RELEASE_OWNER="${WORDPRESS_RELEASE_OWNER:-FutureDecade}"
+FD_THEME_RELEASE_TAG="${FD_THEME_RELEASE_TAG:-v1.0.0}"
+FD_MEMBER_RELEASE_TAG="${FD_MEMBER_RELEASE_TAG:-v1.0.0}"
+FD_PAYMENT_RELEASE_TAG="${FD_PAYMENT_RELEASE_TAG:-v1.0.0}"
+FD_COMMERCE_RELEASE_TAG="${FD_COMMERCE_RELEASE_TAG:-v1.0.0}"
+
+RUNTIME_ROOT="${ROOT_DIR}/runtime/wp-content"
+THEMES_DIR="${RUNTIME_ROOT}/themes"
+PLUGINS_DIR="${RUNTIME_ROOT}/plugins"
+LOCK_FILE="${ROOT_DIR}/runtime/wordpress-assets.lock"
+mkdir -p "${ROOT_DIR}/tmp"
+TMP_DIR="$(mktemp -d "${ROOT_DIR}/tmp/wp-assets.XXXXXX")"
+
+cleanup() {
+  rm -rf "${TMP_DIR}"
+}
+
+trap cleanup EXIT
+
+mkdir -p "${THEMES_DIR}" "${PLUGINS_DIR}"
+
+desired_assets_lock() {
+  cat <<EOF
+fd-theme=${FD_THEME_RELEASE_TAG}
+fd-member=${FD_MEMBER_RELEASE_TAG}
+fd-payment=${FD_PAYMENT_RELEASE_TAG}
+fd-commerce=${FD_COMMERCE_RELEASE_TAG}
+EOF
+}
+
+assets_already_match() {
+  if [[ ! -f "${LOCK_FILE}" ]]; then
+    return 1
+  fi
+
+  if [[ ! -d "${THEMES_DIR}/fd-theme" ]]; then
+    return 1
+  fi
+
+  for plugin_dir in fd-member fd-payment fd-commerce; do
+    if [[ ! -d "${PLUGINS_DIR}/${plugin_dir}" ]]; then
+      return 1
+    fi
+  done
+
+  local current_lock
+  current_lock="$(cat "${LOCK_FILE}")"
+
+  [[ "${current_lock}" == "$(desired_assets_lock)" ]]
+}
+
+if [[ "${FORCE_WORDPRESS_ASSET_FETCH}" != "true" ]] && assets_already_match; then
+  echo "WordPress release assets already match requested tags. Skipping fetch."
   exit 0
 fi
 
@@ -35,26 +92,6 @@ if ! gh auth status >/dev/null 2>&1; then
   echo "GitHub CLI is not authenticated. Run: gh auth login"
   exit 1
 fi
-
-WORDPRESS_RELEASE_OWNER="${WORDPRESS_RELEASE_OWNER:-FutureDecade}"
-FD_THEME_RELEASE_TAG="${FD_THEME_RELEASE_TAG:-v1.0.0}"
-FD_MEMBER_RELEASE_TAG="${FD_MEMBER_RELEASE_TAG:-v1.0.0}"
-FD_PAYMENT_RELEASE_TAG="${FD_PAYMENT_RELEASE_TAG:-v1.0.0}"
-FD_COMMERCE_RELEASE_TAG="${FD_COMMERCE_RELEASE_TAG:-v1.0.0}"
-
-RUNTIME_ROOT="${ROOT_DIR}/runtime/wp-content"
-THEMES_DIR="${RUNTIME_ROOT}/themes"
-PLUGINS_DIR="${RUNTIME_ROOT}/plugins"
-mkdir -p "${ROOT_DIR}/tmp"
-TMP_DIR="$(mktemp -d "${ROOT_DIR}/tmp/wp-assets.XXXXXX")"
-
-cleanup() {
-  rm -rf "${TMP_DIR}"
-}
-
-trap cleanup EXIT
-
-mkdir -p "${THEMES_DIR}" "${PLUGINS_DIR}"
 
 download_and_extract() {
   local slug="$1"
@@ -91,11 +128,6 @@ download_and_extract "fd-member" "${FD_MEMBER_RELEASE_TAG}" "${PLUGINS_DIR}/fd-m
 download_and_extract "fd-payment" "${FD_PAYMENT_RELEASE_TAG}" "${PLUGINS_DIR}/fd-payment"
 download_and_extract "fd-commerce" "${FD_COMMERCE_RELEASE_TAG}" "${PLUGINS_DIR}/fd-commerce"
 
-cat > "${ROOT_DIR}/runtime/wordpress-assets.lock" <<EOF
-fd-theme=${FD_THEME_RELEASE_TAG}
-fd-member=${FD_MEMBER_RELEASE_TAG}
-fd-payment=${FD_PAYMENT_RELEASE_TAG}
-fd-commerce=${FD_COMMERCE_RELEASE_TAG}
-EOF
+desired_assets_lock > "${LOCK_FILE}"
 
 echo "WordPress release assets are ready under ${ROOT_DIR}/runtime/wp-content"

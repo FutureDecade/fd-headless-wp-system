@@ -49,27 +49,78 @@ load_env_file "${ENV_FILE}"
 
 WORDPRESS_FETCH_RELEASE_ASSETS="${WORDPRESS_FETCH_RELEASE_ASSETS:-false}"
 WORDPRESS_RUN_INIT="${WORDPRESS_RUN_INIT:-false}"
+FORCE_WORDPRESS_ASSET_FETCH="${FORCE_WORDPRESS_ASSET_FETCH:-false}"
+FD_THEME_RELEASE_TAG="${FD_THEME_RELEASE_TAG:-v1.0.0}"
+FD_MEMBER_RELEASE_TAG="${FD_MEMBER_RELEASE_TAG:-v1.0.0}"
+FD_PAYMENT_RELEASE_TAG="${FD_PAYMENT_RELEASE_TAG:-v1.0.0}"
+FD_COMMERCE_RELEASE_TAG="${FD_COMMERCE_RELEASE_TAG:-v1.0.0}"
 
 compose_files=(
   -f "${ROOT_DIR}/docker-compose.yml"
 )
 
-if [[ "${WORDPRESS_FETCH_RELEASE_ASSETS}" == "true" ]]; then
-  for cmd in gh unzip; do
-    if ! command -v "${cmd}" >/dev/null 2>&1; then
-      echo "Missing required command for WordPress asset fetch: ${cmd}"
-      exit 1
+need_wordpress_asset_fetch() {
+  if [[ "${WORDPRESS_FETCH_RELEASE_ASSETS}" != "true" ]]; then
+    return 1
+  fi
+
+  if [[ "${FORCE_WORDPRESS_ASSET_FETCH}" == "true" ]]; then
+    return 0
+  fi
+
+  local lock_file="${ROOT_DIR}/runtime/wordpress-assets.lock"
+
+  if [[ ! -f "${lock_file}" ]]; then
+    return 0
+  fi
+
+  if [[ ! -d "${ROOT_DIR}/runtime/wp-content/themes/fd-theme" ]]; then
+    return 0
+  fi
+
+  for plugin_dir in fd-member fd-payment fd-commerce; do
+    if [[ ! -d "${ROOT_DIR}/runtime/wp-content/plugins/${plugin_dir}" ]]; then
+      return 0
     fi
   done
 
-  if ! gh auth status >/dev/null 2>&1; then
-    echo "GitHub CLI is not authenticated. Run: gh auth login"
-    exit 1
+  local expected_lock
+  expected_lock="$(cat <<EOF
+fd-theme=${FD_THEME_RELEASE_TAG}
+fd-member=${FD_MEMBER_RELEASE_TAG}
+fd-payment=${FD_PAYMENT_RELEASE_TAG}
+fd-commerce=${FD_COMMERCE_RELEASE_TAG}
+EOF
+)"
+
+  local current_lock
+  current_lock="$(cat "${lock_file}")"
+
+  if [[ "${current_lock}" != "${expected_lock}" ]]; then
+    return 0
   fi
 
+  return 1
+}
+
+if [[ "${WORDPRESS_FETCH_RELEASE_ASSETS}" == "true" ]]; then
   compose_files+=(
     -f "${ROOT_DIR}/compose/wordpress-assets.override.yml"
   )
+
+  if need_wordpress_asset_fetch; then
+    for cmd in gh unzip; do
+      if ! command -v "${cmd}" >/dev/null 2>&1; then
+        echo "Missing required command for WordPress asset fetch: ${cmd}"
+        exit 1
+      fi
+    done
+
+    if ! gh auth status >/dev/null 2>&1; then
+      echo "GitHub CLI is not authenticated. Run: gh auth login"
+      exit 1
+    fi
+  fi
 fi
 
 if [[ "${WORDPRESS_RUN_INIT}" == "true" ]]; then

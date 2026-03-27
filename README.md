@@ -105,6 +105,7 @@ bash scripts/preflight-check.sh
 # 如果需要 WordPress release 资产，先把 .env 里的 WORDPRESS_FETCH_RELEASE_ASSETS 改成 true
 # 如果需要自动完成首次安装，先把 .env 里的 WORDPRESS_RUN_INIT 改成 true
 bash scripts/fetch-wordpress-assets.sh
+bash scripts/update-stack.sh
 docker compose --env-file .env config
 ```
 
@@ -117,6 +118,9 @@ docker compose --env-file .env config
 - 初始化还会自动设置 `WORDPRESS_PERMALINK_STRUCTURE`，确保 `/graphql` 这种地址能直接使用
 - 如果服务器不能直接从 WordPress 官方源下载插件，可以把 `WORDPRESS_WPGRAPHQL_SOURCE` 改成你自己的 zip 地址
 - 如果要在测试服务器拉取私有 WordPress release 资产，需要把 `WORDPRESS_FETCH_RELEASE_ASSETS=true`
+- 如果 WordPress 资产版本没有变化，`scripts/update-stack.sh` 会自动跳过重复下载；只有需要强制重拉时，才把 `FORCE_WORDPRESS_ASSET_FETCH=true`
+- 测试服务器更新建议直接运行 `bash scripts/update-stack.sh`
+- 如果前端或推送服务镜像在阿里云 ACR 私有仓库，第一次更新时可这样运行：`ACR_USERNAME=你的账号 ACR_PASSWORD=你的密码 bash scripts/update-stack.sh`
 - 这版仓库的目标是先固定系统边界，不是立即完成生产可用的一键部署
 
 ## 下一步路线
