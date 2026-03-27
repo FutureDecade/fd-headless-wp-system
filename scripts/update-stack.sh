@@ -19,6 +19,7 @@ WORDPRESS_FETCH_RELEASE_ASSETS="${WORDPRESS_FETCH_RELEASE_ASSETS:-false}"
 WORDPRESS_RUN_INIT="${WORDPRESS_RUN_INIT:-false}"
 ACR_USERNAME="${ACR_USERNAME:-}"
 ACR_PASSWORD="${ACR_PASSWORD:-}"
+HTTP_PORT="${HTTP_PORT:-80}"
 
 compose_files=(
   -f "${ROOT_DIR}/docker-compose.yml"
@@ -167,6 +168,38 @@ show_summary() {
   "${compose_base[@]}" ps
 }
 
+verify_wordpress_assets_mounts() {
+  if [[ "${WORDPRESS_FETCH_RELEASE_ASSETS}" != "true" ]]; then
+    return 0
+  fi
+
+  echo "Verifying WordPress theme and plugin mounts..."
+  "${compose_base[@]}" exec -T wordpress sh -lc '
+    test -f /var/www/html/wp-content/themes/fd-theme/style.css &&
+    test -d /var/www/html/wp-content/plugins/fd-member &&
+    test -d /var/www/html/wp-content/plugins/fd-payment &&
+    test -d /var/www/html/wp-content/plugins/fd-commerce
+  '
+}
+
+validate_http_endpoints() {
+  local graphql_response=""
+
+  echo "Checking frontend..."
+  curl -fsS -I -H "Host: ${FRONTEND_DOMAIN}" "http://127.0.0.1:${HTTP_PORT}/" >/dev/null
+
+  echo "Checking websocket..."
+  curl -fsS -H "Host: ${WS_DOMAIN}" "http://127.0.0.1:${HTTP_PORT}/health" >/dev/null
+
+  echo "Checking GraphQL schema..."
+  graphql_response="$(curl -fsS --get -H "Host: ${ADMIN_DOMAIN}" --data-urlencode 'query={__type(name:"RootQuery"){fields{name}}}' "http://127.0.0.1:${HTTP_PORT}/graphql")"
+
+  if [[ "${graphql_response}" != *'"resolveSinglePathSlug"'* ]]; then
+    echo "Expected GraphQL field is missing: resolveSinglePathSlug"
+    exit 1
+  fi
+}
+
 echo "Starting safe stack update..."
 login_acr_if_needed
 
@@ -180,8 +213,10 @@ fi
 pull_required_images
 
 echo "Updating core services..."
-"${compose_base[@]}" up -d db redis wordpress
+"${compose_base[@]}" up -d db redis
+"${compose_base[@]}" up -d --force-recreate wordpress
 wait_for_service wordpress 30 3
+verify_wordpress_assets_mounts
 
 if [[ "${WORDPRESS_RUN_INIT}" == "true" ]]; then
   echo "Running WordPress init..."
@@ -189,10 +224,11 @@ if [[ "${WORDPRESS_RUN_INIT}" == "true" ]]; then
 fi
 
 echo "Updating app services..."
-"${compose_base[@]}" up -d frontend websocket nginx
+"${compose_base[@]}" up -d --force-recreate frontend websocket nginx
 wait_for_service frontend 40 3
 wait_for_service websocket 40 3
 wait_for_service nginx 20 2
+validate_http_endpoints
 
 show_summary
 echo
