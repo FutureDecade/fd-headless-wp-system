@@ -111,6 +111,7 @@ docker compose --env-file .env config
 
 注意：
 
+- 先在 GitHub Actions 里手动运行一次 `Sync Base Images`，把 `mariadb`、`redis`、`wordpress`、`wpcli`、`nginx` 同步到自己的 ACR
 - 交付时优先使用阿里云 ACR 镜像
 - 最稳妥的方式是给 `FRONTEND_IMAGE` 和 `WEBSOCKET_IMAGE` 都写入固定 tag，不要直接依赖 `latest`
 - 测试环境建议使用 `PUBLIC_SCHEME=http` 和 `WEBSOCKET_PUBLIC_SCHEME=ws`

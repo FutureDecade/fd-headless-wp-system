@@ -97,6 +97,8 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
 
+            ENV_FILE=.env bash scripts/migrate-base-images-to-acr.sh
+
             if [ -n "$FRONTEND_IMAGE" ] || [ -n "$WEBSOCKET_IMAGE" ]; then
               ENV_FILE=.env \
               FRONTEND_IMAGE="$FRONTEND_IMAGE" \

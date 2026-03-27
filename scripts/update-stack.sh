@@ -126,7 +126,7 @@ login_acr_if_needed() {
 
 pull_required_images() {
   echo "Pulling app images..."
-  "${compose_base[@]}" pull wordpress frontend websocket nginx
+  "${compose_base[@]}" pull db redis wordpress frontend websocket nginx
 
   if [[ "${WORDPRESS_RUN_INIT}" == "true" ]]; then
     echo "Pulling wpcli image..."

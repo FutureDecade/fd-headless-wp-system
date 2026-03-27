@@ -82,7 +82,23 @@ git clone https://github.com/FutureDecade/fd-headless-wp-system.git /opt/fd-head
 cd /opt/fd-headless-wp-system
 ```
 
-### 第四步：生成 `.env`
+### 第四步：先把基础镜像同步到你自己的 ACR
+
+这一步只需要在 GitHub 上做，不需要在服务器上做。
+
+在 `fd-headless-wp-system` 仓库里手动运行一次 `Sync Base Images`。
+
+它会把下面这些基础镜像推到你自己的 ACR：
+
+- `mariadb:10.11`
+- `redis:7`
+- `wordpress:6.8.3-php8.2-apache`
+- `wordpress:cli-2.12.0`
+- `nginx:1.27-alpine`
+
+做完这一步之后，空白服务器首次安装就不再依赖 Docker Hub。
+
+### 第五步：生成 `.env`
 
 ```bash
 cp .env.example .env
@@ -120,7 +136,7 @@ bash scripts/bootstrap-env.sh
 - `WORDPRESS_ADMIN_PASSWORD=你的后台管理员密码`
 - `WORDPRESS_ADMIN_EMAIL=你的后台管理员邮箱`
 
-### 第五步：登录 ACR
+### 第六步：登录 ACR
 
 因为前端和 WebSocket 镜像都在阿里云 ACR 私有仓库，所以第一次部署前要登录：
 
@@ -134,7 +150,7 @@ docker login --username=你的阿里云账号 crpi-8y82lbqoc1haiday.cn-beijing.p
 ACR_USERNAME=你的阿里云账号 ACR_PASSWORD=你的ACR密码 bash scripts/update-stack.sh
 ```
 
-### 第六步：如果要拉 GitHub release 资产，先登录 GitHub CLI
+### 第七步：如果要拉 GitHub release 资产，先登录 GitHub CLI
 
 ```bash
 gh auth login
@@ -146,13 +162,13 @@ gh auth login
 export GH_TOKEN=你的GitHubToken
 ```
 
-### 第七步：预检查
+### 第八步：预检查
 
 ```bash
 bash scripts/preflight-check.sh
 ```
 
-### 第八步：正式启动
+### 第九步：正式启动
 
 最稳妥的方式是直接跑统一更新脚本：
 
@@ -169,6 +185,7 @@ ACR_USERNAME=你的阿里云账号 ACR_PASSWORD=你的ACR密码 GH_TOKEN=你的G
 当前更推荐 `update-stack.sh`，因为它已经带了：
 
 - 预检查
+- 基础镜像拉取
 - WordPress release 资产同步
 - 安全顺序更新
 - 容器健康检查
@@ -208,7 +225,7 @@ ACR_USERNAME=你的阿里云账号 ACR_PASSWORD=你的ACR密码 GH_TOKEN=你的G
 - HTTPS / 证书自动化还没做
 - ACF 还没并入当前 release 交付链路
 - 一些次级页面的 SEO 文案、Twitter 元信息里还残留旧品牌文字
-- 联系方式目前是交付占位文案，需要改成可配置
+- 联系方式这类前端公开信息，后面还要整理成更清晰的交付参数
 - 还没有做真正的客户级一键安装脚本
 
 ## 5. 不同服务器以后怎么更新

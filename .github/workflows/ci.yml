@@ -20,6 +20,7 @@ jobs:
         run: |
           bash -n scripts/bootstrap-env.sh
           bash -n scripts/fetch-wordpress-assets.sh
+          bash -n scripts/migrate-base-images-to-acr.sh
           bash -n scripts/preflight-check.sh
           bash -n scripts/update-wordpress-release-tags.sh
           bash -n scripts/update-stack.sh

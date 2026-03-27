@@ -1,0 +1,57 @@
+name: Sync Base Images
+
+on:
+  workflow_dispatch:
+
+env:
+  ACR_REGISTRY: crpi-8y82lbqoc1haiday.cn-beijing.personal.cr.aliyuncs.com
+  SOURCE_MARIADB: mariadb:10.11
+  SOURCE_REDIS: redis:7
+  SOURCE_WORDPRESS: wordpress:6.8.3-php8.2-apache
+  SOURCE_WPCLI: wordpress:cli-2.12.0
+  SOURCE_NGINX: nginx:1.27-alpine
+  TARGET_MARIADB: crpi-8y82lbqoc1haiday.cn-beijing.personal.cr.aliyuncs.com/futuredecade/runtime-mariadb:10.11
+  TARGET_REDIS: crpi-8y82lbqoc1haiday.cn-beijing.personal.cr.aliyuncs.com/futuredecade/runtime-redis:7
+  TARGET_WORDPRESS: crpi-8y82lbqoc1haiday.cn-beijing.personal.cr.aliyuncs.com/futuredecade/runtime-wordpress:6.8.3-php8.2-apache
+  TARGET_WPCLI: crpi-8y82lbqoc1haiday.cn-beijing.personal.cr.aliyuncs.com/futuredecade/runtime-wpcli:cli-2.12.0
+  TARGET_NGINX: crpi-8y82lbqoc1haiday.cn-beijing.personal.cr.aliyuncs.com/futuredecade/runtime-nginx:1.27-alpine
+
+jobs:
+  sync:
+    name: Mirror Runtime Images To ACR
+    runs-on: ubuntu-latest
+    steps:
+      - name: Login to Alibaba Cloud ACR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.ACR_REGISTRY }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+
+      - name: Pull, tag and push images
+        run: |
+          set -e
+
+          sync_image() {
+            local source="$1"
+            local target="$2"
+
+            echo "Syncing ${source} -> ${target}"
+            docker pull "${source}"
+            docker tag "${source}" "${target}"
+            docker push "${target}"
+          }
+
+          sync_image "${SOURCE_MARIADB}" "${TARGET_MARIADB}"
+          sync_image "${SOURCE_REDIS}" "${TARGET_REDIS}"
+          sync_image "${SOURCE_WORDPRESS}" "${TARGET_WORDPRESS}"
+          sync_image "${SOURCE_WPCLI}" "${TARGET_WPCLI}"
+          sync_image "${SOURCE_NGINX}" "${TARGET_NGINX}"
+
+      - name: Show mirrored images
+        run: |
+          echo "${TARGET_MARIADB}"
+          echo "${TARGET_REDIS}"
+          echo "${TARGET_WORDPRESS}"
+          echo "${TARGET_WPCLI}"
+          echo "${TARGET_NGINX}"
