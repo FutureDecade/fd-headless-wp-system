@@ -88,7 +88,7 @@ if ! command -v unzip >/dev/null 2>&1; then
   exit 1
 fi
 
-if ! gh auth status >/dev/null 2>&1; then
+if [[ -z "${GH_TOKEN:-}" && -z "${GITHUB_TOKEN:-}" ]] && ! gh auth status >/dev/null 2>&1; then
   echo "GitHub CLI is not authenticated. Run: gh auth login"
   exit 1
 fi

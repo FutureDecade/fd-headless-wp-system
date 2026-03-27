@@ -19,8 +19,16 @@ jobs:
       - name: Validate shell scripts
         run: |
           bash -n scripts/bootstrap-env.sh
+          bash -n scripts/fetch-wordpress-assets.sh
           bash -n scripts/preflight-check.sh
+          bash -n scripts/update-stack.sh
           bash -n scripts/install.sh
+
+      - name: Validate asset mode with GH token env
+        run: |
+          cp .env.example .env.asset
+          perl -0pi -e 's/WORDPRESS_FETCH_RELEASE_ASSETS=false/WORDPRESS_FETCH_RELEASE_ASSETS=true/' .env.asset
+          ENV_FILE=.env.asset GH_TOKEN=dummy bash scripts/preflight-check.sh
 
       - name: Generate bootstrap env
         run: |
