@@ -20,6 +20,7 @@ WORDPRESS_ACTIVATE_THEME="${WORDPRESS_ACTIVATE_THEME:-true}"
 WORDPRESS_ACTIVATE_CORE_PLUGINS="${WORDPRESS_ACTIVATE_CORE_PLUGINS:-true}"
 WORDPRESS_INSTALL_WPGRAPHQL="${WORDPRESS_INSTALL_WPGRAPHQL:-true}"
 WORDPRESS_WPGRAPHQL_SOURCE="${WORDPRESS_WPGRAPHQL_SOURCE:-wp-graphql}"
+WORDPRESS_PERMALINK_STRUCTURE="${WORDPRESS_PERMALINK_STRUCTURE:-/%postname%/}"
 PUBLIC_SCHEME="${PUBLIC_SCHEME:-http}"
 
 if [[ "${WORDPRESS_RUN_INIT}" != "true" ]]; then
@@ -104,6 +105,28 @@ install_plugin_if_missing() {
   run_wp plugin install "${plugin_source}" >/dev/null
 }
 
+ensure_permalink_structure() {
+  local target_structure="$1"
+  local current_structure=""
+
+  if [[ -z "${target_structure}" ]]; then
+    echo "Permalink structure is empty. Skipping rewrite configuration."
+    return 0
+  fi
+
+  current_structure="$(run_wp option get permalink_structure 2>/dev/null || true)"
+
+  if [[ "${current_structure}" != "${target_structure}" ]]; then
+    echo "Setting permalink structure: ${target_structure}"
+    run_wp rewrite structure "${target_structure}" --hard >/dev/null
+  else
+    echo "Permalink structure already set: ${target_structure}"
+  fi
+
+  echo "Flushing rewrite rules..."
+  run_wp rewrite flush --hard >/dev/null
+}
+
 wait_for_wp_config
 wait_for_database
 
@@ -139,5 +162,7 @@ if [[ "${WORDPRESS_ACTIVATE_CORE_PLUGINS}" == "true" ]]; then
   activate_plugin_if_present "fd-payment"
   activate_plugin_if_present "fd-commerce"
 fi
+
+ensure_permalink_structure "${WORDPRESS_PERMALINK_STRUCTURE}"
 
 echo "WordPress init completed."

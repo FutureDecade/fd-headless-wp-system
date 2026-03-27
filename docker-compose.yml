@@ -36,6 +36,7 @@ services:
         define('WP_REDIS_HOST', 'redis');
     volumes:
       - wordpress_data:/var/www/html
+      - ./apache/allow-override.conf:/etc/apache2/conf-enabled/fd-allow-override.conf:ro
     networks:
       - core
       - edge
