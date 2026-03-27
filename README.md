@@ -87,6 +87,7 @@
 - 基础脚本
 - 基础 CI 校验
 - WordPress release zip 接入骨架
+- WordPress 初始化脚手架
 
 它当前还不提供：
 
@@ -102,6 +103,7 @@ cp .env.example .env
 bash scripts/bootstrap-env.sh
 bash scripts/preflight-check.sh
 # 如果需要 WordPress release 资产，先把 .env 里的 WORDPRESS_FETCH_RELEASE_ASSETS 改成 true
+# 如果需要自动完成首次安装，先把 .env 里的 WORDPRESS_RUN_INIT 改成 true
 bash scripts/fetch-wordpress-assets.sh
 docker compose --env-file .env config
 ```

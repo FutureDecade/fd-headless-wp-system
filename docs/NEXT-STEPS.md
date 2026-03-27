@@ -36,6 +36,7 @@
 - 四个核心仓库都已发布首个正式版本 `v1.0.0`
 - 四个核心仓库的 GitHub Release 都已挂载 zip asset
 - 交付仓库已具备 release zip 拉取脚本与 compose override
+- 交付仓库已具备 WordPress 初始化脚本
 
 重点不是整个 `wp-content` 打包，而是先区分：
 
@@ -54,8 +55,8 @@
 
 接下来目标：
 
-- 在全新 staging 环境验证 `v1.0.0` 这类 release 制品的实际安装链路
-- 固化 WordPress 首次安装、主题启用、插件启用步骤
+- 在全新 staging 环境验证 release zip + `wp-cli` 初始化的整条链路
+- 补 WordPress 初始化后的基础验证步骤
 - 先把 staging 方案跑通，再做正式 install 流程
 
 ## 4. 设计 staging 运行方式

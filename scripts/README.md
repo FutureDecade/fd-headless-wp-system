@@ -7,6 +7,7 @@
 - `install.sh`
 - `preflight-check.sh`
 - `fetch-wordpress-assets.sh`
+- `init-wordpress.sh`
 - `health-check.sh`
 - `backup.sh`
 - `restore.sh`
@@ -18,3 +19,4 @@
 - 配置生成
 - 编排验证
 - staging 所需的 WordPress 制品拉取
+- staging 所需的 WordPress 初始化
