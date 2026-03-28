@@ -25,6 +25,21 @@ on:
       websocket_image:
         description: full websocket image reference, blank means keep current value
         required: false
+      frontend_domain:
+        description: frontend domain, blank means keep current value
+        required: false
+      admin_domain:
+        description: admin domain, blank means keep current value
+        required: false
+      ws_domain:
+        description: websocket domain, blank means keep current value
+        required: false
+      public_scheme:
+        description: public scheme like http or https, blank means keep current value
+        required: false
+      websocket_public_scheme:
+        description: websocket public scheme like ws or wss, blank means keep current value
+        required: false
 
 concurrency:
   group: fd-headless-wp-system-test-server
@@ -42,6 +57,11 @@ jobs:
       FD_COMMERCE_RELEASE_TAG: ${{ inputs.fd_commerce_release_tag || '' }}
       FRONTEND_IMAGE: ${{ inputs.frontend_image || '' }}
       WEBSOCKET_IMAGE: ${{ inputs.websocket_image || '' }}
+      FRONTEND_DOMAIN: ${{ inputs.frontend_domain || '' }}
+      ADMIN_DOMAIN: ${{ inputs.admin_domain || '' }}
+      WS_DOMAIN: ${{ inputs.ws_domain || '' }}
+      PUBLIC_SCHEME: ${{ inputs.public_scheme || '' }}
+      WEBSOCKET_PUBLIC_SCHEME: ${{ inputs.websocket_public_scheme || '' }}
       ACR_USERNAME: ${{ secrets.ACR_USERNAME }}
       ACR_PASSWORD: ${{ secrets.ACR_PASSWORD }}
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
@@ -75,7 +95,7 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
-          envs: ACR_USERNAME,ACR_PASSWORD,GH_TOKEN,FORCE_WORDPRESS_ASSET_FETCH,FD_THEME_RELEASE_TAG,FD_MEMBER_RELEASE_TAG,FD_PAYMENT_RELEASE_TAG,FD_COMMERCE_RELEASE_TAG,FRONTEND_IMAGE,WEBSOCKET_IMAGE
+          envs: ACR_USERNAME,ACR_PASSWORD,GH_TOKEN,FORCE_WORDPRESS_ASSET_FETCH,FD_THEME_RELEASE_TAG,FD_MEMBER_RELEASE_TAG,FD_PAYMENT_RELEASE_TAG,FD_COMMERCE_RELEASE_TAG,FRONTEND_IMAGE,WEBSOCKET_IMAGE,FRONTEND_DOMAIN,ADMIN_DOMAIN,WS_DOMAIN,PUBLIC_SCHEME,WEBSOCKET_PUBLIC_SCHEME
           command_timeout: 40m
           script: |
             set -e
@@ -84,6 +104,16 @@ jobs:
             git reset --hard origin/main
 
             ENV_FILE=.env bash scripts/migrate-base-images-to-acr.sh
+
+            if [ -n "$FRONTEND_DOMAIN" ] || [ -n "$ADMIN_DOMAIN" ] || [ -n "$WS_DOMAIN" ] || [ -n "$PUBLIC_SCHEME" ] || [ -n "$WEBSOCKET_PUBLIC_SCHEME" ]; then
+              ENV_FILE=.env \
+              FRONTEND_DOMAIN="$FRONTEND_DOMAIN" \
+              ADMIN_DOMAIN="$ADMIN_DOMAIN" \
+              WS_DOMAIN="$WS_DOMAIN" \
+              PUBLIC_SCHEME="$PUBLIC_SCHEME" \
+              WEBSOCKET_PUBLIC_SCHEME="$WEBSOCKET_PUBLIC_SCHEME" \
+              bash scripts/update-domain-config.sh
+            fi
 
             if [ -n "$FRONTEND_IMAGE" ] || [ -n "$WEBSOCKET_IMAGE" ]; then
               ENV_FILE=.env \
