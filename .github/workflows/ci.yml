@@ -25,6 +25,7 @@ jobs:
           bash -n scripts/setup-https.sh
           bash -n scripts/renew-https.sh
           bash -n scripts/update-domain-config.sh
+          bash -n scripts/update-https-config.sh
           bash -n scripts/update-wordpress-release-tags.sh
           bash -n scripts/update-stack.sh
           bash -n scripts/install.sh

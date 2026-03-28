@@ -40,6 +40,16 @@ on:
       websocket_public_scheme:
         description: websocket public scheme like ws or wss, blank means keep current value
         required: false
+      letsencrypt_email:
+        description: letsencrypt notification email, blank means keep current value
+        required: false
+      letsencrypt_staging:
+        description: letsencrypt staging mode true or false, blank means keep current value
+        required: false
+      run_https_setup:
+        description: run HTTPS certificate setup after updating config
+        required: true
+        default: "false"
 
 concurrency:
   group: fd-headless-wp-system-test-server
@@ -62,6 +72,9 @@ jobs:
       WS_DOMAIN: ${{ inputs.ws_domain || '' }}
       PUBLIC_SCHEME: ${{ inputs.public_scheme || '' }}
       WEBSOCKET_PUBLIC_SCHEME: ${{ inputs.websocket_public_scheme || '' }}
+      LETSENCRYPT_EMAIL: ${{ inputs.letsencrypt_email || '' }}
+      LETSENCRYPT_STAGING: ${{ inputs.letsencrypt_staging || '' }}
+      RUN_HTTPS_SETUP: ${{ inputs.run_https_setup || 'false' }}
       ACR_USERNAME: ${{ secrets.ACR_USERNAME }}
       ACR_PASSWORD: ${{ secrets.ACR_PASSWORD }}
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
@@ -95,7 +108,7 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
-          envs: ACR_USERNAME,ACR_PASSWORD,GH_TOKEN,FORCE_WORDPRESS_ASSET_FETCH,FD_THEME_RELEASE_TAG,FD_MEMBER_RELEASE_TAG,FD_PAYMENT_RELEASE_TAG,FD_COMMERCE_RELEASE_TAG,FRONTEND_IMAGE,WEBSOCKET_IMAGE,FRONTEND_DOMAIN,ADMIN_DOMAIN,WS_DOMAIN,PUBLIC_SCHEME,WEBSOCKET_PUBLIC_SCHEME
+          envs: ACR_USERNAME,ACR_PASSWORD,GH_TOKEN,FORCE_WORDPRESS_ASSET_FETCH,FD_THEME_RELEASE_TAG,FD_MEMBER_RELEASE_TAG,FD_PAYMENT_RELEASE_TAG,FD_COMMERCE_RELEASE_TAG,FRONTEND_IMAGE,WEBSOCKET_IMAGE,FRONTEND_DOMAIN,ADMIN_DOMAIN,WS_DOMAIN,PUBLIC_SCHEME,WEBSOCKET_PUBLIC_SCHEME,LETSENCRYPT_EMAIL,LETSENCRYPT_STAGING,RUN_HTTPS_SETUP
           command_timeout: 40m
           script: |
             set -e
@@ -115,6 +128,13 @@ jobs:
               bash scripts/update-domain-config.sh
             fi
 
+            if [ -n "$LETSENCRYPT_EMAIL" ] || [ -n "$LETSENCRYPT_STAGING" ]; then
+              ENV_FILE=.env \
+              LETSENCRYPT_EMAIL="$LETSENCRYPT_EMAIL" \
+              LETSENCRYPT_STAGING="$LETSENCRYPT_STAGING" \
+              bash scripts/update-https-config.sh
+            fi
+
             if [ -n "$FRONTEND_IMAGE" ] || [ -n "$WEBSOCKET_IMAGE" ]; then
               ENV_FILE=.env \
               FRONTEND_IMAGE="$FRONTEND_IMAGE" \
@@ -132,8 +152,16 @@ jobs:
               FORCE_WORDPRESS_ASSET_FETCH=true
             fi
 
-            ACR_USERNAME="$ACR_USERNAME" \
-            ACR_PASSWORD="$ACR_PASSWORD" \
-            GH_TOKEN="$GH_TOKEN" \
-            FORCE_WORDPRESS_ASSET_FETCH="$FORCE_WORDPRESS_ASSET_FETCH" \
-            bash scripts/update-stack.sh
+            if [ "$RUN_HTTPS_SETUP" = "true" ]; then
+              ACR_USERNAME="$ACR_USERNAME" \
+              ACR_PASSWORD="$ACR_PASSWORD" \
+              GH_TOKEN="$GH_TOKEN" \
+              GITHUB_TOKEN="$GH_TOKEN" \
+              bash scripts/setup-https.sh
+            else
+              ACR_USERNAME="$ACR_USERNAME" \
+              ACR_PASSWORD="$ACR_PASSWORD" \
+              GH_TOKEN="$GH_TOKEN" \
+              FORCE_WORDPRESS_ASSET_FETCH="$FORCE_WORDPRESS_ASSET_FETCH" \
+              bash scripts/update-stack.sh
+            fi
