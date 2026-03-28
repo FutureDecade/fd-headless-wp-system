@@ -109,6 +109,14 @@ bash scripts/update-stack.sh
 docker compose --env-file .env config
 ```
 
+如果你想从更简单的入口开始，也可以直接运行：
+
+```bash
+bash scripts/install.sh
+```
+
+如果 `.env` 还不存在，这个脚本会先帮你生成一份，然后停下来提醒你把关键配置改掉，再重新执行。
+
 注意：
 
 - 先在 GitHub Actions 里手动运行一次 `Sync Base Images`，把 `mariadb`、`redis`、`wordpress`、`wpcli`、`nginx`、`certbot` 同步到自己的 ACR
@@ -123,6 +131,7 @@ docker compose --env-file .env config
 - 如果要在测试服务器拉取私有 WordPress release 资产，需要把 `WORDPRESS_FETCH_RELEASE_ASSETS=true`
 - 如果 WordPress 资产版本没有变化，`scripts/update-stack.sh` 会自动跳过重复下载；只有需要强制重拉时，才把 `FORCE_WORDPRESS_ASSET_FETCH=true`
 - 测试服务器更新建议直接运行 `bash scripts/update-stack.sh`
+- `scripts/install.sh` 现在会先做预检查，再直接复用 `scripts/update-stack.sh` 的安全更新流程，避免维护两套部署逻辑
 - 如果前端或推送服务镜像在阿里云 ACR 私有仓库，第一次更新时可这样运行：`ACR_USERNAME=你的账号 ACR_PASSWORD=你的密码 bash scripts/update-stack.sh`
 - 如果已经换成正式域名并准备启用 HTTPS，可以运行 `ACR_USERNAME=你的账号 ACR_PASSWORD=你的密码 bash scripts/setup-https.sh`
 - 后续证书续期可以运行 `ACR_USERNAME=你的账号 ACR_PASSWORD=你的密码 bash scripts/renew-https.sh`

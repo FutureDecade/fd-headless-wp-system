@@ -120,6 +120,14 @@ cp .env.example .env
 bash scripts/bootstrap-env.sh
 ```
 
+如果你不想手动先执行这两步，也可以直接运行：
+
+```bash
+bash scripts/install.sh
+```
+
+如果 `.env` 不存在，`install.sh` 会先生成 `.env`，然后停下来提醒你把关键配置改掉，再重新执行。
+
 然后手工修改 `.env`。至少要改这些：
 
 - `FRONTEND_DOMAIN`
@@ -213,7 +221,9 @@ ACR_USERNAME=你的阿里云账号 ACR_PASSWORD=你的ACR密码 GH_TOKEN=你的G
 ACR_USERNAME=你的阿里云账号 ACR_PASSWORD=你的ACR密码 GH_TOKEN=你的GitHubToken bash scripts/install.sh
 ```
 
-当前更推荐 `update-stack.sh`，因为它已经带了：
+现在的 `install.sh` 本质上也是先做预检查，然后直接复用 `update-stack.sh` 这条已经验证过的安全更新路径。
+
+当前更推荐的核心路径仍然是 `update-stack.sh`，因为它已经带了：
 
 - 预检查
 - 基础镜像拉取

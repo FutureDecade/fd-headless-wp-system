@@ -14,6 +14,7 @@ fi
 
 required_commands=(
   docker
+  curl
   perl
   openssl
 )
@@ -25,10 +26,17 @@ for cmd in "${required_commands[@]}"; do
   fi
 done
 
+if ! docker compose version >/dev/null 2>&1; then
+  echo "Missing required command: docker compose"
+  exit 1
+fi
+
 required_keys=(
   FRONTEND_DOMAIN
   ADMIN_DOMAIN
   WS_DOMAIN
+  FRONTEND_IMAGE
+  WEBSOCKET_IMAGE
   MYSQL_DATABASE
   MYSQL_USER
   MYSQL_PASSWORD
@@ -47,10 +55,105 @@ done
 
 load_env_file "${ENV_FILE}"
 
+PUBLIC_SCHEME="${PUBLIC_SCHEME:-http}"
+WEBSOCKET_PUBLIC_SCHEME="${WEBSOCKET_PUBLIC_SCHEME:-ws}"
+HTTPS_ENABLED="${HTTPS_ENABLED:-false}"
 WORDPRESS_FETCH_RELEASE_ASSETS="${WORDPRESS_FETCH_RELEASE_ASSETS:-false}"
 WORDPRESS_RUN_INIT="${WORDPRESS_RUN_INIT:-false}"
+
+config_errors=()
+
+add_config_error() {
+  config_errors+=("$1")
+}
+
+check_not_blank() {
+  local key="$1"
+  local actual="${!key:-}"
+
+  if [[ -z "${actual}" ]]; then
+    add_config_error "${key} 不能为空"
+  fi
+}
+
+check_exact_placeholder() {
+  local key="$1"
+  local expected="$2"
+  local actual="${!key:-}"
+
+  if [[ "${actual}" == "${expected}" ]]; then
+    add_config_error "${key} 还没有改，当前还是 ${expected}"
+  fi
+}
+
+check_pattern_placeholder() {
+  local key="$1"
+  local pattern="$2"
+  local actual="${!key:-}"
+
+  if [[ "${actual}" == ${pattern} ]]; then
+    add_config_error "${key} 还没有改，当前还是占位值"
+  fi
+}
+
+check_allowed_value() {
+  local key="$1"
+  shift
+  local actual="${!key:-}"
+  local candidate=""
+
+  for candidate in "$@"; do
+    if [[ "${actual}" == "${candidate}" ]]; then
+      return 0
+    fi
+  done
+
+  add_config_error "${key} 的值无效，当前是 ${actual}"
+}
+
+check_not_blank "FRONTEND_DOMAIN"
+check_not_blank "ADMIN_DOMAIN"
+check_not_blank "WS_DOMAIN"
+check_not_blank "FRONTEND_IMAGE"
+check_not_blank "WEBSOCKET_IMAGE"
+check_not_blank "MYSQL_DATABASE"
+check_not_blank "MYSQL_USER"
+check_not_blank "MYSQL_PASSWORD"
+check_not_blank "MYSQL_ROOT_PASSWORD"
+check_not_blank "JWT_SECRET"
+check_not_blank "PUSH_SECRET"
+check_not_blank "REVALIDATE_SECRET"
+
+check_exact_placeholder "FRONTEND_DOMAIN" "www.example.com"
+check_exact_placeholder "ADMIN_DOMAIN" "admin.example.com"
+check_exact_placeholder "WS_DOMAIN" "ws.example.com"
+check_pattern_placeholder "FRONTEND_IMAGE" "*CHANGE_ME*"
+check_pattern_placeholder "WEBSOCKET_IMAGE" "*CHANGE_ME*"
+check_pattern_placeholder "MYSQL_PASSWORD" "CHANGE_ME*"
+check_pattern_placeholder "MYSQL_ROOT_PASSWORD" "CHANGE_ME*"
+check_pattern_placeholder "JWT_SECRET" "CHANGE_ME*"
+check_pattern_placeholder "PUSH_SECRET" "CHANGE_ME*"
+check_pattern_placeholder "REVALIDATE_SECRET" "CHANGE_ME*"
+
+check_allowed_value "PUBLIC_SCHEME" "http" "https"
+check_allowed_value "WEBSOCKET_PUBLIC_SCHEME" "ws" "wss"
+check_allowed_value "HTTPS_ENABLED" "true" "false"
+check_allowed_value "WORDPRESS_FETCH_RELEASE_ASSETS" "true" "false"
+check_allowed_value "WORDPRESS_RUN_INIT" "true" "false"
+
+if [[ "${FRONTEND_DOMAIN:-}" == "${ADMIN_DOMAIN:-}" || "${FRONTEND_DOMAIN:-}" == "${WS_DOMAIN:-}" || "${ADMIN_DOMAIN:-}" == "${WS_DOMAIN:-}" ]]; then
+  add_config_error "FRONTEND_DOMAIN、ADMIN_DOMAIN、WS_DOMAIN 不能重复"
+fi
+
+if [[ -n "${HTTP_PORT:-}" && ! "${HTTP_PORT}" =~ ^[0-9]+$ ]]; then
+  add_config_error "HTTP_PORT 必须是数字，当前是 ${HTTP_PORT}"
+fi
+
+if [[ -n "${HTTPS_PORT:-}" && ! "${HTTPS_PORT}" =~ ^[0-9]+$ ]]; then
+  add_config_error "HTTPS_PORT 必须是数字，当前是 ${HTTPS_PORT}"
+fi
+
 FORCE_WORDPRESS_ASSET_FETCH="${FORCE_WORDPRESS_ASSET_FETCH:-false}"
-HTTPS_ENABLED="${HTTPS_ENABLED:-false}"
 FD_THEME_RELEASE_TAG="${FD_THEME_RELEASE_TAG:-v1.0.0}"
 FD_MEMBER_RELEASE_TAG="${FD_MEMBER_RELEASE_TAG:-v1.0.0}"
 FD_PAYMENT_RELEASE_TAG="${FD_PAYMENT_RELEASE_TAG:-v1.0.0}"
@@ -125,6 +228,8 @@ if [[ "${WORDPRESS_FETCH_RELEASE_ASSETS}" == "true" ]]; then
 fi
 
 if [[ "${HTTPS_ENABLED}" == "true" ]]; then
+  check_exact_placeholder "LETSENCRYPT_EMAIL" "admin@example.com"
+
   compose_files+=(
     -f "${ROOT_DIR}/compose/https.override.yml"
   )
@@ -163,6 +268,17 @@ if [[ "${WORDPRESS_RUN_INIT}" == "true" ]]; then
       exit 1
     fi
   done
+
+  check_pattern_placeholder "WORDPRESS_ADMIN_PASSWORD" "CHANGE_ME*"
+  check_exact_placeholder "WORDPRESS_ADMIN_EMAIL" "admin@example.com"
+fi
+
+if (( ${#config_errors[@]} > 0 )); then
+  echo "Preflight check failed. 请先改完这些 .env 配置："
+  for error in "${config_errors[@]}"; do
+    echo "- ${error}"
+  done
+  exit 1
 fi
 
 compose_cmd=(
