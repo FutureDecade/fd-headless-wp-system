@@ -18,6 +18,13 @@
 - `fd-payment`：`v1.0.0`
 - `fd-commerce`：`v1.0.0`
 
+## 当前推荐默认版本
+
+- `fd-theme`：`v1.0.4`
+- `fd-member`：`v1.0.1`
+- `fd-payment`：`v1.0.0`
+- `fd-commerce`：`v1.0.0`
+
 对应 release asset：
 
 - `fd-theme.zip`

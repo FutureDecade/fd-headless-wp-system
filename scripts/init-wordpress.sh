@@ -130,23 +130,96 @@ ensure_permalink_structure() {
 flush_graphql_schema_cache() {
   echo "Flushing GraphQL schema cache..."
   run_wp eval 'global $wpdb;
-if ( function_exists( "do_graphql_request" ) ) {
-    do_action( "graphql_flush_schema_cache" );
-}
-$queries = [
-    "DELETE FROM {$wpdb->options} WHERE option_name LIKE \"_transient_graphql%\" OR option_name LIKE \"_transient_timeout_graphql%\" OR option_name LIKE \"_transient_wpgraphql%\" OR option_name LIKE \"_transient_timeout_wpgraphql%\"",
-    "DELETE FROM {$wpdb->options} WHERE option_name LIKE \"_transient_acf_graphql%\" OR option_name LIKE \"_transient_timeout_acf_graphql%\"",
-];
+	do_action( "graphql_cache_clear" );
+	do_action( "graphql_flush_schema_cache" );
+	$queries = [
+	    "DELETE FROM {$wpdb->options} WHERE option_name LIKE \"_transient_graphql%\" OR option_name LIKE \"_transient_timeout_graphql%\" OR option_name LIKE \"_transient_wpgraphql%\" OR option_name LIKE \"_transient_timeout_wpgraphql%\"",
+	    "DELETE FROM {$wpdb->options} WHERE option_name LIKE \"_transient_acf_graphql%\" OR option_name LIKE \"_transient_timeout_acf_graphql%\"",
+	];
 foreach ( $queries as $query ) {
     $wpdb->query( $query );
 }
-delete_option( "graphql_schema_version" );
-delete_option( "wpgraphql_schema_entry_point" );
-wp_cache_flush();' >/dev/null
+	delete_option( "graphql_schema_version" );
+	delete_option( "wpgraphql_schema_entry_point" );
+	wp_cache_flush();' >/dev/null
+}
+
+seed_delivery_sample_page() {
+  local sample_page_id=""
+  local sample_page_content="<p>Your headless WordPress delivery stack is running.</p><p>Replace this page with your own published content after installation.</p>"
+
+  sample_page_id="$(run_wp post list --post_type=page --name=sample-page --format=ids 2>/dev/null || true)"
+  sample_page_id="$(printf '%s' "${sample_page_id}" | tr -d '[:space:]')"
+
+  if [[ -z "${sample_page_id}" ]]; then
+    echo "Creating delivery sample page..."
+    run_wp post create \
+      --post_type=page \
+      --post_status=publish \
+      --post_title="Sample Page" \
+      --post_name="sample-page" \
+      --post_content="${sample_page_content}" >/dev/null
+    return 0
+  fi
+
+  echo "Normalizing sample page content for delivery validation..."
+  run_wp post update "${sample_page_id}" \
+    --post_status=publish \
+    --post_title="Sample Page" \
+    --post_content="${sample_page_content}" >/dev/null
+}
+
+verify_graphql_route_mapping() {
+  local attempts=6
+  local delay=2
+  local output=""
+
+  for ((i = 1; i <= attempts; i++)); do
+    output="$(run_wp eval '
+	$result = function_exists( "do_graphql_request" )
+	    ? do_graphql_request( "query { slugMappingTable { slug type id } }" )
+	    : null;
+
+	if ( ! is_array( $result ) ) {
+	    fwrite( STDERR, "GraphQL request handler is unavailable." . PHP_EOL );
+	    exit( 1 );
+	}
+
+	$errors = $result["errors"] ?? [];
+	$rows = $result["data"]["slugMappingTable"] ?? null;
+
+	if ( ! empty( $errors ) || ! is_array( $rows ) || count( $rows ) === 0 ) {
+	    fwrite( STDERR, wp_json_encode( $result ) . PHP_EOL );
+	    exit( 1 );
+	}
+
+	echo wp_json_encode( $rows );
+	' 2>/dev/null || true)"
+
+    if [[ -n "${output}" ]]; then
+      echo "GraphQL route mapping is ready."
+      return 0
+    fi
+
+    echo "GraphQL route mapping is not ready yet. Retrying..."
+    flush_graphql_schema_cache
+    sleep "${delay}"
+  done
+
+  echo "GraphQL route mapping did not become ready after repeated retries."
+  run_wp eval '
+	$result = function_exists( "do_graphql_request" )
+	    ? do_graphql_request( "query { slugMappingTable { slug type id } }" )
+	    : null;
+	echo wp_json_encode( $result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES ) . PHP_EOL;
+	exit( 1 );
+	'
 }
 
 wait_for_wp_config
 wait_for_database
+
+fresh_install="false"
 
 if run_wp core is-installed >/dev/null 2>&1; then
   echo "WordPress is already installed."
@@ -159,6 +232,7 @@ else
     --admin_password="${WORDPRESS_ADMIN_PASSWORD}" \
     --admin_email="${WORDPRESS_ADMIN_EMAIL}" \
     --skip-email >/dev/null
+  fresh_install="true"
 fi
 
 if [[ "${WORDPRESS_ACTIVATE_THEME}" == "true" ]] && run_wp theme is-installed fd-theme >/dev/null 2>&1; then
@@ -181,7 +255,12 @@ if [[ "${WORDPRESS_ACTIVATE_CORE_PLUGINS}" == "true" ]]; then
   activate_plugin_if_present "fd-commerce"
 fi
 
+if [[ "${fresh_install}" == "true" ]]; then
+  seed_delivery_sample_page
+fi
+
 ensure_permalink_structure "${WORDPRESS_PERMALINK_STRUCTURE}"
 flush_graphql_schema_cache
+verify_graphql_route_mapping
 
 echo "WordPress init completed."

@@ -129,6 +129,24 @@ git clone https://github.com/FutureDecade/fd-headless-wp-system.git /opt/fd-head
 cd /opt/fd-headless-wp-system
 ```
 
+但这里要注意一个真实问题：
+
+- 如果 `fd-headless-wp-system` 仓库继续保持私有，空白服务器不能直接匿名 `git clone`
+- 这次真机测试里，我们就是在这里卡住过一次
+
+最稳妥的交付做法有两个：
+
+- 对外交付时把这个仓库改成公开仓库
+- 如果暂时还要保持私有，就先在服务器登录 GitHub CLI，再用 `gh repo clone`
+
+私有仓库时可以这样做：
+
+```bash
+gh auth login
+gh repo clone FutureDecade/fd-headless-wp-system /opt/fd-headless-wp-system
+cd /opt/fd-headless-wp-system
+```
+
 ### 第四步：先把基础镜像同步到你自己的 ACR
 
 这一步只需要在 GitHub 上做，不需要在服务器上做。
@@ -352,6 +370,8 @@ ACR_USERNAME=你的阿里云账号 ACR_PASSWORD=你的ACR密码 bash scripts/ren
 - 一些次级页面的 SEO 文案、Twitter 元信息里还残留旧品牌文字
 - 联系方式这类前端公开信息，后面还要整理成更清晰的交付参数
 - 还没有做真正的客户级一键安装脚本
+- 如果 `fd-headless-wp-system` 继续保持私有，客户空白服务器仍然不能直接匿名拉仓库
+- SSH 登录时还可能看到 locale 警告，但它目前不影响部署链路本身
 
 ## 5. 不同服务器以后怎么更新
 
