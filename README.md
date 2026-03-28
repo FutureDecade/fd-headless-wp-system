@@ -117,6 +117,14 @@ bash scripts/install.sh
 
 如果 `.env` 还不存在，这个脚本会先帮你生成一份，然后停下来提醒你把关键配置改掉，再重新执行。
 
+如果你面对的是一台刚装好的 Debian / Ubuntu 服务器，也可以先运行：
+
+```bash
+bash scripts/prepare-server.sh
+```
+
+这个脚本只负责安装系统依赖、Docker、Docker Compose、GitHub CLI，不会启动项目服务。
+
 注意：
 
 - 先在 GitHub Actions 里手动运行一次 `Sync Base Images`，把 `mariadb`、`redis`、`wordpress`、`wpcli`、`nginx`、`certbot` 同步到自己的 ACR

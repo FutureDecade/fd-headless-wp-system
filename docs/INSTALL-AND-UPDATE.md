@@ -59,14 +59,45 @@
 
 - Debian 12
 
+最稳妥的顺序，不是直接一口气手敲很多命令，而是先做一个最小引导：
+
+```bash
+apt update
+apt install -y git curl ca-certificates
+git clone https://github.com/FutureDecade/fd-headless-wp-system.git /opt/fd-headless-wp-system
+cd /opt/fd-headless-wp-system
+bash scripts/prepare-server.sh
+```
+
+这一步会补齐：
+
+- 基础命令
+- Docker Engine
+- Docker Compose
+- GitHub CLI
+
+而且它不会碰你的项目容器，也不会启动业务服务。
+
+如果你想手工安装，而不是跑脚本，也可以按下面的方式做。
+
 先安装基础命令：
 
 ```bash
 apt update
-apt install -y git curl unzip openssl perl ca-certificates
+apt install -y git curl unzip openssl perl ca-certificates gnupg lsb-release
 ```
 
-再安装 Docker 和 Docker Compose。
+再安装 Docker 和 Docker Compose：
+
+```bash
+install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
+chmod a+r /etc/apt/keyrings/docker.asc
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian $(. /etc/os-release && echo \"$VERSION_CODENAME\") stable" > /etc/apt/sources.list.d/docker.list
+apt update
+apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+systemctl enable --now docker
+```
 
 如果服务器需要自动从 GitHub release 拉 WordPress 主题/插件，还需要安装 GitHub CLI：
 
@@ -90,6 +121,8 @@ apt install -y gh
 如果只是临时测试，也可以先用 `sslip.io` 或者临时子域名，等前后端联通后再换正式域名。
 
 ### 第三步：拉交付仓库
+
+如果你在第一步已经 clone 过仓库，这一步可以跳过。
 
 ```bash
 git clone https://github.com/FutureDecade/fd-headless-wp-system.git /opt/fd-headless-wp-system

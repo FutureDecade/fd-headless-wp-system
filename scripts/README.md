@@ -5,6 +5,7 @@
 后续预计包括：
 
 - `install.sh`
+- `prepare-server.sh`
 - `update-stack.sh`
 - `preflight-check.sh`
 - `fetch-wordpress-assets.sh`
@@ -31,3 +32,10 @@
 - 如果 `.env` 不存在，会先自动生成
 - 然后提醒你修改关键配置
 - 真正执行安装时，会直接复用 `update-stack.sh`
+
+目前 `prepare-server.sh` 负责另一件事：
+
+- 在干净的 Debian / Ubuntu 机器上安装基础命令
+- 安装 Docker Engine 和 Docker Compose
+- 安装 GitHub CLI
+- 不碰项目容器，不启动业务服务
