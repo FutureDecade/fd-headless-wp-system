@@ -114,8 +114,9 @@ docker compose --env-file .env config
 - 先在 GitHub Actions 里手动运行一次 `Sync Base Images`，把 `mariadb`、`redis`、`wordpress`、`wpcli`、`nginx`、`certbot` 同步到自己的 ACR
 - 交付时优先使用阿里云 ACR 镜像
 - 最稳妥的方式是给 `FRONTEND_IMAGE` 和 `WEBSOCKET_IMAGE` 都写入固定 tag，不要直接依赖 `latest`
-- 测试环境建议使用 `PUBLIC_SCHEME=http` 和 `WEBSOCKET_PUBLIC_SCHEME=ws`
+- 空白服务器首次启动，建议先使用 `PUBLIC_SCHEME=http` 和 `WEBSOCKET_PUBLIC_SCHEME=ws`，先把整套服务跑通
 - 真正切到 HTTPS 前，要先重新构建一版前端交付镜像，把 `site_url` 改成 `https://...`，把 `websocket_url` 改成 `wss://...`
+- `scripts/setup-https.sh` 现在会自动申请证书，并把 `.env` 里的 `HTTPS_ENABLED`、`HTTPS_PORT`、`PUBLIC_SCHEME`、`WEBSOCKET_PUBLIC_SCHEME` 一起改到正确值
 - `WORDPRESS_RUN_INIT=true` 时，会自动完成 WordPress 首次安装，并安装激活 `WPGraphQL`
 - 初始化还会自动设置 `WORDPRESS_PERMALINK_STRUCTURE`，确保 `/graphql` 这种地址能直接使用
 - 如果服务器不能直接从 WordPress 官方源下载插件，可以把 `WORDPRESS_WPGRAPHQL_SOURCE` 改成你自己的 zip 地址
@@ -127,6 +128,7 @@ docker compose --env-file .env config
 - 后续证书续期可以运行 `ACR_USERNAME=你的账号 ACR_PASSWORD=你的密码 bash scripts/renew-https.sh`
 - 如果只想更新 `fd-theme`、`fd-member`、`fd-payment`、`fd-commerce` 的 release tag，可以运行 `FD_THEME_RELEASE_TAG=v1.0.3 bash scripts/update-wordpress-release-tags.sh`
 - GitHub Actions 里的 `Deploy Test Server` 现在支持手动填写这些 release tag，服务器会先改 `.env`，再自动重拉并更新
+- 截至 `2026-03-28`，测试机 `144.48.8.218` 已经完成 `www.futuredecade.com`、`admin.futuredecade.com`、`ws.futuredecade.com` 的正式 HTTPS 验证
 - 这版仓库的目标是先固定系统边界，不是立即完成生产可用的一键部署
 
 ## 下一步路线

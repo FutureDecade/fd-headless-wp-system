@@ -8,16 +8,20 @@
 
 ## 1. 当前验证状态
 
-截至 2026-03-28，这套交付骨架已经在测试服务器 `144.48.8.218` 跑通。
+截至 2026-03-28，这套交付骨架已经在测试服务器 `144.48.8.218` 跑通，并完成了正式域名的 HTTPS 验证。
 
 当前测试域名：
 
-- 前台：`http://www.144.48.8.218.sslip.io`
-- 后台：`http://admin.144.48.8.218.sslip.io`
-- 推送：`ws://ws.144.48.8.218.sslip.io`
+- 前台：`https://www.futuredecade.com`
+- 后台：`https://admin.futuredecade.com`
+- 推送：`wss://ws.futuredecade.com`
 
 当前已验证通过：
 
+- `http://www.futuredecade.com` 会自动跳转到 `https://www.futuredecade.com`
+- `https://www.futuredecade.com` 可正常返回 `200`
+- `https://admin.futuredecade.com` 可正常返回 `200`
+- `https://ws.futuredecade.com/health` 可正常返回健康状态
 - 前端容器可正常启动，并通过健康检查
 - WebSocket 容器可正常启动，并通过 `/health`
 - Nginx 反向代理可把三个域名分别转发到前端、WordPress、推送服务
@@ -29,20 +33,23 @@
 - `fd-commerce` 已启用
 - `/graphql` 路由可正常返回 `slugMappingTable`
 - 前台首页和示例页面可正常访问
-- 前端主要旧域名硬编码已经去掉
+- 前端主要旧域名硬编码已经去掉，页面源码里不再残留 `sslip.io`、`http://admin.futuredecade.com`、`ws://ws.futuredecade.com`
 - 基础镜像已经切到你自己的 ACR，不再依赖 Docker Hub 拉 `nginx` 和 `wordpress`
+- `GraphQL generalSettings.url` 现在已经是 `https://admin.futuredecade.com`
+- Let’s Encrypt 正式证书已经申请成功
 
 当前测试机使用的关键版本：
 
 - `fd-theme`: `v1.0.4`
-- `fd-frontend`: `crpi-8y82lbqoc1haiday.cn-beijing.personal.cr.aliyuncs.com/futuredecade/fd-frontend:test-144-48-8-218-751122fc1a8c89e8cdf6c2187706314589a0f7db`
+- `fd-frontend`: `crpi-8y82lbqoc1haiday.cn-beijing.personal.cr.aliyuncs.com/futuredecade/fd-frontend:futuredecade-https-8862356`
 - `fd-websocket`: `crpi-8y82lbqoc1haiday.cn-beijing.personal.cr.aliyuncs.com/futuredecade/fd-websocket:248efba2800ce856e043d673233bc5f5205e2a40`
 
 当前关于 HTTPS 的状态：
 
 - HTTPS 脚本、compose 配置、CI 校验已经补上
-- 但还没有在正式域名下真实申请一次证书
-- 当前测试机仍然保持 `http/ws`，没有强行切 HTTPS
+- 已经在正式域名下真实申请到 Let’s Encrypt 证书
+- 当前测试机已经切到 `https/wss`
+- 当前证书有效期到 `2026-06-26`
 
 ## 2. 一台空白服务器怎么装
 
@@ -80,7 +87,7 @@ apt install -y gh
 - 后台域名，例如 `admin.xxx.com`
 - 推送域名，例如 `ws.xxx.com`
 
-如果只是临时测试，也可以像现在这样直接用 `sslip.io`。
+如果只是临时测试，也可以先用 `sslip.io` 或者临时子域名，等前后端联通后再换正式域名。
 
 ### 第三步：拉交付仓库
 
@@ -118,6 +125,8 @@ bash scripts/bootstrap-env.sh
 - `FRONTEND_DOMAIN`
 - `ADMIN_DOMAIN`
 - `WS_DOMAIN`
+- `PUBLIC_SCHEME`
+- `WEBSOCKET_PUBLIC_SCHEME`
 - `FRONTEND_IMAGE`
 - `WEBSOCKET_IMAGE`
 - `MYSQL_PASSWORD`
@@ -128,6 +137,19 @@ bash scripts/bootstrap-env.sh
 - `WORDPRESS_ADMIN_PASSWORD`
 - `WORDPRESS_ADMIN_EMAIL`
 - `LETSENCRYPT_EMAIL`
+
+首次启动建议这样填：
+
+- `PUBLIC_SCHEME=http`
+- `WEBSOCKET_PUBLIC_SCHEME=ws`
+- `HTTPS_ENABLED=false`
+- `HTTPS_PORT=443`
+
+原因很简单：
+
+- 先用最朴素的 `http/ws` 把整套服务跑通
+- 确认前台、后台、推送都正常以后
+- 再切 `https/wss`
 
 如果这台机器要自动拉 GitHub release 里的主题和插件，还要确认这些：
 
@@ -208,14 +230,15 @@ ACR_USERNAME=你的阿里云账号 ACR_PASSWORD=你的ACR密码 GH_TOKEN=你的G
 
 所以你准备切到正式 HTTPS 时，顺序要这样走：
 
-1. 先在前端仓库重新构建一版正式交付镜像
-2. 构建参数里把：
+1. 先确认 3 个正式域名已经全部解析到这台服务器
+2. 先在前端仓库重新构建一版正式交付镜像
+3. 构建参数里把：
    - `wordpress_api_url` 改成 `https://你的后台域名/graphql`
    - `wordpress_url` 改成 `https://你的后台域名`
    - `site_url` 改成 `https://你的前台域名`
    - `websocket_url` 改成 `wss://你的推送域名`
-3. 把新的前端镜像 tag 写进这台服务器的 `.env`
-4. 再运行：
+4. 把新的前端镜像 tag 写进这台服务器的 `.env`
+5. 再运行：
 
 ```bash
 ACR_USERNAME=你的阿里云账号 ACR_PASSWORD=你的ACR密码 bash scripts/setup-https.sh
@@ -223,11 +246,12 @@ ACR_USERNAME=你的阿里云账号 ACR_PASSWORD=你的ACR密码 bash scripts/set
 
 如果这台机器本来就依赖 `GH_TOKEN` 拉私有主题和插件，就把 `GH_TOKEN` 一起带上。
 
-这个脚本会做 4 件事：
+这个脚本会做 5 件事：
 
 - 先确保当前 HTTP 栈正常
 - 申请 Let’s Encrypt 证书
 - 自动把 `.env` 改成 `HTTPS_ENABLED=true`
+- 自动把 `HTTPS_PORT` 补成 `443`
 - 自动把 `PUBLIC_SCHEME` 改成 `https`，把 `WEBSOCKET_PUBLIC_SCHEME` 改成 `wss`
 
 后续证书续期直接运行：
@@ -255,7 +279,7 @@ ACR_USERNAME=你的阿里云账号 ACR_PASSWORD=你的ACR密码 bash scripts/ren
 
 ## 4. 现在功能是否完全正常
 
-就“基础交付链路”来说，当前测试机已经可用。
+就“基础交付链路”来说，当前测试机已经可用，而且现在验证的是正式域名下的 HTTPS 访问，不再是临时测试域名。
 
 已经确认正常：
 
@@ -325,7 +349,7 @@ ACR_USERNAME=你的阿里云账号 ACR_PASSWORD=你的ACR密码 GH_TOKEN=你的G
 - 可以明确版本
 - 可以从空白机器部署
 - 可以按镜像 tag / release tag 更新
-- 可以可选开启 Let’s Encrypt HTTPS
+- 已经在测试机完成正式域名 Let’s Encrypt HTTPS 验证
 - 可以不动线上旧系统，先在新机器验证
 
 离真正“商业化一键交付”的差距，已经不是架构方向问题了，主要是最后一层工程封装和交付细节。
