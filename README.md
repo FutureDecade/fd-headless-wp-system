@@ -98,6 +98,16 @@
 
 ## 快速开始
 
+如果你现在最关心的是：
+
+- 一台空白服务器怎么从 0 装起来
+- 需要准备什么
+- 先跑 HTTP，再切 HTTPS 的顺序怎么走
+
+先看这份更短的入口文档：
+
+- `docs/BLANK-SERVER-QUICKSTART.md`
+
 ```bash
 cp .env.example .env
 bash scripts/bootstrap-env.sh
@@ -166,6 +176,7 @@ bash scripts/configure-env.sh
 
 ## 关键文档
 
+- `docs/BLANK-SERVER-QUICKSTART.md`
 - `docs/PROJECT-MANAGEMENT.md`
 - `docs/MINIMAL-INTEGRATION-STRATEGY.md`
 - `docs/COMPONENT-SOURCES.md`
