@@ -22,6 +22,8 @@ jobs:
           bash -n scripts/fetch-wordpress-assets.sh
           bash -n scripts/migrate-base-images-to-acr.sh
           bash -n scripts/preflight-check.sh
+          bash -n scripts/setup-https.sh
+          bash -n scripts/renew-https.sh
           bash -n scripts/update-wordpress-release-tags.sh
           bash -n scripts/update-stack.sh
           bash -n scripts/install.sh
@@ -31,6 +33,21 @@ jobs:
           cp .env.example .env.asset
           perl -0pi -e 's/WORDPRESS_FETCH_RELEASE_ASSETS=false/WORDPRESS_FETCH_RELEASE_ASSETS=true/' .env.asset
           ENV_FILE=.env.asset GH_TOKEN=dummy bash scripts/preflight-check.sh
+
+      - name: Validate optional HTTPS mode
+        run: |
+          cp .env.example .env.https
+          perl -0pi -e 's/^FRONTEND_DOMAIN=.*/FRONTEND_DOMAIN=www.example.com/m' .env.https
+          perl -0pi -e 's/^ADMIN_DOMAIN=.*/ADMIN_DOMAIN=admin.example.com/m' .env.https
+          perl -0pi -e 's/^WS_DOMAIN=.*/WS_DOMAIN=ws.example.com/m' .env.https
+          perl -0pi -e 's/^PUBLIC_SCHEME=.*/PUBLIC_SCHEME=https/m' .env.https
+          perl -0pi -e 's/^WEBSOCKET_PUBLIC_SCHEME=.*/WEBSOCKET_PUBLIC_SCHEME=wss/m' .env.https
+          perl -0pi -e 's/^HTTPS_ENABLED=.*/HTTPS_ENABLED=true/m' .env.https
+          mkdir -p runtime/letsencrypt/live/www.example.com
+          touch runtime/letsencrypt/live/www.example.com/fullchain.pem
+          touch runtime/letsencrypt/live/www.example.com/privkey.pem
+          ENV_FILE=.env.https bash scripts/preflight-check.sh
+          docker compose -f docker-compose.yml -f compose/https.override.yml --env-file .env.https config >/dev/null
 
       - name: Validate release tag updater
         run: |

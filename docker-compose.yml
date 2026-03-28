@@ -69,6 +69,14 @@ services:
       - core
       - edge
 
+  certbot:
+    image: ${CERTBOT_IMAGE:-crpi-8y82lbqoc1haiday.cn-beijing.personal.cr.aliyuncs.com/futuredecade/runtime-certbot:latest}
+    profiles:
+      - tools
+    volumes:
+      - ./runtime/certbot/www:/var/www/certbot
+      - ./runtime/letsencrypt:/etc/letsencrypt
+
   frontend:
     image: ${FRONTEND_IMAGE}
     restart: unless-stopped
@@ -114,14 +122,21 @@ services:
       FRONTEND_DOMAIN: ${FRONTEND_DOMAIN}
       ADMIN_DOMAIN: ${ADMIN_DOMAIN}
       WS_DOMAIN: ${WS_DOMAIN}
+      HTTPS_ENABLED: ${HTTPS_ENABLED:-false}
     volumes:
-      - ./nginx/default.conf.template:/etc/nginx/templates/default.conf.template:ro
+      - ./nginx:/etc/nginx/fd:ro
+      - ./runtime/certbot/www:/var/www/certbot:ro
+      - ./runtime/letsencrypt:/etc/letsencrypt:ro
     command:
       - /bin/sh
       - -c
       - |
+        TEMPLATE=/etc/nginx/fd/http.conf.template
+        if [ "$${HTTPS_ENABLED:-false}" = "true" ]; then
+          TEMPLATE=/etc/nginx/fd/https.conf.template
+        fi
         envsubst '$$FRONTEND_DOMAIN $$ADMIN_DOMAIN $$WS_DOMAIN' \
-          < /etc/nginx/templates/default.conf.template \
+          < "$$TEMPLATE" \
           > /etc/nginx/conf.d/default.conf
         exec nginx -g 'daemon off;'
     networks:

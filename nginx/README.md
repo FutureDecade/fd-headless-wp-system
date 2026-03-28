@@ -11,3 +11,8 @@
 - wordpress
 - websocket
 - 可选扩展服务
+
+当前已经拆成两种模板：
+
+- `http.conf.template`
+- `https.conf.template`

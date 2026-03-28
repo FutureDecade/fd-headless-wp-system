@@ -17,6 +17,7 @@ load_env_file "${ENV_FILE}"
 
 WORDPRESS_FETCH_RELEASE_ASSETS="${WORDPRESS_FETCH_RELEASE_ASSETS:-false}"
 WORDPRESS_RUN_INIT="${WORDPRESS_RUN_INIT:-false}"
+HTTPS_ENABLED="${HTTPS_ENABLED:-false}"
 
 compose_files=(
   -f "${ROOT_DIR}/docker-compose.yml"
@@ -26,6 +27,12 @@ if [[ "${WORDPRESS_FETCH_RELEASE_ASSETS}" == "true" ]]; then
   ENV_FILE="${ENV_FILE}" bash "${ROOT_DIR}/scripts/fetch-wordpress-assets.sh"
   compose_files+=(
     -f "${ROOT_DIR}/compose/wordpress-assets.override.yml"
+  )
+fi
+
+if [[ "${HTTPS_ENABLED}" == "true" ]]; then
+  compose_files+=(
+    -f "${ROOT_DIR}/compose/https.override.yml"
   )
 fi
 

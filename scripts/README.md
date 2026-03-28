@@ -9,6 +9,8 @@
 - `preflight-check.sh`
 - `fetch-wordpress-assets.sh`
 - `init-wordpress.sh`
+- `setup-https.sh`
+- `renew-https.sh`
 - `health-check.sh`
 - `backup.sh`
 - `restore.sh`
@@ -22,3 +24,4 @@
 - 测试服务器所需的 WordPress 制品拉取
 - 测试服务器所需的 WordPress 初始化
 - 测试服务器安全更新脚本
+- 可选 HTTPS 证书申请与续期

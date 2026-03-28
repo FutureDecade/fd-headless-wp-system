@@ -10,11 +10,13 @@ env:
   SOURCE_WORDPRESS: wordpress:6.8.3-php8.2-apache
   SOURCE_WPCLI: wordpress:cli-2.12.0
   SOURCE_NGINX: nginx:1.27-alpine
+  SOURCE_CERTBOT: certbot/certbot:latest
   TARGET_MARIADB: crpi-8y82lbqoc1haiday.cn-beijing.personal.cr.aliyuncs.com/futuredecade/runtime-mariadb:10.11
   TARGET_REDIS: crpi-8y82lbqoc1haiday.cn-beijing.personal.cr.aliyuncs.com/futuredecade/runtime-redis:7
   TARGET_WORDPRESS: crpi-8y82lbqoc1haiday.cn-beijing.personal.cr.aliyuncs.com/futuredecade/runtime-wordpress:6.8.3-php8.2-apache
   TARGET_WPCLI: crpi-8y82lbqoc1haiday.cn-beijing.personal.cr.aliyuncs.com/futuredecade/runtime-wpcli:cli-2.12.0
   TARGET_NGINX: crpi-8y82lbqoc1haiday.cn-beijing.personal.cr.aliyuncs.com/futuredecade/runtime-nginx:1.27-alpine
+  TARGET_CERTBOT: crpi-8y82lbqoc1haiday.cn-beijing.personal.cr.aliyuncs.com/futuredecade/runtime-certbot:latest
 
 jobs:
   sync:
@@ -47,6 +49,7 @@ jobs:
           sync_image "${SOURCE_WORDPRESS}" "${TARGET_WORDPRESS}"
           sync_image "${SOURCE_WPCLI}" "${TARGET_WPCLI}"
           sync_image "${SOURCE_NGINX}" "${TARGET_NGINX}"
+          sync_image "${SOURCE_CERTBOT}" "${TARGET_CERTBOT}"
 
       - name: Show mirrored images
         run: |
@@ -55,3 +58,4 @@ jobs:
           echo "${TARGET_WORDPRESS}"
           echo "${TARGET_WPCLI}"
           echo "${TARGET_NGINX}"
+          echo "${TARGET_CERTBOT}"

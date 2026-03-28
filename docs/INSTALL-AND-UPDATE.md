@@ -30,12 +30,19 @@
 - `/graphql` 路由可正常返回 `slugMappingTable`
 - 前台首页和示例页面可正常访问
 - 前端主要旧域名硬编码已经去掉
+- 基础镜像已经切到你自己的 ACR，不再依赖 Docker Hub 拉 `nginx` 和 `wordpress`
 
 当前测试机使用的关键版本：
 
 - `fd-theme`: `v1.0.4`
-- `fd-frontend`: `crpi-8y82lbqoc1haiday.cn-beijing.personal.cr.aliyuncs.com/futuredecade/fd-frontend:test-144-48-8-218-83c194934ad0deaeef7d3591f0bdd36248a2513a`
+- `fd-frontend`: `crpi-8y82lbqoc1haiday.cn-beijing.personal.cr.aliyuncs.com/futuredecade/fd-frontend:test-144-48-8-218-751122fc1a8c89e8cdf6c2187706314589a0f7db`
 - `fd-websocket`: `crpi-8y82lbqoc1haiday.cn-beijing.personal.cr.aliyuncs.com/futuredecade/fd-websocket:248efba2800ce856e043d673233bc5f5205e2a40`
+
+当前关于 HTTPS 的状态：
+
+- HTTPS 脚本、compose 配置、CI 校验已经补上
+- 但还没有在正式域名下真实申请一次证书
+- 当前测试机仍然保持 `http/ws`，没有强行切 HTTPS
 
 ## 2. 一台空白服务器怎么装
 
@@ -95,6 +102,7 @@ cd /opt/fd-headless-wp-system
 - `wordpress:6.8.3-php8.2-apache`
 - `wordpress:cli-2.12.0`
 - `nginx:1.27-alpine`
+- `certbot/certbot:latest`
 
 做完这一步之后，空白服务器首次安装就不再依赖 Docker Hub。
 
@@ -119,6 +127,7 @@ bash scripts/bootstrap-env.sh
 - `REVALIDATE_SECRET`
 - `WORDPRESS_ADMIN_PASSWORD`
 - `WORDPRESS_ADMIN_EMAIL`
+- `LETSENCRYPT_EMAIL`
 
 如果这台机器要自动拉 GitHub release 里的主题和插件，还要确认这些：
 
@@ -191,6 +200,42 @@ ACR_USERNAME=你的阿里云账号 ACR_PASSWORD=你的ACR密码 GH_TOKEN=你的G
 - 容器健康检查
 - 前台 / 推送 / GraphQL 的基本验收
 
+### 第十步：如果你要切正式 HTTPS
+
+先说明一件事：
+
+前端交付镜像里有一部分公开地址是在构建镜像时写进去的。
+
+所以你准备切到正式 HTTPS 时，顺序要这样走：
+
+1. 先在前端仓库重新构建一版正式交付镜像
+2. 构建参数里把：
+   - `wordpress_api_url` 改成 `https://你的后台域名/graphql`
+   - `wordpress_url` 改成 `https://你的后台域名`
+   - `site_url` 改成 `https://你的前台域名`
+   - `websocket_url` 改成 `wss://你的推送域名`
+3. 把新的前端镜像 tag 写进这台服务器的 `.env`
+4. 再运行：
+
+```bash
+ACR_USERNAME=你的阿里云账号 ACR_PASSWORD=你的ACR密码 bash scripts/setup-https.sh
+```
+
+如果这台机器本来就依赖 `GH_TOKEN` 拉私有主题和插件，就把 `GH_TOKEN` 一起带上。
+
+这个脚本会做 4 件事：
+
+- 先确保当前 HTTP 栈正常
+- 申请 Let’s Encrypt 证书
+- 自动把 `.env` 改成 `HTTPS_ENABLED=true`
+- 自动把 `PUBLIC_SCHEME` 改成 `https`，把 `WEBSOCKET_PUBLIC_SCHEME` 改成 `wss`
+
+后续证书续期直接运行：
+
+```bash
+ACR_USERNAME=你的阿里云账号 ACR_PASSWORD=你的ACR密码 bash scripts/renew-https.sh
+```
+
 ## 3. 域名和访问逻辑
 
 外部访问路径是这样：
@@ -222,7 +267,6 @@ ACR_USERNAME=你的阿里云账号 ACR_PASSWORD=你的ACR密码 GH_TOKEN=你的G
 
 但目前还不能说“已经完全最终版可商用交付”，因为还剩这些收尾项：
 
-- HTTPS / 证书自动化还没做
 - ACF 还没并入当前 release 交付链路
 - 一些次级页面的 SEO 文案、Twitter 元信息里还残留旧品牌文字
 - 联系方式这类前端公开信息，后面还要整理成更清晰的交付参数
@@ -281,6 +325,7 @@ ACR_USERNAME=你的阿里云账号 ACR_PASSWORD=你的ACR密码 GH_TOKEN=你的G
 - 可以明确版本
 - 可以从空白机器部署
 - 可以按镜像 tag / release tag 更新
+- 可以可选开启 Let’s Encrypt HTTPS
 - 可以不动线上旧系统，先在新机器验证
 
 离真正“商业化一键交付”的差距，已经不是架构方向问题了，主要是最后一层工程封装和交付细节。

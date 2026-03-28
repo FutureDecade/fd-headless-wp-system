@@ -10,3 +10,8 @@
 - `runtime/wp-content/plugins/fd-commerce`
 
 这些内容由 `scripts/fetch-wordpress-assets.sh` 生成。
+
+如果启用了 HTTPS，这里还会出现：
+
+- `runtime/certbot/www`
+- `runtime/letsencrypt`

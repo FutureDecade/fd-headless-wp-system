@@ -50,6 +50,7 @@ load_env_file "${ENV_FILE}"
 WORDPRESS_FETCH_RELEASE_ASSETS="${WORDPRESS_FETCH_RELEASE_ASSETS:-false}"
 WORDPRESS_RUN_INIT="${WORDPRESS_RUN_INIT:-false}"
 FORCE_WORDPRESS_ASSET_FETCH="${FORCE_WORDPRESS_ASSET_FETCH:-false}"
+HTTPS_ENABLED="${HTTPS_ENABLED:-false}"
 FD_THEME_RELEASE_TAG="${FD_THEME_RELEASE_TAG:-v1.0.0}"
 FD_MEMBER_RELEASE_TAG="${FD_MEMBER_RELEASE_TAG:-v1.0.0}"
 FD_PAYMENT_RELEASE_TAG="${FD_PAYMENT_RELEASE_TAG:-v1.0.0}"
@@ -120,6 +121,31 @@ if [[ "${WORDPRESS_FETCH_RELEASE_ASSETS}" == "true" ]]; then
       echo "GitHub CLI is not authenticated. Run: gh auth login"
       exit 1
     fi
+  fi
+fi
+
+if [[ "${HTTPS_ENABLED}" == "true" ]]; then
+  compose_files+=(
+    -f "${ROOT_DIR}/compose/https.override.yml"
+  )
+
+  cert_dir="${ROOT_DIR}/runtime/letsencrypt/live/${FRONTEND_DOMAIN}"
+  for cert_file in fullchain.pem privkey.pem; do
+    if [[ ! -f "${cert_dir}/${cert_file}" ]]; then
+      echo "Missing HTTPS certificate file: ${cert_dir}/${cert_file}"
+      echo "Run: bash scripts/setup-https.sh"
+      exit 1
+    fi
+  done
+
+  if [[ "${PUBLIC_SCHEME:-http}" != "https" ]]; then
+    echo "HTTPS is enabled, but PUBLIC_SCHEME is not https."
+    exit 1
+  fi
+
+  if [[ "${WEBSOCKET_PUBLIC_SCHEME:-ws}" != "wss" ]]; then
+    echo "HTTPS is enabled, but WEBSOCKET_PUBLIC_SCHEME is not wss."
+    exit 1
   fi
 fi
 

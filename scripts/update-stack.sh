@@ -20,6 +20,8 @@ WORDPRESS_RUN_INIT="${WORDPRESS_RUN_INIT:-false}"
 ACR_USERNAME="${ACR_USERNAME:-}"
 ACR_PASSWORD="${ACR_PASSWORD:-}"
 HTTP_PORT="${HTTP_PORT:-80}"
+HTTPS_ENABLED="${HTTPS_ENABLED:-false}"
+HTTPS_PORT="${HTTPS_PORT:-443}"
 
 compose_files=(
   -f "${ROOT_DIR}/docker-compose.yml"
@@ -28,6 +30,12 @@ compose_files=(
 if [[ "${WORDPRESS_FETCH_RELEASE_ASSETS}" == "true" ]]; then
   compose_files+=(
     -f "${ROOT_DIR}/compose/wordpress-assets.override.yml"
+  )
+fi
+
+if [[ "${HTTPS_ENABLED}" == "true" ]]; then
+  compose_files+=(
+    -f "${ROOT_DIR}/compose/https.override.yml"
   )
 fi
 
@@ -184,15 +192,34 @@ verify_wordpress_assets_mounts() {
 
 validate_http_endpoints() {
   local graphql_response=""
+  local frontend_status=""
 
-  echo "Checking frontend..."
-  curl -fsS -I -H "Host: ${FRONTEND_DOMAIN}" "http://127.0.0.1:${HTTP_PORT}/" >/dev/null
+  if [[ "${HTTPS_ENABLED}" == "true" ]]; then
+    echo "Checking frontend HTTP redirect..."
+    frontend_status="$(curl -ksS -o /dev/null -w '%{http_code}' -H "Host: ${FRONTEND_DOMAIN}" "http://127.0.0.1:${HTTP_PORT}/")"
+    if [[ "${frontend_status}" != "301" && "${frontend_status}" != "308" ]]; then
+      echo "Frontend HTTP redirect check failed. status=${frontend_status}"
+      exit 1
+    fi
 
-  echo "Checking websocket..."
-  curl -fsS -H "Host: ${WS_DOMAIN}" "http://127.0.0.1:${HTTP_PORT}/health" >/dev/null
+    echo "Checking frontend HTTPS..."
+    curl -kfsS -I --resolve "${FRONTEND_DOMAIN}:${HTTPS_PORT}:127.0.0.1" "https://${FRONTEND_DOMAIN}:${HTTPS_PORT}/" >/dev/null
 
-  echo "Checking GraphQL route mapping..."
-  graphql_response="$(curl -fsS --get -H "Host: ${ADMIN_DOMAIN}" --data-urlencode 'query={slugMappingTable{slug type id}}' "http://127.0.0.1:${HTTP_PORT}/graphql")"
+    echo "Checking websocket HTTPS..."
+    curl -kfsS --resolve "${WS_DOMAIN}:${HTTPS_PORT}:127.0.0.1" "https://${WS_DOMAIN}:${HTTPS_PORT}/health" >/dev/null
+
+    echo "Checking GraphQL route mapping over HTTPS..."
+    graphql_response="$(curl -kfsS --resolve "${ADMIN_DOMAIN}:${HTTPS_PORT}:127.0.0.1" --get --data-urlencode 'query={slugMappingTable{slug type id}}' "https://${ADMIN_DOMAIN}:${HTTPS_PORT}/graphql")"
+  else
+    echo "Checking frontend..."
+    curl -fsS -I -H "Host: ${FRONTEND_DOMAIN}" "http://127.0.0.1:${HTTP_PORT}/" >/dev/null
+
+    echo "Checking websocket..."
+    curl -fsS -H "Host: ${WS_DOMAIN}" "http://127.0.0.1:${HTTP_PORT}/health" >/dev/null
+
+    echo "Checking GraphQL route mapping..."
+    graphql_response="$(curl -fsS --get -H "Host: ${ADMIN_DOMAIN}" --data-urlencode 'query={slugMappingTable{slug type id}}' "http://127.0.0.1:${HTTP_PORT}/graphql")"
+  fi
 
   if [[ "${graphql_response}" == *'"errors"'* ]]; then
     echo "GraphQL route mapping check failed."
