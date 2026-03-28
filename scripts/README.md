@@ -5,6 +5,7 @@
 后续预计包括：
 
 - `install.sh`
+- `configure-env.sh`
 - `prepare-server.sh`
 - `update-stack.sh`
 - `preflight-check.sh`
@@ -32,6 +33,13 @@
 - 如果 `.env` 不存在，会先自动生成
 - 然后提醒你修改关键配置
 - 真正执行安装时，会直接复用 `update-stack.sh`
+
+目前 `configure-env.sh` 负责：
+
+- 按顺序询问核心配置
+- 自动写入 `.env`
+- 尽量复用已有值
+- 不启动任何服务
 
 目前 `prepare-server.sh` 负责另一件事：
 

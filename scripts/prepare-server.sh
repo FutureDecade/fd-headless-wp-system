@@ -257,4 +257,5 @@ fi
 print_step "Next"
 echo "1. Clone the delivery repo if you have not done it yet."
 echo "2. Enter the repo directory."
-echo "3. Run: bash scripts/install.sh"
+echo "3. Run: bash scripts/configure-env.sh"
+echo "4. Then run: bash scripts/install.sh"

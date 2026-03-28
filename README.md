@@ -125,6 +125,14 @@ bash scripts/prepare-server.sh
 
 这个脚本只负责安装系统依赖、Docker、Docker Compose、GitHub CLI，不会启动项目服务。
 
+如果你已经有 `.env`，或者不想手改一堆配置项，也可以运行：
+
+```bash
+bash scripts/configure-env.sh
+```
+
+这个脚本会按顺序询问域名、镜像、证书邮箱、WordPress 初始化等核心配置，然后写入 `.env`。
+
 注意：
 
 - 先在 GitHub Actions 里手动运行一次 `Sync Base Images`，把 `mariadb`、`redis`、`wordpress`、`wpcli`、`nginx`、`certbot` 同步到自己的 ACR

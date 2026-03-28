@@ -21,6 +21,7 @@ if [[ ! -f "${ENV_FILE}" ]]; then
   echo "- PUSH_SECRET"
   echo "- REVALIDATE_SECRET"
   echo
+  echo "你也可以先运行：bash scripts/configure-env.sh"
   echo "改完后，再重新运行这条命令即可。"
   exit 1
 fi

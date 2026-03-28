@@ -161,7 +161,21 @@ bash scripts/install.sh
 
 如果 `.env` 不存在，`install.sh` 会先生成 `.env`，然后停下来提醒你把关键配置改掉，再重新执行。
 
-然后手工修改 `.env`。至少要改这些：
+如果你不想手改 `.env`，更推荐先运行：
+
+```bash
+bash scripts/configure-env.sh
+```
+
+这个向导会按顺序询问：
+
+- 主域名和 3 个子域名
+- 前端镜像和推送镜像
+- 证书通知邮箱
+- 是否自动拉 WordPress release 主题和插件
+- 是否自动完成首次 WordPress 安装
+
+如果你不用向导，而是手工修改 `.env`，至少要改这些：
 
 - `FRONTEND_DOMAIN`
 - `ADMIN_DOMAIN`
