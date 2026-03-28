@@ -108,6 +108,18 @@
 
 - `docs/BLANK-SERVER-QUICKSTART.md`
 
+如果你想直接用更少命令开始，空白 Debian 12 服务器现在可以先这样做：
+
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/FutureDecade/fd-headless-wp-system/main/scripts/remote-install.sh)
+```
+
+确认 HTTP 正常后，再切 HTTPS：
+
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/FutureDecade/fd-headless-wp-system/main/scripts/remote-setup-https.sh)
+```
+
 ```bash
 cp .env.example .env
 bash scripts/bootstrap-env.sh
@@ -158,7 +170,11 @@ bash scripts/configure-env.sh
 - 如果 WordPress 资产版本没有变化，`scripts/update-stack.sh` 会自动跳过重复下载；只有需要强制重拉时，才把 `FORCE_WORDPRESS_ASSET_FETCH=true`
 - 测试服务器更新建议直接运行 `bash scripts/update-stack.sh`
 - `scripts/install.sh` 现在会先做预检查，再直接复用 `scripts/update-stack.sh` 的安全更新流程，避免维护两套部署逻辑
-- 如果 `fd-headless-wp-system` 仓库保持私有，空白服务器不能直接匿名 `git clone`；要么先 `gh auth login` 后用 `gh repo clone`，要么把交付仓库改成公开
+- `scripts/quick-install.sh` 会把“配置 + 收集凭据 + 首次安装”收成一个入口
+- `scripts/remote-install.sh` 支持空白 Debian 12 服务器一条命令拉起首装入口
+- `scripts/quick-setup-https.sh` 会把“收集凭据 + 切 HTTPS”收成一个入口
+- `scripts/remote-setup-https.sh` 支持一条命令触发 HTTPS 切换入口
+- `fd-headless-wp-system` 现在已经是公开交付仓库，空白服务器可以直接 `git clone`
 - 如果前端或推送服务镜像在阿里云 ACR 私有仓库，第一次更新时可这样运行：`ACR_USERNAME=你的账号 ACR_PASSWORD=你的密码 bash scripts/update-stack.sh`
 - 如果已经换成正式域名并准备启用 HTTPS，可以运行 `ACR_USERNAME=你的账号 ACR_PASSWORD=你的密码 bash scripts/setup-https.sh`
 - 后续证书续期可以运行 `ACR_USERNAME=你的账号 ACR_PASSWORD=你的密码 bash scripts/renew-https.sh`

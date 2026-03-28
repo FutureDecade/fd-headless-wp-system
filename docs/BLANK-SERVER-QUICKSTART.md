@@ -32,7 +32,26 @@
 
 ## 第 2 步：登录服务器，拉交付仓库
 
-如果仓库是公开的：
+现在这个交付仓库已经公开。
+
+所以最省事的首装命令已经可以直接变成一条：
+
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/FutureDecade/fd-headless-wp-system/main/scripts/remote-install.sh)
+```
+
+这条命令会自动做这些事：
+
+- 安装最基础的 `git`、`curl`、`ca-certificates`
+- 把交付仓库拉到 `/opt/fd-headless-wp-system`
+- 安装 Docker、Docker Compose、GitHub CLI
+- 进入配置向导
+- 收集首次安装需要的 ACR / GitHub 凭据
+- 调用已经验证通过的首装流程
+
+如果你想分步手工做，再继续看下面。
+
+如果你还是想手工拉仓库：
 
 ```bash
 apt update
@@ -41,7 +60,7 @@ git clone https://github.com/FutureDecade/fd-headless-wp-system.git /opt/fd-head
 cd /opt/fd-headless-wp-system
 ```
 
-如果仓库还是私有的，先装 GitHub CLI 并登录，再拉仓库：
+如果以后为了商业授权又改回私有，可以改成下面这套拉取方式：
 
 ```bash
 apt update
@@ -96,6 +115,10 @@ bash scripts/configure-env.sh
 - 自动完成首次 WordPress 安装：`y`
 
 ## 第 5 步：第一次安装
+
+如果你已经使用上面那条 `remote-install.sh` 一条命令入口，这一步已经会自动带你走完。
+
+如果你是手工分步操作，再执行下面这条：
 
 ```bash
 ACR_USERNAME=你的阿里云账号 \
@@ -155,6 +178,21 @@ bash scripts/install.sh
 - `websocket_url=wss://ws.你的域名`
 
 然后把新的前端镜像地址写回这台服务器的 `.env`。
+
+如果你想继续用更少命令，也可以直接执行：
+
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/FutureDecade/fd-headless-wp-system/main/scripts/remote-setup-https.sh)
+```
+
+这条命令会自动：
+
+- 更新本机的交付仓库
+- 进入 HTTPS 切换入口
+- 收集这一步需要的 ACR / GitHub 凭据
+- 调用 `setup-https.sh`
+
+如果你想手工执行，再用下面这条：
 
 确认无误后，再执行：
 
@@ -234,8 +272,8 @@ bash scripts/update-stack.sh
 现在已经不是“架构方向不行”，而是还剩最后几项交付收尾：
 
 - ACF 还没正式并入这条 release 交付链
-- 交付仓库如果继续保持私有，客户空白服务器不能直接匿名拉仓库
-- 还可以再压缩成更少命令的一键安装入口
+- 付费授权链路还没有接上你未来的授权中台
+- 还没有做成最终的客户授权安装器
 
 如果你要看更完整的说明，再看：
 

@@ -10,6 +10,12 @@
 
 - `docs/BLANK-SERVER-QUICKSTART.md`
 
+现在这个交付仓库已经公开，所以空白服务器也可以直接用下面这条命令进入首装流程：
+
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/FutureDecade/fd-headless-wp-system/main/scripts/remote-install.sh)
+```
+
 ## 1. 当前验证状态
 
 截至 2026-03-28，这套交付骨架已经在测试服务器 `144.48.8.218` 跑通，并完成了正式域名的 HTTPS 验证。
