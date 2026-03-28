@@ -120,6 +120,7 @@ if [[ ! -f "${cert_dir}/fullchain.pem" || ! -f "${cert_dir}/privkey.pem" ]]; the
 fi
 
 set_env_value "${ENV_FILE}" "HTTPS_ENABLED" "true"
+set_env_value "${ENV_FILE}" "HTTPS_PORT" "${HTTPS_PORT:-443}"
 set_env_value "${ENV_FILE}" "PUBLIC_SCHEME" "https"
 set_env_value "${ENV_FILE}" "WEBSOCKET_PUBLIC_SCHEME" "wss"
 
