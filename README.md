@@ -110,6 +110,10 @@
 
 - `docs/BLANK-SERVER-QUICKSTART.md`
 
+如果你要的是当前最完整的“空白主机一键部署说明”，直接看：
+
+- `docs/ONE-CLICK-DEPLOY.md`
+
 如果你想直接用更少命令开始，空白 Debian 12 服务器现在可以先这样做：
 
 ```bash
@@ -196,6 +200,7 @@ bash scripts/configure-env.sh
 ## 关键文档
 
 - `docs/BLANK-SERVER-QUICKSTART.md`
+- `docs/ONE-CLICK-DEPLOY.md`
 - `docs/PROJECT-MANAGEMENT.md`
 - `docs/MINIMAL-INTEGRATION-STRATEGY.md`
 - `docs/COMPONENT-SOURCES.md`

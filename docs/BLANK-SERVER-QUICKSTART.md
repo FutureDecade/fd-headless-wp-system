@@ -1,10 +1,12 @@
 # 空白服务器快速安装
 
-这份说明只解决一件事：
+这份是短版入口。
 
-- 一台刚装好的 Debian 12 服务器，怎么把这套系统从 0 跑起来
+如果你想看更完整、更接近正式交付的版本，先看：
 
-如果你只想先装起来，不想先看长文档，就照这份走。
+- `docs/ONE-CLICK-DEPLOY.md`
+
+如果你现在只想马上在空白机上开始，就照这份走。
 
 ## 先准备好 4 样东西
 
@@ -34,7 +36,7 @@
 
 现在这个交付仓库已经公开。
 
-所以最省事的首装命令已经可以直接变成一条：
+所以最省事的首装命令就是这一条：
 
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/FutureDecade/fd-headless-wp-system/main/scripts/remote-install.sh)
@@ -252,10 +254,14 @@ bash scripts/update-stack.sh
 
 ## 当前已经确认的真实状态
 
-截至 `2026-03-28`，下面这套链路已经在空白 Debian 12 服务器 `144.48.8.218` 上跑通并验收过：
+截至 `2026-03-29`，下面这套链路已经在空白 Debian 12 服务器 `144.48.8.218` 上跑通并验收过：
 
 - 首次安装
 - WordPress 自动初始化
+- `fd-websocket-push`
+- `wp-graphql-jwt-authentication`
+- `wp-graphql-tax-query-develop`
+- `redis-cache`
 - GraphQL 可用
 - 示例页面可访问
 - HTTPS 证书申请
