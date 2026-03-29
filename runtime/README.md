@@ -5,6 +5,7 @@
 它只用于 staging / install 过程中放置临时拉取下来的 WordPress 制品，例如：
 
 - `runtime/wp-content/themes/fd-theme`
+- `runtime/wp-content/plugins/fd-admin-ui`
 - `runtime/wp-content/plugins/fd-member`
 - `runtime/wp-content/plugins/fd-payment`
 - `runtime/wp-content/plugins/fd-commerce`

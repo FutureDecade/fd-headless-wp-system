@@ -24,6 +24,7 @@ fi
 
 WORDPRESS_RELEASE_OWNER="${WORDPRESS_RELEASE_OWNER:-FutureDecade}"
 FD_THEME_RELEASE_TAG="${FD_THEME_RELEASE_TAG:-v1.0.0}"
+FD_ADMIN_UI_RELEASE_TAG="${FD_ADMIN_UI_RELEASE_TAG:-v1.3.1}"
 FD_MEMBER_RELEASE_TAG="${FD_MEMBER_RELEASE_TAG:-v1.0.1}"
 FD_PAYMENT_RELEASE_TAG="${FD_PAYMENT_RELEASE_TAG:-v1.0.0}"
 FD_COMMERCE_RELEASE_TAG="${FD_COMMERCE_RELEASE_TAG:-v1.0.0}"
@@ -46,6 +47,7 @@ mkdir -p "${THEMES_DIR}" "${PLUGINS_DIR}"
 desired_assets_lock() {
   cat <<EOF
 fd-theme=${FD_THEME_RELEASE_TAG}
+fd-admin-ui=${FD_ADMIN_UI_RELEASE_TAG}
 fd-member=${FD_MEMBER_RELEASE_TAG}
 fd-payment=${FD_PAYMENT_RELEASE_TAG}
 fd-commerce=${FD_COMMERCE_RELEASE_TAG}
@@ -61,7 +63,7 @@ assets_already_match() {
     return 1
   fi
 
-  for plugin_dir in fd-member fd-payment fd-commerce; do
+  for plugin_dir in fd-admin-ui fd-member fd-payment fd-commerce; do
     if [[ ! -d "${PLUGINS_DIR}/${plugin_dir}" ]]; then
       return 1
     fi
@@ -124,6 +126,7 @@ download_and_extract() {
 }
 
 download_and_extract "fd-theme" "${FD_THEME_RELEASE_TAG}" "${THEMES_DIR}/fd-theme"
+download_and_extract "fd-admin-ui" "${FD_ADMIN_UI_RELEASE_TAG}" "${PLUGINS_DIR}/fd-admin-ui"
 download_and_extract "fd-member" "${FD_MEMBER_RELEASE_TAG}" "${PLUGINS_DIR}/fd-member"
 download_and_extract "fd-payment" "${FD_PAYMENT_RELEASE_TAG}" "${PLUGINS_DIR}/fd-payment"
 download_and_extract "fd-commerce" "${FD_COMMERCE_RELEASE_TAG}" "${PLUGINS_DIR}/fd-commerce"

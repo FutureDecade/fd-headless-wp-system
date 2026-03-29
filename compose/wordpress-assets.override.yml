@@ -2,12 +2,14 @@ services:
   wordpress:
     volumes:
       - ./runtime/wp-content/themes/fd-theme:/var/www/html/wp-content/themes/fd-theme:ro
+      - ./runtime/wp-content/plugins/fd-admin-ui:/var/www/html/wp-content/plugins/fd-admin-ui:ro
       - ./runtime/wp-content/plugins/fd-member:/var/www/html/wp-content/plugins/fd-member:ro
       - ./runtime/wp-content/plugins/fd-payment:/var/www/html/wp-content/plugins/fd-payment:ro
       - ./runtime/wp-content/plugins/fd-commerce:/var/www/html/wp-content/plugins/fd-commerce:ro
   wpcli:
     volumes:
       - ./runtime/wp-content/themes/fd-theme:/var/www/html/wp-content/themes/fd-theme:ro
+      - ./runtime/wp-content/plugins/fd-admin-ui:/var/www/html/wp-content/plugins/fd-admin-ui:ro
       - ./runtime/wp-content/plugins/fd-member:/var/www/html/wp-content/plugins/fd-member:ro
       - ./runtime/wp-content/plugins/fd-payment:/var/www/html/wp-content/plugins/fd-payment:ro
       - ./runtime/wp-content/plugins/fd-commerce:/var/www/html/wp-content/plugins/fd-commerce:ro

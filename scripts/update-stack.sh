@@ -55,6 +55,7 @@ compose_tools=(
 desired_assets_lock() {
   cat <<EOF
 fd-theme=${FD_THEME_RELEASE_TAG:-v1.0.0}
+fd-admin-ui=${FD_ADMIN_UI_RELEASE_TAG:-v1.3.1}
 fd-member=${FD_MEMBER_RELEASE_TAG:-v1.0.1}
 fd-payment=${FD_PAYMENT_RELEASE_TAG:-v1.0.0}
 fd-commerce=${FD_COMMERCE_RELEASE_TAG:-v1.0.0}
@@ -184,6 +185,7 @@ verify_wordpress_assets_mounts() {
   echo "Verifying WordPress theme and plugin mounts..."
   "${compose_base[@]}" exec -T wordpress sh -lc '
     test -f /var/www/html/wp-content/themes/fd-theme/style.css &&
+    test -d /var/www/html/wp-content/plugins/fd-admin-ui &&
     test -d /var/www/html/wp-content/plugins/fd-member &&
     test -d /var/www/html/wp-content/plugins/fd-payment &&
     test -d /var/www/html/wp-content/plugins/fd-commerce

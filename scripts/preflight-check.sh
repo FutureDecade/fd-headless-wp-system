@@ -155,6 +155,7 @@ fi
 
 FORCE_WORDPRESS_ASSET_FETCH="${FORCE_WORDPRESS_ASSET_FETCH:-false}"
 FD_THEME_RELEASE_TAG="${FD_THEME_RELEASE_TAG:-v1.0.0}"
+FD_ADMIN_UI_RELEASE_TAG="${FD_ADMIN_UI_RELEASE_TAG:-v1.3.1}"
 FD_MEMBER_RELEASE_TAG="${FD_MEMBER_RELEASE_TAG:-v1.0.1}"
 FD_PAYMENT_RELEASE_TAG="${FD_PAYMENT_RELEASE_TAG:-v1.0.0}"
 FD_COMMERCE_RELEASE_TAG="${FD_COMMERCE_RELEASE_TAG:-v1.0.0}"
@@ -182,7 +183,7 @@ need_wordpress_asset_fetch() {
     return 0
   fi
 
-  for plugin_dir in fd-member fd-payment fd-commerce; do
+  for plugin_dir in fd-admin-ui fd-member fd-payment fd-commerce; do
     if [[ ! -d "${ROOT_DIR}/runtime/wp-content/plugins/${plugin_dir}" ]]; then
       return 0
     fi
@@ -191,6 +192,7 @@ need_wordpress_asset_fetch() {
   local expected_lock
   expected_lock="$(cat <<EOF
 fd-theme=${FD_THEME_RELEASE_TAG}
+fd-admin-ui=${FD_ADMIN_UI_RELEASE_TAG}
 fd-member=${FD_MEMBER_RELEASE_TAG}
 fd-payment=${FD_PAYMENT_RELEASE_TAG}
 fd-commerce=${FD_COMMERCE_RELEASE_TAG}

@@ -37,6 +37,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/FutureDecade/fd-headless-wp-
 - Nginx 反向代理可把三个域名分别转发到前端、WordPress、推送服务
 - WordPress 可正常启动
 - `fd-theme` 已作为 release 资产挂载并启用
+- `fd-admin-ui` 已启用
 - `wp-graphql` 已安装并启用
 - `fd-member` 已启用
 - `fd-payment` 已启用
@@ -51,6 +52,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/FutureDecade/fd-headless-wp-
 当前测试机使用的关键版本：
 
 - `fd-theme`: `v1.0.4`
+- `fd-admin-ui`: `v1.3.1`
 - `fd-frontend`: `crpi-8y82lbqoc1haiday.cn-beijing.personal.cr.aliyuncs.com/futuredecade/fd-frontend:futuredecade-https-8862356`
 - `fd-websocket`: `crpi-8y82lbqoc1haiday.cn-beijing.personal.cr.aliyuncs.com/futuredecade/fd-websocket:248efba2800ce856e043d673233bc5f5205e2a40`
 
@@ -238,6 +240,7 @@ bash scripts/configure-env.sh
 
 - `WORDPRESS_FETCH_RELEASE_ASSETS=true`
 - `FD_THEME_RELEASE_TAG=v1.0.4`
+- `FD_ADMIN_UI_RELEASE_TAG=v1.3.1`
 - `FD_MEMBER_RELEASE_TAG=...`
 - `FD_PAYMENT_RELEASE_TAG=...`
 - `FD_COMMERCE_RELEASE_TAG=...`

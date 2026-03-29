@@ -250,6 +250,7 @@ if [[ "${WORDPRESS_INSTALL_WPGRAPHQL}" == "true" ]]; then
 fi
 
 if [[ "${WORDPRESS_ACTIVATE_CORE_PLUGINS}" == "true" ]]; then
+  activate_plugin_if_present "fd-admin-ui"
   activate_plugin_if_present "fd-member"
   activate_plugin_if_present "fd-payment"
   activate_plugin_if_present "fd-commerce"

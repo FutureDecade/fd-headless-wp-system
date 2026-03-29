@@ -10,6 +10,9 @@ on:
       fd_theme_release_tag:
         description: fd-theme release tag, blank means keep current value
         required: false
+      fd_admin_ui_release_tag:
+        description: fd-admin-ui release tag, blank means keep current value
+        required: false
       fd_member_release_tag:
         description: fd-member release tag, blank means keep current value
         required: false
@@ -62,6 +65,7 @@ jobs:
     env:
       FORCE_WORDPRESS_ASSET_FETCH: ${{ inputs.force_wordpress_asset_fetch || 'false' }}
       FD_THEME_RELEASE_TAG: ${{ inputs.fd_theme_release_tag || '' }}
+      FD_ADMIN_UI_RELEASE_TAG: ${{ inputs.fd_admin_ui_release_tag || '' }}
       FD_MEMBER_RELEASE_TAG: ${{ inputs.fd_member_release_tag || '' }}
       FD_PAYMENT_RELEASE_TAG: ${{ inputs.fd_payment_release_tag || '' }}
       FD_COMMERCE_RELEASE_TAG: ${{ inputs.fd_commerce_release_tag || '' }}
@@ -98,6 +102,7 @@ jobs:
           }
 
           validate_release fd-theme "$FD_THEME_RELEASE_TAG"
+          validate_release fd-admin-ui "$FD_ADMIN_UI_RELEASE_TAG"
           validate_release fd-member "$FD_MEMBER_RELEASE_TAG"
           validate_release fd-payment "$FD_PAYMENT_RELEASE_TAG"
           validate_release fd-commerce "$FD_COMMERCE_RELEASE_TAG"
@@ -108,7 +113,7 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
-          envs: ACR_USERNAME,ACR_PASSWORD,GH_TOKEN,FORCE_WORDPRESS_ASSET_FETCH,FD_THEME_RELEASE_TAG,FD_MEMBER_RELEASE_TAG,FD_PAYMENT_RELEASE_TAG,FD_COMMERCE_RELEASE_TAG,FRONTEND_IMAGE,WEBSOCKET_IMAGE,FRONTEND_DOMAIN,ADMIN_DOMAIN,WS_DOMAIN,PUBLIC_SCHEME,WEBSOCKET_PUBLIC_SCHEME,LETSENCRYPT_EMAIL,LETSENCRYPT_STAGING,RUN_HTTPS_SETUP
+          envs: ACR_USERNAME,ACR_PASSWORD,GH_TOKEN,FORCE_WORDPRESS_ASSET_FETCH,FD_THEME_RELEASE_TAG,FD_ADMIN_UI_RELEASE_TAG,FD_MEMBER_RELEASE_TAG,FD_PAYMENT_RELEASE_TAG,FD_COMMERCE_RELEASE_TAG,FRONTEND_IMAGE,WEBSOCKET_IMAGE,FRONTEND_DOMAIN,ADMIN_DOMAIN,WS_DOMAIN,PUBLIC_SCHEME,WEBSOCKET_PUBLIC_SCHEME,LETSENCRYPT_EMAIL,LETSENCRYPT_STAGING,RUN_HTTPS_SETUP
           command_timeout: 40m
           script: |
             set -e
@@ -142,9 +147,10 @@ jobs:
               bash scripts/update-runtime-images.sh
             fi
 
-            if [ -n "$FD_THEME_RELEASE_TAG" ] || [ -n "$FD_MEMBER_RELEASE_TAG" ] || [ -n "$FD_PAYMENT_RELEASE_TAG" ] || [ -n "$FD_COMMERCE_RELEASE_TAG" ]; then
+            if [ -n "$FD_THEME_RELEASE_TAG" ] || [ -n "$FD_ADMIN_UI_RELEASE_TAG" ] || [ -n "$FD_MEMBER_RELEASE_TAG" ] || [ -n "$FD_PAYMENT_RELEASE_TAG" ] || [ -n "$FD_COMMERCE_RELEASE_TAG" ]; then
               ENV_FILE=.env \
               FD_THEME_RELEASE_TAG="$FD_THEME_RELEASE_TAG" \
+              FD_ADMIN_UI_RELEASE_TAG="$FD_ADMIN_UI_RELEASE_TAG" \
               FD_MEMBER_RELEASE_TAG="$FD_MEMBER_RELEASE_TAG" \
               FD_PAYMENT_RELEASE_TAG="$FD_PAYMENT_RELEASE_TAG" \
               FD_COMMERCE_RELEASE_TAG="$FD_COMMERCE_RELEASE_TAG" \
