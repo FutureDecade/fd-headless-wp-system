@@ -179,15 +179,25 @@ need_wordpress_asset_fetch() {
     return 0
   fi
 
-  if [[ ! -d "${ROOT_DIR}/runtime/wp-content/themes/fd-theme" ]]; then
+  if [[ ! -f "${ROOT_DIR}/runtime/wp-content/themes/fd-theme/style.css" ]]; then
     return 0
   fi
 
-  for plugin_dir in fd-admin-ui fd-member fd-payment fd-commerce; do
-    if [[ ! -d "${ROOT_DIR}/runtime/wp-content/plugins/${plugin_dir}" ]]; then
-      return 0
-    fi
-  done
+  if [[ ! -f "${ROOT_DIR}/runtime/wp-content/plugins/fd-admin-ui/fd-admin-ui.php" ]]; then
+    return 0
+  fi
+
+  if [[ ! -f "${ROOT_DIR}/runtime/wp-content/plugins/fd-member/index.php" ]]; then
+    return 0
+  fi
+
+  if [[ ! -f "${ROOT_DIR}/runtime/wp-content/plugins/fd-payment/index.php" ]]; then
+    return 0
+  fi
+
+  if [[ ! -f "${ROOT_DIR}/runtime/wp-content/plugins/fd-commerce/fd-commerce.php" ]]; then
+    return 0
+  fi
 
   local expected_lock
   expected_lock="$(cat <<EOF

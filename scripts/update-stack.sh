@@ -185,10 +185,10 @@ verify_wordpress_assets_mounts() {
   echo "Verifying WordPress theme and plugin mounts..."
   "${compose_base[@]}" exec -T wordpress sh -lc '
     test -f /var/www/html/wp-content/themes/fd-theme/style.css &&
-    test -d /var/www/html/wp-content/plugins/fd-admin-ui &&
-    test -d /var/www/html/wp-content/plugins/fd-member &&
-    test -d /var/www/html/wp-content/plugins/fd-payment &&
-    test -d /var/www/html/wp-content/plugins/fd-commerce
+    test -f /var/www/html/wp-content/plugins/fd-admin-ui/fd-admin-ui.php &&
+    test -f /var/www/html/wp-content/plugins/fd-member/index.php &&
+    test -f /var/www/html/wp-content/plugins/fd-payment/index.php &&
+    test -f /var/www/html/wp-content/plugins/fd-commerce/fd-commerce.php
   '
 }
 

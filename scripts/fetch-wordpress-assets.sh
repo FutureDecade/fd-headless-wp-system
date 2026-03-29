@@ -59,15 +59,25 @@ assets_already_match() {
     return 1
   fi
 
-  if [[ ! -d "${THEMES_DIR}/fd-theme" ]]; then
+  if [[ ! -f "${THEMES_DIR}/fd-theme/style.css" ]]; then
     return 1
   fi
 
-  for plugin_dir in fd-admin-ui fd-member fd-payment fd-commerce; do
-    if [[ ! -d "${PLUGINS_DIR}/${plugin_dir}" ]]; then
-      return 1
-    fi
-  done
+  if [[ ! -f "${PLUGINS_DIR}/fd-admin-ui/fd-admin-ui.php" ]]; then
+    return 1
+  fi
+
+  if [[ ! -f "${PLUGINS_DIR}/fd-member/index.php" ]]; then
+    return 1
+  fi
+
+  if [[ ! -f "${PLUGINS_DIR}/fd-payment/index.php" ]]; then
+    return 1
+  fi
+
+  if [[ ! -f "${PLUGINS_DIR}/fd-commerce/fd-commerce.php" ]]; then
+    return 1
+  fi
 
   local current_lock
   current_lock="$(cat "${LOCK_FILE}")"
