@@ -22,6 +22,9 @@ on:
       fd_commerce_release_tag:
         description: fd-commerce release tag, blank means keep current value
         required: false
+      fd_content_types_release_tag:
+        description: fd-content-types release tag, blank means keep current value
+        required: false
       fd_websocket_push_release_tag:
         description: fd-websocket-push release tag, blank means keep current value
         required: false
@@ -78,6 +81,7 @@ jobs:
       FD_MEMBER_RELEASE_TAG: ${{ inputs.fd_member_release_tag || '' }}
       FD_PAYMENT_RELEASE_TAG: ${{ inputs.fd_payment_release_tag || '' }}
       FD_COMMERCE_RELEASE_TAG: ${{ inputs.fd_commerce_release_tag || '' }}
+      FD_CONTENT_TYPES_RELEASE_TAG: ${{ inputs.fd_content_types_release_tag || '' }}
       FD_WEBSOCKET_PUSH_RELEASE_TAG: ${{ inputs.fd_websocket_push_release_tag || '' }}
       WPGRAPHQL_JWT_AUTH_RELEASE_TAG: ${{ inputs.wpgraphql_jwt_auth_release_tag || '' }}
       WPGRAPHQL_TAX_QUERY_REF: ${{ inputs.wpgraphql_tax_query_ref || '' }}
@@ -118,6 +122,7 @@ jobs:
           validate_release fd-member "$FD_MEMBER_RELEASE_TAG"
           validate_release fd-payment "$FD_PAYMENT_RELEASE_TAG"
           validate_release fd-commerce "$FD_COMMERCE_RELEASE_TAG"
+          validate_release fd-content-types "$FD_CONTENT_TYPES_RELEASE_TAG"
           validate_release fd-websocket-push "$FD_WEBSOCKET_PUSH_RELEASE_TAG"
           if [ -n "$WPGRAPHQL_JWT_AUTH_RELEASE_TAG" ]; then
             echo "Checking wp-graphql/wp-graphql-jwt-authentication $WPGRAPHQL_JWT_AUTH_RELEASE_TAG"
@@ -134,7 +139,7 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
-          envs: ACR_USERNAME,ACR_PASSWORD,GH_TOKEN,FORCE_WORDPRESS_ASSET_FETCH,FD_THEME_RELEASE_TAG,FD_ADMIN_UI_RELEASE_TAG,FD_MEMBER_RELEASE_TAG,FD_PAYMENT_RELEASE_TAG,FD_COMMERCE_RELEASE_TAG,FD_WEBSOCKET_PUSH_RELEASE_TAG,WPGRAPHQL_JWT_AUTH_RELEASE_TAG,WPGRAPHQL_TAX_QUERY_REF,FRONTEND_IMAGE,WEBSOCKET_IMAGE,FRONTEND_DOMAIN,ADMIN_DOMAIN,WS_DOMAIN,PUBLIC_SCHEME,WEBSOCKET_PUBLIC_SCHEME,LETSENCRYPT_EMAIL,LETSENCRYPT_STAGING,RUN_HTTPS_SETUP
+          envs: ACR_USERNAME,ACR_PASSWORD,GH_TOKEN,FORCE_WORDPRESS_ASSET_FETCH,FD_THEME_RELEASE_TAG,FD_ADMIN_UI_RELEASE_TAG,FD_MEMBER_RELEASE_TAG,FD_PAYMENT_RELEASE_TAG,FD_COMMERCE_RELEASE_TAG,FD_CONTENT_TYPES_RELEASE_TAG,FD_WEBSOCKET_PUSH_RELEASE_TAG,WPGRAPHQL_JWT_AUTH_RELEASE_TAG,WPGRAPHQL_TAX_QUERY_REF,FRONTEND_IMAGE,WEBSOCKET_IMAGE,FRONTEND_DOMAIN,ADMIN_DOMAIN,WS_DOMAIN,PUBLIC_SCHEME,WEBSOCKET_PUBLIC_SCHEME,LETSENCRYPT_EMAIL,LETSENCRYPT_STAGING,RUN_HTTPS_SETUP
           command_timeout: 40m
           script: |
             set -e
@@ -168,13 +173,14 @@ jobs:
               bash scripts/update-runtime-images.sh
             fi
 
-            if [ -n "$FD_THEME_RELEASE_TAG" ] || [ -n "$FD_ADMIN_UI_RELEASE_TAG" ] || [ -n "$FD_MEMBER_RELEASE_TAG" ] || [ -n "$FD_PAYMENT_RELEASE_TAG" ] || [ -n "$FD_COMMERCE_RELEASE_TAG" ] || [ -n "$FD_WEBSOCKET_PUSH_RELEASE_TAG" ] || [ -n "$WPGRAPHQL_JWT_AUTH_RELEASE_TAG" ] || [ -n "$WPGRAPHQL_TAX_QUERY_REF" ]; then
+            if [ -n "$FD_THEME_RELEASE_TAG" ] || [ -n "$FD_ADMIN_UI_RELEASE_TAG" ] || [ -n "$FD_MEMBER_RELEASE_TAG" ] || [ -n "$FD_PAYMENT_RELEASE_TAG" ] || [ -n "$FD_COMMERCE_RELEASE_TAG" ] || [ -n "$FD_CONTENT_TYPES_RELEASE_TAG" ] || [ -n "$FD_WEBSOCKET_PUSH_RELEASE_TAG" ] || [ -n "$WPGRAPHQL_JWT_AUTH_RELEASE_TAG" ] || [ -n "$WPGRAPHQL_TAX_QUERY_REF" ]; then
               ENV_FILE=.env \
               FD_THEME_RELEASE_TAG="$FD_THEME_RELEASE_TAG" \
               FD_ADMIN_UI_RELEASE_TAG="$FD_ADMIN_UI_RELEASE_TAG" \
               FD_MEMBER_RELEASE_TAG="$FD_MEMBER_RELEASE_TAG" \
               FD_PAYMENT_RELEASE_TAG="$FD_PAYMENT_RELEASE_TAG" \
               FD_COMMERCE_RELEASE_TAG="$FD_COMMERCE_RELEASE_TAG" \
+              FD_CONTENT_TYPES_RELEASE_TAG="$FD_CONTENT_TYPES_RELEASE_TAG" \
               FD_WEBSOCKET_PUSH_RELEASE_TAG="$FD_WEBSOCKET_PUSH_RELEASE_TAG" \
               WPGRAPHQL_JWT_AUTH_RELEASE_TAG="$WPGRAPHQL_JWT_AUTH_RELEASE_TAG" \
               WPGRAPHQL_TAX_QUERY_REF="$WPGRAPHQL_TAX_QUERY_REF" \

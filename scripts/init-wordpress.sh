@@ -292,6 +292,7 @@ if [[ "${WORDPRESS_ACTIVATE_CORE_PLUGINS}" == "true" ]]; then
   activate_plugin_if_present "fd-member"
   activate_plugin_if_present "fd-payment"
   activate_plugin_if_present "fd-commerce"
+  activate_plugin_if_present "fd-content-types"
   activate_plugin_if_present "fd-websocket-push"
   activate_plugin_if_present "wp-graphql-jwt-authentication"
   activate_plugin_if_present "wp-graphql-tax-query-develop"

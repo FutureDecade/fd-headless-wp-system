@@ -28,6 +28,7 @@ FD_ADMIN_UI_RELEASE_TAG="${FD_ADMIN_UI_RELEASE_TAG:-v1.3.1}"
 FD_MEMBER_RELEASE_TAG="${FD_MEMBER_RELEASE_TAG:-v1.0.1}"
 FD_PAYMENT_RELEASE_TAG="${FD_PAYMENT_RELEASE_TAG:-v1.0.0}"
 FD_COMMERCE_RELEASE_TAG="${FD_COMMERCE_RELEASE_TAG:-v1.0.0}"
+FD_CONTENT_TYPES_RELEASE_TAG="${FD_CONTENT_TYPES_RELEASE_TAG:-v0.1.0}"
 FD_WEBSOCKET_PUSH_RELEASE_TAG="${FD_WEBSOCKET_PUSH_RELEASE_TAG:-v1.0.0}"
 WPGRAPHQL_JWT_AUTH_RELEASE_TAG="${WPGRAPHQL_JWT_AUTH_RELEASE_TAG:-v0.7.2}"
 WPGRAPHQL_TAX_QUERY_REF="${WPGRAPHQL_TAX_QUERY_REF:-v0.2.0}"
@@ -54,6 +55,7 @@ fd-admin-ui=${FD_ADMIN_UI_RELEASE_TAG}
 fd-member=${FD_MEMBER_RELEASE_TAG}
 fd-payment=${FD_PAYMENT_RELEASE_TAG}
 fd-commerce=${FD_COMMERCE_RELEASE_TAG}
+fd-content-types=${FD_CONTENT_TYPES_RELEASE_TAG}
 fd-websocket-push=${FD_WEBSOCKET_PUSH_RELEASE_TAG}
 wp-graphql-jwt-authentication=${WPGRAPHQL_JWT_AUTH_RELEASE_TAG}
 wp-graphql-tax-query-develop=${WPGRAPHQL_TAX_QUERY_REF}
@@ -82,6 +84,10 @@ assets_already_match() {
   fi
 
   if [[ ! -f "${PLUGINS_DIR}/fd-commerce/fd-commerce.php" ]]; then
+    return 1
+  fi
+
+  if [[ ! -f "${PLUGINS_DIR}/fd-content-types/fd-content-types.php" ]]; then
     return 1
   fi
 
@@ -223,6 +229,7 @@ download_release_asset "${WORDPRESS_RELEASE_OWNER}/fd-admin-ui" "${FD_ADMIN_UI_R
 download_release_asset "${WORDPRESS_RELEASE_OWNER}/fd-member" "${FD_MEMBER_RELEASE_TAG}" "fd-member.zip" "fd-member" "${PLUGINS_DIR}/fd-member" "fd-member"
 download_release_asset "${WORDPRESS_RELEASE_OWNER}/fd-payment" "${FD_PAYMENT_RELEASE_TAG}" "fd-payment.zip" "fd-payment" "${PLUGINS_DIR}/fd-payment" "fd-payment"
 download_release_asset "${WORDPRESS_RELEASE_OWNER}/fd-commerce" "${FD_COMMERCE_RELEASE_TAG}" "fd-commerce.zip" "fd-commerce" "${PLUGINS_DIR}/fd-commerce" "fd-commerce"
+download_release_asset "${WORDPRESS_RELEASE_OWNER}/fd-content-types" "${FD_CONTENT_TYPES_RELEASE_TAG}" "fd-content-types.zip" "fd-content-types" "${PLUGINS_DIR}/fd-content-types" "fd-content-types"
 download_release_asset "${WORDPRESS_RELEASE_OWNER}/fd-websocket-push" "${FD_WEBSOCKET_PUSH_RELEASE_TAG}" "fd-websocket-push.zip" "fd-websocket-push" "${PLUGINS_DIR}/fd-websocket-push" "fd-websocket-push"
 download_release_asset "wp-graphql/wp-graphql-jwt-authentication" "${WPGRAPHQL_JWT_AUTH_RELEASE_TAG}" "wp-graphql-jwt-authentication.zip" "wp-graphql-jwt-authentication" "${PLUGINS_DIR}/wp-graphql-jwt-authentication" "wp-graphql-jwt-authentication" "wp-graphql-jwt-authentication.php"
 download_repo_archive "wp-graphql/wp-graphql-tax-query" "${WPGRAPHQL_TAX_QUERY_REF}" "${PLUGINS_DIR}/wp-graphql-tax-query-develop" "wp-graphql-tax-query-develop"

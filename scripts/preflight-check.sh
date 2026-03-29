@@ -159,6 +159,7 @@ FD_ADMIN_UI_RELEASE_TAG="${FD_ADMIN_UI_RELEASE_TAG:-v1.3.1}"
 FD_MEMBER_RELEASE_TAG="${FD_MEMBER_RELEASE_TAG:-v1.0.1}"
 FD_PAYMENT_RELEASE_TAG="${FD_PAYMENT_RELEASE_TAG:-v1.0.0}"
 FD_COMMERCE_RELEASE_TAG="${FD_COMMERCE_RELEASE_TAG:-v1.0.0}"
+FD_CONTENT_TYPES_RELEASE_TAG="${FD_CONTENT_TYPES_RELEASE_TAG:-v0.1.0}"
 FD_WEBSOCKET_PUSH_RELEASE_TAG="${FD_WEBSOCKET_PUSH_RELEASE_TAG:-v1.0.0}"
 WPGRAPHQL_JWT_AUTH_RELEASE_TAG="${WPGRAPHQL_JWT_AUTH_RELEASE_TAG:-v0.7.2}"
 WPGRAPHQL_TAX_QUERY_REF="${WPGRAPHQL_TAX_QUERY_REF:-v0.2.0}"
@@ -202,6 +203,10 @@ need_wordpress_asset_fetch() {
     return 0
   fi
 
+  if [[ ! -f "${ROOT_DIR}/runtime/wp-content/plugins/fd-content-types/fd-content-types.php" ]]; then
+    return 0
+  fi
+
   if [[ ! -f "${ROOT_DIR}/runtime/wp-content/plugins/fd-websocket-push/fd-websocket-push.php" ]]; then
     return 0
   fi
@@ -221,6 +226,7 @@ fd-admin-ui=${FD_ADMIN_UI_RELEASE_TAG}
 fd-member=${FD_MEMBER_RELEASE_TAG}
 fd-payment=${FD_PAYMENT_RELEASE_TAG}
 fd-commerce=${FD_COMMERCE_RELEASE_TAG}
+fd-content-types=${FD_CONTENT_TYPES_RELEASE_TAG}
 fd-websocket-push=${FD_WEBSOCKET_PUSH_RELEASE_TAG}
 wp-graphql-jwt-authentication=${WPGRAPHQL_JWT_AUTH_RELEASE_TAG}
 wp-graphql-tax-query-develop=${WPGRAPHQL_TAX_QUERY_REF}

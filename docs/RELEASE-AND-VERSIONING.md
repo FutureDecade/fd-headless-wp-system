@@ -17,13 +17,15 @@
 - `fd-member`：`v1.0.0`
 - `fd-payment`：`v1.0.0`
 - `fd-commerce`：`v1.0.0`
+- `fd-content-types`：`v0.1.0`
 
 ## 当前推荐默认版本
 
-- `fd-theme`：`v1.0.4`
+- `fd-theme`：`v1.0.5`
 - `fd-member`：`v1.0.1`
 - `fd-payment`：`v1.0.0`
 - `fd-commerce`：`v1.0.0`
+- `fd-content-types`：`v0.1.0`
 
 对应 release asset：
 
@@ -31,6 +33,7 @@
 - `fd-member.zip`
 - `fd-payment.zip`
 - `fd-commerce.zip`
+- `fd-content-types.zip`
 
 ## 推荐发布顺序
 

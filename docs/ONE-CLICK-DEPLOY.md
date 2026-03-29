@@ -35,6 +35,7 @@
 - `fd-member`
 - `fd-payment`
 - `fd-commerce`
+- `fd-content-types`
 - `fd-websocket-push`
 - `wp-graphql`
 - `wp-graphql-jwt-authentication`
@@ -142,6 +143,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/FutureDecade/fd-headless-wp-
 - `fd-member`
 - `fd-payment`
 - `fd-commerce`
+- `fd-content-types`
 - `fd-websocket-push`
 - `wp-graphql-jwt-authentication`
 - `wp-graphql-tax-query`
