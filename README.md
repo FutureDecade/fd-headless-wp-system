@@ -170,6 +170,7 @@ bash scripts/configure-env.sh
 - 如果要在测试服务器拉取私有 WordPress release 资产，需要把 `WORDPRESS_FETCH_RELEASE_ASSETS=true`
 - 如果 WordPress 资产版本没有变化，`scripts/update-stack.sh` 会自动跳过重复下载；只有需要强制重拉时，才把 `FORCE_WORDPRESS_ASSET_FETCH=true`
 - 测试服务器更新建议直接运行 `bash scripts/update-stack.sh`
+- 服务器上不要直接手写裸 `docker compose up/run` 来操作 WordPress 相关容器，应该统一走仓库脚本；否则可能遗漏 `wordpress-assets` 挂载
 - `scripts/install.sh` 现在会先做预检查，再直接复用 `scripts/update-stack.sh` 的安全更新流程，避免维护两套部署逻辑
 - `scripts/quick-install.sh` 会把“配置 + 收集凭据 + 首次安装”收成一个入口
 - `scripts/remote-install.sh` 支持空白 Debian 12 服务器一条命令拉起首装入口

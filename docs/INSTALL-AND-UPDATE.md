@@ -411,6 +411,12 @@ FD_THEME_RELEASE_TAG=v1.0.4 bash scripts/update-wordpress-release-tags.sh
 ACR_USERNAME=你的阿里云账号 ACR_PASSWORD=你的ACR密码 GH_TOKEN=你的GitHubToken bash scripts/update-stack.sh
 ```
 
+注意：
+
+- 不要直接手写裸 `docker compose up` 或 `docker compose run` 去操作 WordPress 容器
+- 这套交付依赖 `compose/wordpress-assets.override.yml` 挂载主题和插件
+- 最稳妥的方式是统一使用仓库里的 `scripts/install.sh`、`scripts/update-stack.sh`、`scripts/setup-https.sh`
+
 ### 最推荐的更新顺序
 
 最稳妥的做法永远是：
