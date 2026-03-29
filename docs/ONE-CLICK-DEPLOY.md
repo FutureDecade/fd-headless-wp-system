@@ -254,7 +254,7 @@ bash scripts/update-stack.sh
 
 ```bash
 cd /opt/fd-headless-wp-system
-FD_THEME_RELEASE_TAG=v1.0.4 \
+FD_THEME_RELEASE_TAG=v1.0.7 \
 FD_ADMIN_UI_RELEASE_TAG=v1.3.1 \
 FD_MEMBER_RELEASE_TAG=v1.0.1 \
 FD_PAYMENT_RELEASE_TAG=v1.0.0 \

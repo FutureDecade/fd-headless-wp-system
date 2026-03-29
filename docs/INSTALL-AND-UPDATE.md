@@ -52,7 +52,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/FutureDecade/fd-headless-wp-
 
 当前测试机使用的关键版本：
 
-- `fd-theme`: `v1.0.6`
+- `fd-theme`: `v1.0.7`
 - `fd-admin-ui`: `v1.3.1`
 - `fd-content-types`: `v0.1.0`
 - `fd-frontend`: `crpi-8y82lbqoc1haiday.cn-beijing.personal.cr.aliyuncs.com/futuredecade/fd-frontend:futuredecade-https-8862356`
@@ -241,7 +241,7 @@ bash scripts/configure-env.sh
 如果这台机器要自动拉 GitHub release 里的主题和插件，还要确认这些：
 
 - `WORDPRESS_FETCH_RELEASE_ASSETS=true`
-- `FD_THEME_RELEASE_TAG=v1.0.4`
+- `FD_THEME_RELEASE_TAG=v1.0.7`
 - `FD_ADMIN_UI_RELEASE_TAG=v1.3.1`
 - `FD_MEMBER_RELEASE_TAG=...`
 - `FD_PAYMENT_RELEASE_TAG=...`
@@ -409,7 +409,7 @@ ACR_USERNAME=你的阿里云账号 ACR_PASSWORD=你的ACR密码 GH_TOKEN=你的G
 修改 `.env` 里的 release tag：
 
 ```bash
-FD_THEME_RELEASE_TAG=v1.0.4 bash scripts/update-wordpress-release-tags.sh
+FD_THEME_RELEASE_TAG=v1.0.7 bash scripts/update-wordpress-release-tags.sh
 ```
 
 然后执行更新：
