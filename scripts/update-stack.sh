@@ -19,6 +19,7 @@ WORDPRESS_FETCH_RELEASE_ASSETS="${WORDPRESS_FETCH_RELEASE_ASSETS:-false}"
 WORDPRESS_RUN_INIT="${WORDPRESS_RUN_INIT:-false}"
 ACR_USERNAME="${ACR_USERNAME:-}"
 ACR_PASSWORD="${ACR_PASSWORD:-}"
+SKIP_IMAGE_PULL="${SKIP_IMAGE_PULL:-false}"
 HTTP_PORT="${HTTP_PORT:-80}"
 HTTPS_ENABLED="${HTTPS_ENABLED:-false}"
 HTTPS_PORT="${HTTPS_PORT:-443}"
@@ -108,6 +109,11 @@ login_acr_if_needed() {
   local image=""
   local -a seen=()
 
+  if [[ "${SKIP_IMAGE_PULL}" == "true" ]]; then
+    echo "SKIP_IMAGE_PULL=true, skipping ACR login."
+    return 0
+  fi
+
   for image in \
     "${MARIADB_IMAGE:-}" \
     "${REDIS_IMAGE:-}" \
@@ -138,6 +144,11 @@ login_acr_if_needed() {
 }
 
 pull_required_images() {
+  if [[ "${SKIP_IMAGE_PULL}" == "true" ]]; then
+    echo "SKIP_IMAGE_PULL=true, skipping image pulls."
+    return 0
+  fi
+
   echo "Pulling app images..."
   "${compose_base[@]}" pull db redis wordpress frontend websocket nginx
 

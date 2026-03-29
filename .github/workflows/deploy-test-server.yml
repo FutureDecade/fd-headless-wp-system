@@ -7,6 +7,10 @@ on:
         description: Force re-download WordPress release assets
         required: true
         default: "false"
+      skip_image_pull:
+        description: Skip docker login and image pull, only refresh WordPress assets and recreate containers
+        required: true
+        default: "false"
       fd_theme_release_tag:
         description: fd-theme release tag, blank means keep current value
         required: false
@@ -76,6 +80,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       FORCE_WORDPRESS_ASSET_FETCH: ${{ inputs.force_wordpress_asset_fetch || 'false' }}
+      SKIP_IMAGE_PULL: ${{ inputs.skip_image_pull || 'false' }}
       FD_THEME_RELEASE_TAG: ${{ inputs.fd_theme_release_tag || '' }}
       FD_ADMIN_UI_RELEASE_TAG: ${{ inputs.fd_admin_ui_release_tag || '' }}
       FD_MEMBER_RELEASE_TAG: ${{ inputs.fd_member_release_tag || '' }}
@@ -139,7 +144,7 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
-          envs: ACR_USERNAME,ACR_PASSWORD,GH_TOKEN,FORCE_WORDPRESS_ASSET_FETCH,FD_THEME_RELEASE_TAG,FD_ADMIN_UI_RELEASE_TAG,FD_MEMBER_RELEASE_TAG,FD_PAYMENT_RELEASE_TAG,FD_COMMERCE_RELEASE_TAG,FD_CONTENT_TYPES_RELEASE_TAG,FD_WEBSOCKET_PUSH_RELEASE_TAG,WPGRAPHQL_JWT_AUTH_RELEASE_TAG,WPGRAPHQL_TAX_QUERY_REF,FRONTEND_IMAGE,WEBSOCKET_IMAGE,FRONTEND_DOMAIN,ADMIN_DOMAIN,WS_DOMAIN,PUBLIC_SCHEME,WEBSOCKET_PUBLIC_SCHEME,LETSENCRYPT_EMAIL,LETSENCRYPT_STAGING,RUN_HTTPS_SETUP
+          envs: ACR_USERNAME,ACR_PASSWORD,GH_TOKEN,FORCE_WORDPRESS_ASSET_FETCH,SKIP_IMAGE_PULL,FD_THEME_RELEASE_TAG,FD_ADMIN_UI_RELEASE_TAG,FD_MEMBER_RELEASE_TAG,FD_PAYMENT_RELEASE_TAG,FD_COMMERCE_RELEASE_TAG,FD_CONTENT_TYPES_RELEASE_TAG,FD_WEBSOCKET_PUSH_RELEASE_TAG,WPGRAPHQL_JWT_AUTH_RELEASE_TAG,WPGRAPHQL_TAX_QUERY_REF,FRONTEND_IMAGE,WEBSOCKET_IMAGE,FRONTEND_DOMAIN,ADMIN_DOMAIN,WS_DOMAIN,PUBLIC_SCHEME,WEBSOCKET_PUBLIC_SCHEME,LETSENCRYPT_EMAIL,LETSENCRYPT_STAGING,RUN_HTTPS_SETUP
           command_timeout: 40m
           script: |
             set -e
@@ -199,5 +204,6 @@ jobs:
               ACR_PASSWORD="$ACR_PASSWORD" \
               GH_TOKEN="$GH_TOKEN" \
               FORCE_WORDPRESS_ASSET_FETCH="$FORCE_WORDPRESS_ASSET_FETCH" \
+              SKIP_IMAGE_PULL="$SKIP_IMAGE_PULL" \
               bash scripts/update-stack.sh
             fi
