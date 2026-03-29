@@ -36,25 +36,35 @@
 ### Theme / Plugins
 
 - `fd-theme`
+- `fd-admin-ui`
 - `fd-member`
 - `fd-payment`
 - `fd-commerce`
-- 其他 `fd-*` 插件
+- `fd-websocket-push`
+- `wp-graphql-jwt-authentication`
+- `wp-graphql-tax-query`
+- `redis-cache`
 
 当前状态：
 
 - 已有独立 Git 仓库来源：
   - `https://github.com/FutureDecade/fd-theme`
+  - `https://github.com/FutureDecade/fd-admin-ui`
   - `https://github.com/FutureDecade/fd-member`
   - `https://github.com/FutureDecade/fd-payment`
   - `https://github.com/FutureDecade/fd-commerce`
-- 四个核心仓库都已具备基础 PHP CI
-- 四个核心仓库都已具备 zip 打包 workflow artifact
-- 四个核心仓库都已具备首个正式 release `v1.0.0`
-- 交付仓库已可消费这些 release zip 做内部 staging
+  - `https://github.com/FutureDecade/fd-websocket-push`
+- `wp-graphql-jwt-authentication` 来自官方仓库：
+  - `https://github.com/wp-graphql/wp-graphql-jwt-authentication`
+- `wp-graphql-tax-query` 来自官方仓库：
+  - `https://github.com/wp-graphql/wp-graphql-tax-query`
+- `redis-cache` 目前直接通过 WordPress 官方插件源安装
+- 六个核心自有仓库都已具备基础版本来源
+- 交付仓库已可消费自有 release zip，并补拉外部官方插件
 - 交付仓库已可用 `wp-cli` 做首次安装与启用
 - 线上也有运行中的副本
-- 其余 `fd-*` 组件仍未完全独立治理
+- `fd-editor-enhancer` 不再单独纳入交付链
+- 它的编辑器增强能力已经并进 `fd-admin-ui`
 - 还没有完成正式安装链路验证
 
 未来方向：

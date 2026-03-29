@@ -28,6 +28,9 @@ FD_ADMIN_UI_RELEASE_TAG="${FD_ADMIN_UI_RELEASE_TAG:-v1.3.1}"
 FD_MEMBER_RELEASE_TAG="${FD_MEMBER_RELEASE_TAG:-v1.0.1}"
 FD_PAYMENT_RELEASE_TAG="${FD_PAYMENT_RELEASE_TAG:-v1.0.0}"
 FD_COMMERCE_RELEASE_TAG="${FD_COMMERCE_RELEASE_TAG:-v1.0.0}"
+FD_WEBSOCKET_PUSH_RELEASE_TAG="${FD_WEBSOCKET_PUSH_RELEASE_TAG:-v1.0.0}"
+WPGRAPHQL_JWT_AUTH_RELEASE_TAG="${WPGRAPHQL_JWT_AUTH_RELEASE_TAG:-v0.7.2}"
+WPGRAPHQL_TAX_QUERY_REF="${WPGRAPHQL_TAX_QUERY_REF:-v0.2.0}"
 
 RUNTIME_ROOT="${ROOT_DIR}/runtime/wp-content"
 THEMES_DIR="${RUNTIME_ROOT}/themes"
@@ -51,6 +54,9 @@ fd-admin-ui=${FD_ADMIN_UI_RELEASE_TAG}
 fd-member=${FD_MEMBER_RELEASE_TAG}
 fd-payment=${FD_PAYMENT_RELEASE_TAG}
 fd-commerce=${FD_COMMERCE_RELEASE_TAG}
+fd-websocket-push=${FD_WEBSOCKET_PUSH_RELEASE_TAG}
+wp-graphql-jwt-authentication=${WPGRAPHQL_JWT_AUTH_RELEASE_TAG}
+wp-graphql-tax-query-develop=${WPGRAPHQL_TAX_QUERY_REF}
 EOF
 }
 
@@ -79,6 +85,18 @@ assets_already_match() {
     return 1
   fi
 
+  if [[ ! -f "${PLUGINS_DIR}/fd-websocket-push/fd-websocket-push.php" ]]; then
+    return 1
+  fi
+
+  if [[ ! -f "${PLUGINS_DIR}/wp-graphql-jwt-authentication/wp-graphql-jwt-authentication.php" ]]; then
+    return 1
+  fi
+
+  if [[ ! -f "${PLUGINS_DIR}/wp-graphql-tax-query-develop/wp-graphql-tax-query.php" ]]; then
+    return 1
+  fi
+
   local current_lock
   current_lock="$(cat "${LOCK_FILE}")"
 
@@ -100,19 +118,25 @@ if ! command -v unzip >/dev/null 2>&1; then
   exit 1
 fi
 
+if ! command -v curl >/dev/null 2>&1; then
+  echo "Missing required command: curl"
+  exit 1
+fi
+
 if [[ -z "${GH_TOKEN:-}" && -z "${GITHUB_TOKEN:-}" ]] && ! gh auth status >/dev/null 2>&1; then
   echo "GitHub CLI is not authenticated. Run: gh auth login"
   exit 1
 fi
 
-download_and_extract() {
-  local slug="$1"
+download_release_asset() {
+  local repo="$1"
   local release_tag="$2"
-  local repo="${WORDPRESS_RELEASE_OWNER}/${slug}"
-  local asset_name="${slug}.zip"
-  local package_dir="${TMP_DIR}/${slug}"
-  local extracted_dir="${TMP_DIR}/extracted-${slug}"
-  local target_dir="$3"
+  local asset_name="$3"
+  local expected_dir="$4"
+  local target_dir="$5"
+  local cache_key="$6"
+  local package_dir="${TMP_DIR}/${cache_key}"
+  local extracted_dir="${TMP_DIR}/extracted-${cache_key}"
 
   echo "Fetching ${repo} ${release_tag}..."
 
@@ -125,21 +149,57 @@ download_and_extract() {
 
   unzip -q "${package_dir}/${asset_name}" -d "${extracted_dir}"
 
-  if [[ ! -d "${extracted_dir}/${slug}" ]]; then
-    echo "Invalid package layout for ${asset_name}: missing ${slug}/"
+  if [[ ! -d "${extracted_dir}/${expected_dir}" ]]; then
+    echo "Invalid package layout for ${asset_name}: missing ${expected_dir}/"
     exit 1
   fi
 
   rm -rf "${target_dir}"
   mkdir -p "$(dirname "${target_dir}")"
-  mv "${extracted_dir}/${slug}" "${target_dir}"
+  mv "${extracted_dir}/${expected_dir}" "${target_dir}"
 }
 
-download_and_extract "fd-theme" "${FD_THEME_RELEASE_TAG}" "${THEMES_DIR}/fd-theme"
-download_and_extract "fd-admin-ui" "${FD_ADMIN_UI_RELEASE_TAG}" "${PLUGINS_DIR}/fd-admin-ui"
-download_and_extract "fd-member" "${FD_MEMBER_RELEASE_TAG}" "${PLUGINS_DIR}/fd-member"
-download_and_extract "fd-payment" "${FD_PAYMENT_RELEASE_TAG}" "${PLUGINS_DIR}/fd-payment"
-download_and_extract "fd-commerce" "${FD_COMMERCE_RELEASE_TAG}" "${PLUGINS_DIR}/fd-commerce"
+download_repo_archive() {
+  local repo="$1"
+  local ref="$2"
+  local target_dir="$3"
+  local cache_key="$4"
+  local package_zip="${TMP_DIR}/${cache_key}.zip"
+  local extracted_dir="${TMP_DIR}/extracted-${cache_key}"
+  local archive_url=""
+  local source_dir=""
+
+  echo "Fetching ${repo} ${ref} archive..."
+
+  mkdir -p "${extracted_dir}"
+
+  archive_url="https://github.com/${repo}/archive/refs/tags/${ref}.zip"
+  if ! curl -fsSL "${archive_url}" -o "${package_zip}"; then
+    archive_url="https://github.com/${repo}/archive/refs/heads/${ref}.zip"
+    curl -fsSL "${archive_url}" -o "${package_zip}"
+  fi
+
+  unzip -q "${package_zip}" -d "${extracted_dir}"
+
+  source_dir="$(find "${extracted_dir}" -mindepth 1 -maxdepth 1 -type d | head -n 1)"
+  if [[ -z "${source_dir}" ]]; then
+    echo "Invalid archive layout for ${repo} ${ref}"
+    exit 1
+  fi
+
+  rm -rf "${target_dir}"
+  mkdir -p "$(dirname "${target_dir}")"
+  mv "${source_dir}" "${target_dir}"
+}
+
+download_release_asset "${WORDPRESS_RELEASE_OWNER}/fd-theme" "${FD_THEME_RELEASE_TAG}" "fd-theme.zip" "fd-theme" "${THEMES_DIR}/fd-theme" "fd-theme"
+download_release_asset "${WORDPRESS_RELEASE_OWNER}/fd-admin-ui" "${FD_ADMIN_UI_RELEASE_TAG}" "fd-admin-ui.zip" "fd-admin-ui" "${PLUGINS_DIR}/fd-admin-ui" "fd-admin-ui"
+download_release_asset "${WORDPRESS_RELEASE_OWNER}/fd-member" "${FD_MEMBER_RELEASE_TAG}" "fd-member.zip" "fd-member" "${PLUGINS_DIR}/fd-member" "fd-member"
+download_release_asset "${WORDPRESS_RELEASE_OWNER}/fd-payment" "${FD_PAYMENT_RELEASE_TAG}" "fd-payment.zip" "fd-payment" "${PLUGINS_DIR}/fd-payment" "fd-payment"
+download_release_asset "${WORDPRESS_RELEASE_OWNER}/fd-commerce" "${FD_COMMERCE_RELEASE_TAG}" "fd-commerce.zip" "fd-commerce" "${PLUGINS_DIR}/fd-commerce" "fd-commerce"
+download_release_asset "${WORDPRESS_RELEASE_OWNER}/fd-websocket-push" "${FD_WEBSOCKET_PUSH_RELEASE_TAG}" "fd-websocket-push.zip" "fd-websocket-push" "${PLUGINS_DIR}/fd-websocket-push" "fd-websocket-push"
+download_release_asset "wp-graphql/wp-graphql-jwt-authentication" "${WPGRAPHQL_JWT_AUTH_RELEASE_TAG}" "wp-graphql-jwt-authentication.zip" "wp-graphql-jwt-authentication" "${PLUGINS_DIR}/wp-graphql-jwt-authentication" "wp-graphql-jwt-authentication"
+download_repo_archive "wp-graphql/wp-graphql-tax-query" "${WPGRAPHQL_TAX_QUERY_REF}" "${PLUGINS_DIR}/wp-graphql-tax-query-develop" "wp-graphql-tax-query-develop"
 
 desired_assets_lock > "${LOCK_FILE}"
 

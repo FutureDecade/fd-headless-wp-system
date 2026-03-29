@@ -190,6 +190,9 @@ fd_admin_ui_release_tag_default="${FD_ADMIN_UI_RELEASE_TAG:-v1.3.1}"
 fd_member_release_tag_default="${FD_MEMBER_RELEASE_TAG:-v1.0.1}"
 fd_payment_release_tag_default="${FD_PAYMENT_RELEASE_TAG:-v1.0.0}"
 fd_commerce_release_tag_default="${FD_COMMERCE_RELEASE_TAG:-v1.0.0}"
+fd_websocket_push_release_tag_default="${FD_WEBSOCKET_PUSH_RELEASE_TAG:-v1.0.0}"
+wpgraphql_jwt_auth_release_tag_default="${WPGRAPHQL_JWT_AUTH_RELEASE_TAG:-v0.7.2}"
+wpgraphql_tax_query_ref_default="${WPGRAPHQL_TAX_QUERY_REF:-v0.2.0}"
 wordpress_title_default="${WORDPRESS_TITLE:-FD Headless WP}"
 wordpress_admin_user_default="${WORDPRESS_ADMIN_USER:-fdadmin}"
 wordpress_admin_password_default="${WORDPRESS_ADMIN_PASSWORD:-}"
@@ -288,6 +291,9 @@ if [[ "${wordpress_fetch_release_assets}" == "true" ]]; then
   fd_member_release_tag="$(prompt_required_value "fd-member release tag" "${fd_member_release_tag_default}")"
   fd_payment_release_tag="$(prompt_required_value "fd-payment release tag" "${fd_payment_release_tag_default}")"
   fd_commerce_release_tag="$(prompt_required_value "fd-commerce release tag" "${fd_commerce_release_tag_default}")"
+  fd_websocket_push_release_tag="$(prompt_required_value "fd-websocket-push release tag" "${fd_websocket_push_release_tag_default}")"
+  wpgraphql_jwt_auth_release_tag="$(prompt_required_value "wp-graphql-jwt-authentication release tag" "${wpgraphql_jwt_auth_release_tag_default}")"
+  wpgraphql_tax_query_ref="$(prompt_required_value "wp-graphql-tax-query ref" "${wpgraphql_tax_query_ref_default}")"
 
   set_env_value "${ENV_FILE}" "WORDPRESS_RELEASE_OWNER" "${wordpress_release_owner}"
   set_env_value "${ENV_FILE}" "FD_THEME_RELEASE_TAG" "${fd_theme_release_tag}"
@@ -295,6 +301,9 @@ if [[ "${wordpress_fetch_release_assets}" == "true" ]]; then
   set_env_value "${ENV_FILE}" "FD_MEMBER_RELEASE_TAG" "${fd_member_release_tag}"
   set_env_value "${ENV_FILE}" "FD_PAYMENT_RELEASE_TAG" "${fd_payment_release_tag}"
   set_env_value "${ENV_FILE}" "FD_COMMERCE_RELEASE_TAG" "${fd_commerce_release_tag}"
+  set_env_value "${ENV_FILE}" "FD_WEBSOCKET_PUSH_RELEASE_TAG" "${fd_websocket_push_release_tag}"
+  set_env_value "${ENV_FILE}" "WPGRAPHQL_JWT_AUTH_RELEASE_TAG" "${wpgraphql_jwt_auth_release_tag}"
+  set_env_value "${ENV_FILE}" "WPGRAPHQL_TAX_QUERY_REF" "${wpgraphql_tax_query_ref}"
 fi
 
 if [[ "${wordpress_run_init}" == "true" ]]; then

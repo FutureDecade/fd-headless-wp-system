@@ -159,6 +159,9 @@ FD_ADMIN_UI_RELEASE_TAG="${FD_ADMIN_UI_RELEASE_TAG:-v1.3.1}"
 FD_MEMBER_RELEASE_TAG="${FD_MEMBER_RELEASE_TAG:-v1.0.1}"
 FD_PAYMENT_RELEASE_TAG="${FD_PAYMENT_RELEASE_TAG:-v1.0.0}"
 FD_COMMERCE_RELEASE_TAG="${FD_COMMERCE_RELEASE_TAG:-v1.0.0}"
+FD_WEBSOCKET_PUSH_RELEASE_TAG="${FD_WEBSOCKET_PUSH_RELEASE_TAG:-v1.0.0}"
+WPGRAPHQL_JWT_AUTH_RELEASE_TAG="${WPGRAPHQL_JWT_AUTH_RELEASE_TAG:-v0.7.2}"
+WPGRAPHQL_TAX_QUERY_REF="${WPGRAPHQL_TAX_QUERY_REF:-v0.2.0}"
 
 compose_files=(
   -f "${ROOT_DIR}/docker-compose.yml"
@@ -199,6 +202,18 @@ need_wordpress_asset_fetch() {
     return 0
   fi
 
+  if [[ ! -f "${ROOT_DIR}/runtime/wp-content/plugins/fd-websocket-push/fd-websocket-push.php" ]]; then
+    return 0
+  fi
+
+  if [[ ! -f "${ROOT_DIR}/runtime/wp-content/plugins/wp-graphql-jwt-authentication/wp-graphql-jwt-authentication.php" ]]; then
+    return 0
+  fi
+
+  if [[ ! -f "${ROOT_DIR}/runtime/wp-content/plugins/wp-graphql-tax-query-develop/wp-graphql-tax-query.php" ]]; then
+    return 0
+  fi
+
   local expected_lock
   expected_lock="$(cat <<EOF
 fd-theme=${FD_THEME_RELEASE_TAG}
@@ -206,6 +221,9 @@ fd-admin-ui=${FD_ADMIN_UI_RELEASE_TAG}
 fd-member=${FD_MEMBER_RELEASE_TAG}
 fd-payment=${FD_PAYMENT_RELEASE_TAG}
 fd-commerce=${FD_COMMERCE_RELEASE_TAG}
+fd-websocket-push=${FD_WEBSOCKET_PUSH_RELEASE_TAG}
+wp-graphql-jwt-authentication=${WPGRAPHQL_JWT_AUTH_RELEASE_TAG}
+wp-graphql-tax-query-develop=${WPGRAPHQL_TAX_QUERY_REF}
 EOF
 )"
 

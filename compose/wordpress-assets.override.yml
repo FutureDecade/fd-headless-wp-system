@@ -6,6 +6,9 @@ services:
       - ./runtime/wp-content/plugins/fd-member:/var/www/html/wp-content/plugins/fd-member:ro
       - ./runtime/wp-content/plugins/fd-payment:/var/www/html/wp-content/plugins/fd-payment:ro
       - ./runtime/wp-content/plugins/fd-commerce:/var/www/html/wp-content/plugins/fd-commerce:ro
+      - ./runtime/wp-content/plugins/fd-websocket-push:/var/www/html/wp-content/plugins/fd-websocket-push:ro
+      - ./runtime/wp-content/plugins/wp-graphql-jwt-authentication:/var/www/html/wp-content/plugins/wp-graphql-jwt-authentication:ro
+      - ./runtime/wp-content/plugins/wp-graphql-tax-query-develop:/var/www/html/wp-content/plugins/wp-graphql-tax-query-develop:ro
   wpcli:
     volumes:
       - ./runtime/wp-content/themes/fd-theme:/var/www/html/wp-content/themes/fd-theme:ro
@@ -13,3 +16,6 @@ services:
       - ./runtime/wp-content/plugins/fd-member:/var/www/html/wp-content/plugins/fd-member:ro
       - ./runtime/wp-content/plugins/fd-payment:/var/www/html/wp-content/plugins/fd-payment:ro
       - ./runtime/wp-content/plugins/fd-commerce:/var/www/html/wp-content/plugins/fd-commerce:ro
+      - ./runtime/wp-content/plugins/fd-websocket-push:/var/www/html/wp-content/plugins/fd-websocket-push:ro
+      - ./runtime/wp-content/plugins/wp-graphql-jwt-authentication:/var/www/html/wp-content/plugins/wp-graphql-jwt-authentication:ro
+      - ./runtime/wp-content/plugins/wp-graphql-tax-query-develop:/var/www/html/wp-content/plugins/wp-graphql-tax-query-develop:ro

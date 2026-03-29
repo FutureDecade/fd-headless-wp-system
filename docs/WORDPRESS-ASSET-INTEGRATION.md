@@ -4,9 +4,13 @@
 而是：
 
 - `fd-theme`
+- `fd-admin-ui`
 - `fd-member`
 - `fd-payment`
 - `fd-commerce`
+- `fd-websocket-push`
+- `wp-graphql-jwt-authentication`
+- `wp-graphql-tax-query`
 
 这些已经独立成仓库的资产，未来如何进入交付系统。
 
@@ -40,19 +44,24 @@
 ### 方案 A：Zip 制品
 
 - `fd-theme.zip`
+- `fd-admin-ui.zip`
 - `fd-member.zip`
 - `fd-payment.zip`
 - `fd-commerce.zip`
+- `fd-websocket-push.zip`
 
 当前状态：
 
-- 四个仓库都已具备 GitHub Actions 打包流程
+- 自有插件和主题已经具备 GitHub Actions 打包流程
 - push 到 `main` 会生成对应 zip workflow artifact
 - 发布 GitHub Release 时可以自动上传对应 zip asset
-- 四个核心仓库都已发布首个正式版本 `v1.0.0`
+- `fd-websocket-push` 也已经纳入这条 release zip 路径
 - 交付仓库已具备内部 staging 资产拉取脚本：`scripts/fetch-wordpress-assets.sh`
 - 交付仓库已具备对应挂载文件：`compose/wordpress-assets.override.yml`
 - 交付仓库已具备 WordPress 初始化脚本：`scripts/init-wordpress.sh`
+- `wp-graphql-jwt-authentication` 走官方 release zip
+- `wp-graphql-tax-query` 因为官方 release 没有 zip asset，所以暂时走官方仓库 archive
+- `redis-cache` 目前不进 release 资产目录，首次安装时由 `wp-cli` 直接安装
 
 优点：
 
@@ -89,7 +98,7 @@
 因为现在还缺：
 
 - ACF 导出治理
-- 其余关键 `fd-*` 插件治理
+- 个别外部插件的完全离线安装治理
 - WordPress 初始化治理
 
 ## 当前阶段目标

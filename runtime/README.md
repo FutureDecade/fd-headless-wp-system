@@ -9,6 +9,9 @@
 - `runtime/wp-content/plugins/fd-member`
 - `runtime/wp-content/plugins/fd-payment`
 - `runtime/wp-content/plugins/fd-commerce`
+- `runtime/wp-content/plugins/fd-websocket-push`
+- `runtime/wp-content/plugins/wp-graphql-jwt-authentication`
+- `runtime/wp-content/plugins/wp-graphql-tax-query-develop`
 
 这些内容由 `scripts/fetch-wordpress-assets.sh` 生成。
 

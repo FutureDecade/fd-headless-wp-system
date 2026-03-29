@@ -20,6 +20,9 @@ WORDPRESS_ACTIVATE_THEME="${WORDPRESS_ACTIVATE_THEME:-true}"
 WORDPRESS_ACTIVATE_CORE_PLUGINS="${WORDPRESS_ACTIVATE_CORE_PLUGINS:-true}"
 WORDPRESS_INSTALL_WPGRAPHQL="${WORDPRESS_INSTALL_WPGRAPHQL:-true}"
 WORDPRESS_WPGRAPHQL_SOURCE="${WORDPRESS_WPGRAPHQL_SOURCE:-wp-graphql}"
+WORDPRESS_INSTALL_REDIS_CACHE="${WORDPRESS_INSTALL_REDIS_CACHE:-true}"
+WORDPRESS_REDIS_CACHE_SOURCE="${WORDPRESS_REDIS_CACHE_SOURCE:-redis-cache}"
+WORDPRESS_ENABLE_REDIS_OBJECT_CACHE="${WORDPRESS_ENABLE_REDIS_OBJECT_CACHE:-true}"
 WORDPRESS_PERMALINK_STRUCTURE="${WORDPRESS_PERMALINK_STRUCTURE:-/%postname%/}"
 PUBLIC_SCHEME="${PUBLIC_SCHEME:-http}"
 
@@ -103,6 +106,32 @@ install_plugin_if_missing() {
 
   echo "Installing plugin: ${plugin_slug} (source: ${plugin_source})"
   run_wp plugin install "${plugin_source}" >/dev/null
+}
+
+redis_object_cache_is_enabled() {
+  local enabled=""
+
+  enabled="$(run_wp eval 'echo file_exists( WP_CONTENT_DIR . "/object-cache.php" ) ? "yes" : "no";' 2>/dev/null || true)"
+  [[ "${enabled}" == "yes" ]]
+}
+
+enable_redis_object_cache() {
+  if ! run_wp plugin is-active "redis-cache" >/dev/null 2>&1; then
+    echo "Redis Cache plugin is not active. Skipping object cache enable."
+    return 0
+  fi
+
+  if redis_object_cache_is_enabled; then
+    echo "Redis object cache already enabled."
+    return 0
+  fi
+
+  echo "Enabling Redis object cache..."
+  if run_wp redis enable >/dev/null 2>&1; then
+    echo "Redis object cache enabled."
+  else
+    echo "Redis object cache enable failed. Continuing without drop-in."
+  fi
 }
 
 ensure_permalink_structure() {
@@ -249,11 +278,23 @@ if [[ "${WORDPRESS_INSTALL_WPGRAPHQL}" == "true" ]]; then
   activate_plugin_if_present "wp-graphql"
 fi
 
+if [[ "${WORDPRESS_INSTALL_REDIS_CACHE}" == "true" ]]; then
+  install_plugin_if_missing "redis-cache" "${WORDPRESS_REDIS_CACHE_SOURCE}"
+  activate_plugin_if_present "redis-cache"
+
+  if [[ "${WORDPRESS_ENABLE_REDIS_OBJECT_CACHE}" == "true" ]]; then
+    enable_redis_object_cache
+  fi
+fi
+
 if [[ "${WORDPRESS_ACTIVATE_CORE_PLUGINS}" == "true" ]]; then
   activate_plugin_if_present "fd-admin-ui"
   activate_plugin_if_present "fd-member"
   activate_plugin_if_present "fd-payment"
   activate_plugin_if_present "fd-commerce"
+  activate_plugin_if_present "fd-websocket-push"
+  activate_plugin_if_present "wp-graphql-jwt-authentication"
+  activate_plugin_if_present "wp-graphql-tax-query-develop"
 fi
 
 if [[ "${fresh_install}" == "true" ]]; then

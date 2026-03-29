@@ -244,6 +244,9 @@ bash scripts/configure-env.sh
 - `FD_MEMBER_RELEASE_TAG=...`
 - `FD_PAYMENT_RELEASE_TAG=...`
 - `FD_COMMERCE_RELEASE_TAG=...`
+- `FD_WEBSOCKET_PUSH_RELEASE_TAG=v1.0.0`
+- `WPGRAPHQL_JWT_AUTH_RELEASE_TAG=v0.7.2`
+- `WPGRAPHQL_TAX_QUERY_REF=v0.2.0`
 
 如果这台机器要自动完成首次 WordPress 安装，还要确认这些：
 
@@ -252,6 +255,8 @@ bash scripts/configure-env.sh
 - `WORDPRESS_ADMIN_USER=你的后台管理员用户名`
 - `WORDPRESS_ADMIN_PASSWORD=你的后台管理员密码`
 - `WORDPRESS_ADMIN_EMAIL=你的后台管理员邮箱`
+- `WORDPRESS_INSTALL_REDIS_CACHE=true`
+- `WORDPRESS_ENABLE_REDIS_OBJECT_CACHE=true`
 
 ### 第六步：登录 ACR
 
