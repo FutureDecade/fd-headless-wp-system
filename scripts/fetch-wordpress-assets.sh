@@ -135,8 +135,11 @@ download_release_asset() {
   local expected_dir="$4"
   local target_dir="$5"
   local cache_key="$6"
+  local expected_main_file="${7:-}"
   local package_dir="${TMP_DIR}/${cache_key}"
   local extracted_dir="${TMP_DIR}/extracted-${cache_key}"
+  local source_dir=""
+  local top_level_entries=0
 
   echo "Fetching ${repo} ${release_tag}..."
 
@@ -149,14 +152,37 @@ download_release_asset() {
 
   unzip -q "${package_dir}/${asset_name}" -d "${extracted_dir}"
 
-  if [[ ! -d "${extracted_dir}/${expected_dir}" ]]; then
-    echo "Invalid package layout for ${asset_name}: missing ${expected_dir}/"
+  if [[ -d "${extracted_dir}/${expected_dir}" ]]; then
+    source_dir="${extracted_dir}/${expected_dir}"
+  else
+    top_level_entries="$(find "${extracted_dir}" -mindepth 1 -maxdepth 1 | wc -l | tr -d '[:space:]')"
+
+    if [[ "${top_level_entries}" == "1" ]]; then
+      source_dir="$(find "${extracted_dir}" -mindepth 1 -maxdepth 1 -type d | head -n 1)"
+    fi
+
+    if [[ -z "${source_dir}" && -n "${expected_main_file}" && -f "${extracted_dir}/${expected_main_file}" ]]; then
+      source_dir="${extracted_dir}"
+    fi
+  fi
+
+  if [[ -z "${source_dir}" ]]; then
+    echo "Invalid package layout for ${asset_name}: expected ${expected_dir}/ or ${expected_main_file}"
     exit 1
   fi
 
   rm -rf "${target_dir}"
   mkdir -p "$(dirname "${target_dir}")"
-  mv "${extracted_dir}/${expected_dir}" "${target_dir}"
+
+  if [[ "${source_dir}" == "${extracted_dir}" ]]; then
+    mkdir -p "${target_dir}"
+    (
+      shopt -s dotglob nullglob
+      mv "${extracted_dir}"/* "${target_dir}/"
+    )
+  else
+    mv "${source_dir}" "${target_dir}"
+  fi
 }
 
 download_repo_archive() {
@@ -198,7 +224,7 @@ download_release_asset "${WORDPRESS_RELEASE_OWNER}/fd-member" "${FD_MEMBER_RELEA
 download_release_asset "${WORDPRESS_RELEASE_OWNER}/fd-payment" "${FD_PAYMENT_RELEASE_TAG}" "fd-payment.zip" "fd-payment" "${PLUGINS_DIR}/fd-payment" "fd-payment"
 download_release_asset "${WORDPRESS_RELEASE_OWNER}/fd-commerce" "${FD_COMMERCE_RELEASE_TAG}" "fd-commerce.zip" "fd-commerce" "${PLUGINS_DIR}/fd-commerce" "fd-commerce"
 download_release_asset "${WORDPRESS_RELEASE_OWNER}/fd-websocket-push" "${FD_WEBSOCKET_PUSH_RELEASE_TAG}" "fd-websocket-push.zip" "fd-websocket-push" "${PLUGINS_DIR}/fd-websocket-push" "fd-websocket-push"
-download_release_asset "wp-graphql/wp-graphql-jwt-authentication" "${WPGRAPHQL_JWT_AUTH_RELEASE_TAG}" "wp-graphql-jwt-authentication.zip" "wp-graphql-jwt-authentication" "${PLUGINS_DIR}/wp-graphql-jwt-authentication" "wp-graphql-jwt-authentication"
+download_release_asset "wp-graphql/wp-graphql-jwt-authentication" "${WPGRAPHQL_JWT_AUTH_RELEASE_TAG}" "wp-graphql-jwt-authentication.zip" "wp-graphql-jwt-authentication" "${PLUGINS_DIR}/wp-graphql-jwt-authentication" "wp-graphql-jwt-authentication" "wp-graphql-jwt-authentication.php"
 download_repo_archive "wp-graphql/wp-graphql-tax-query" "${WPGRAPHQL_TAX_QUERY_REF}" "${PLUGINS_DIR}/wp-graphql-tax-query-develop" "wp-graphql-tax-query-develop"
 
 desired_assets_lock > "${LOCK_FILE}"
