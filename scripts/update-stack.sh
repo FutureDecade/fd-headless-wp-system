@@ -54,7 +54,7 @@ compose_tools=(
 
 desired_assets_lock() {
   cat <<EOF
-fd-theme=${FD_THEME_RELEASE_TAG:-v1.0.0}
+fd-theme=${FD_THEME_RELEASE_TAG:-v1.0.5}
 fd-admin-ui=${FD_ADMIN_UI_RELEASE_TAG:-v1.3.1}
 fd-member=${FD_MEMBER_RELEASE_TAG:-v1.0.1}
 fd-payment=${FD_PAYMENT_RELEASE_TAG:-v1.0.0}
