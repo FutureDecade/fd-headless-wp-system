@@ -52,7 +52,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/FutureDecade/fd-headless-wp-
 
 当前测试机使用的关键版本：
 
-- `fd-theme`: `v1.0.5`
+- `fd-theme`: `v1.0.6`
 - `fd-admin-ui`: `v1.3.1`
 - `fd-content-types`: `v0.1.0`
 - `fd-frontend`: `crpi-8y82lbqoc1haiday.cn-beijing.personal.cr.aliyuncs.com/futuredecade/fd-frontend:futuredecade-https-8862356`
