@@ -170,6 +170,45 @@ collect_github_token_if_needed() {
   export GH_TOKEN
 }
 
+is_placeholder_email() {
+  local value="$1"
+  [[ -z "${value}" || "${value}" == "admin@example.com" ]]
+}
+
+auto_https_enabled() {
+  if [[ "${stack_bootstrap_mode}" != "true" ]]; then
+    return 1
+  fi
+
+  if is_placeholder_email "${LETSENCRYPT_EMAIL:-}"; then
+    return 1
+  fi
+
+  if [[ -z "${FRONTEND_DOMAIN:-}" || -z "${ADMIN_DOMAIN:-}" || -z "${WS_DOMAIN:-}" ]]; then
+    return 1
+  fi
+
+  return 0
+}
+
+print_final_summary() {
+  load_env_file "${ENV_FILE}"
+
+  echo
+  echo "部署完成。"
+  echo "前台地址：${PUBLIC_SCHEME:-http}://${FRONTEND_DOMAIN}"
+  echo "后台地址：${PUBLIC_SCHEME:-http}://${ADMIN_DOMAIN}"
+  echo "推送健康检查：${WEBSOCKET_PUBLIC_SCHEME:-ws}://${WS_DOMAIN}/health"
+
+  if [[ "${WORDPRESS_RUN_INIT:-false}" == "true" ]]; then
+    echo "WordPress 管理员用户名：${WORDPRESS_ADMIN_USER}"
+    echo "WordPress 管理员密码：${WORDPRESS_ADMIN_PASSWORD}"
+    echo "WordPress 管理员邮箱：${WORDPRESS_ADMIN_EMAIL}"
+  fi
+}
+
+stack_bootstrap_mode="false"
+
 echo
 echo "这一步会按顺序做 3 件事："
 echo "1. 生成或更新 .env"
@@ -177,6 +216,7 @@ echo "2. 收集首次安装需要的凭据"
 echo "3. 调用已经验证过的 install.sh 完成首装"
 
 if [[ -n "${FD_STACK_BOOTSTRAP_JSON:-}" || -n "${FD_STACK_DEPLOY_TOKEN:-}" ]]; then
+  stack_bootstrap_mode="true"
   if ! load_stack_bootstrap; then
     echo "FD Stack 部署预设加载失败，安装已停止。"
     exit 1
@@ -209,13 +249,15 @@ echo "目标前台域名：${FRONTEND_DOMAIN:-未设置}"
 echo "目标后台域名：${ADMIN_DOMAIN:-未设置}"
 echo "目标推送域名：${WS_DOMAIN:-未设置}"
 
-while true; do
-  if [[ "$(prompt_yes_no "现在开始安装" "y")" == "yes" ]]; then
-    break
-  fi
-  echo "已取消安装。配置已保留在 ${ENV_FILE}"
-  exit 0
-done
+if [[ "${stack_bootstrap_mode}" != "true" ]]; then
+  while true; do
+    if [[ "$(prompt_yes_no "现在开始安装" "y")" == "yes" ]]; then
+      break
+    fi
+    echo "已取消安装。配置已保留在 ${ENV_FILE}"
+    exit 0
+  done
+fi
 
 ENV_FILE="${ENV_FILE}" \
 ACR_USERNAME="${ACR_USERNAME:-}" \
@@ -225,6 +267,21 @@ GITHUB_TOKEN="${GITHUB_TOKEN:-${GH_TOKEN:-}}" \
 bash "${ROOT_DIR}/scripts/install.sh"
 
 echo
+if auto_https_enabled; then
+  echo "HTTP 首装完成，开始自动申请证书并切换 HTTPS..."
+  ENV_FILE="${ENV_FILE}" \
+  ACR_USERNAME="${ACR_USERNAME:-}" \
+  ACR_PASSWORD="${ACR_PASSWORD:-}" \
+  GH_TOKEN="${GH_TOKEN:-${GITHUB_TOKEN:-}}" \
+  GITHUB_TOKEN="${GITHUB_TOKEN:-${GH_TOKEN:-}}" \
+  bash "${ROOT_DIR}/scripts/setup-https.sh"
+fi
+
 echo "首装入口执行完成。"
-echo "下一步请先检查 HTTP 是否正常。"
-echo "确认正常后，再运行：bash scripts/quick-setup-https.sh"
+
+if [[ "${stack_bootstrap_mode}" == "true" ]]; then
+  print_final_summary
+else
+  echo "下一步请先检查 HTTP 是否正常。"
+  echo "确认正常后，再运行：bash ${ROOT_DIR}/scripts/quick-setup-https.sh"
+fi

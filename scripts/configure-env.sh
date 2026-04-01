@@ -18,6 +18,10 @@ generate_secret() {
   openssl rand -hex 32
 }
 
+generate_admin_password() {
+  openssl rand -hex 12
+}
+
 is_placeholder_domain() {
   local value="$1"
   [[ -z "${value}" || "${value}" == "www.example.com" || "${value}" == "admin.example.com" || "${value}" == "ws.example.com" ]]
@@ -163,6 +167,16 @@ ensure_secret_value() {
   set_env_value "${ENV_FILE}" "${key}" "${current}"
 }
 
+ensure_required_config_value() {
+  local key="$1"
+  local value="$2"
+
+  if [[ -z "${value}" ]]; then
+    echo "缺少必需配置：${key}"
+    exit 1
+  fi
+}
+
 should_apply_bootstrap_default() {
   local key="$1"
   local current="$2"
@@ -222,9 +236,16 @@ prime_env_from_stack_bootstrap() {
 
 fresh_env_guess="false"
 env_file_created="false"
+stack_bootstrap_mode="false"
+
+if [[ -n "${FD_STACK_BOOTSTRAP_JSON:-}" || -n "${FD_STACK_DEPLOY_TOKEN:-}" ]]; then
+  stack_bootstrap_mode="true"
+fi
 
 if [[ ! -f "${ENV_FILE}" ]]; then
-  ENV_FILE="${ENV_FILE}" bash "${ROOT_DIR}/scripts/bootstrap-env.sh"
+  ENV_FILE="${ENV_FILE}" \
+  BOOTSTRAP_ENV_SILENT="${stack_bootstrap_mode}" \
+  bash "${ROOT_DIR}/scripts/bootstrap-env.sh"
   env_file_created="true"
 fi
 
@@ -317,36 +338,69 @@ else
   wordpress_run_init_default="false"
 fi
 
+if [[ "${stack_bootstrap_mode}" == "true" && "${wordpress_run_init_default}" == "true" ]]; then
+  if [[ -z "${wordpress_admin_user_default}" ]]; then
+    wordpress_admin_user_default="fdadmin"
+  fi
+
+  if [[ -z "${wordpress_admin_password_default}" ]]; then
+    wordpress_admin_password_default="$(generate_admin_password)"
+  fi
+
+  if [[ -z "${wordpress_admin_email_default}" ]]; then
+    wordpress_admin_email_default="${letsencrypt_email_default}"
+  fi
+fi
+
 echo
 echo "现在开始配置：${ENV_FILE}"
 echo "这一步只会修改配置文件，不会启动任何服务。"
 echo
 
-base_domain="$(prompt_value "主域名，例如 futuredecade.com" "${base_domain_default}")"
-base_domain="$(normalize_base_domain_input "${base_domain}")"
+if [[ "${stack_bootstrap_mode}" == "true" ]]; then
+  base_domain="${base_domain_default}"
+  frontend_domain="${frontend_default}"
+  admin_domain="${admin_default}"
+  ws_domain="${ws_default}"
+  frontend_image="${frontend_image_default}"
+  websocket_image="${websocket_image_default}"
+  letsencrypt_email="${letsencrypt_email_default}"
+  wordpress_fetch_release_assets="${wordpress_fetch_release_assets_default}"
+  wordpress_run_init="${wordpress_run_init_default}"
+else
+  base_domain="$(prompt_value "主域名，例如 futuredecade.com" "${base_domain_default}")"
+  base_domain="$(normalize_base_domain_input "${base_domain}")"
 
-if [[ -n "${base_domain}" ]]; then
-  if [[ -z "${frontend_default}" ]]; then
-    frontend_default="www.${base_domain}"
+  if [[ -n "${base_domain}" ]]; then
+    if [[ -z "${frontend_default}" ]]; then
+      frontend_default="www.${base_domain}"
+    fi
+    if [[ -z "${admin_default}" ]]; then
+      admin_default="admin.${base_domain}"
+    fi
+    if [[ -z "${ws_default}" ]]; then
+      ws_default="ws.${base_domain}"
+    fi
   fi
-  if [[ -z "${admin_default}" ]]; then
-    admin_default="admin.${base_domain}"
-  fi
-  if [[ -z "${ws_default}" ]]; then
-    ws_default="ws.${base_domain}"
-  fi
+
+  frontend_domain="$(prompt_required_value "前台域名" "${frontend_default}")"
+  admin_domain="$(prompt_required_value "后台域名" "${admin_default}")"
+  ws_domain="$(prompt_required_value "推送域名" "${ws_default}")"
+
+  frontend_image="$(prompt_required_value "前台镜像完整地址" "${frontend_image_default}")"
+  websocket_image="$(prompt_required_value "推送镜像完整地址" "${websocket_image_default}")"
+  letsencrypt_email="$(prompt_required_value "证书通知邮箱" "${letsencrypt_email_default}")"
+
+  wordpress_fetch_release_assets="$(prompt_bool "是否自动从 GitHub release 拉主题和插件，推荐 y" "${wordpress_fetch_release_assets_default}")"
+  wordpress_run_init="$(prompt_bool "是否自动完成首次 WordPress 安装" "${wordpress_run_init_default}")"
 fi
 
-frontend_domain="$(prompt_required_value "前台域名" "${frontend_default}")"
-admin_domain="$(prompt_required_value "后台域名" "${admin_default}")"
-ws_domain="$(prompt_required_value "推送域名" "${ws_default}")"
-
-frontend_image="$(prompt_required_value "前台镜像完整地址" "${frontend_image_default}")"
-websocket_image="$(prompt_required_value "推送镜像完整地址" "${websocket_image_default}")"
-letsencrypt_email="$(prompt_required_value "证书通知邮箱" "${letsencrypt_email_default}")"
-
-wordpress_fetch_release_assets="$(prompt_bool "是否自动从 GitHub release 拉主题和插件，推荐 y" "${wordpress_fetch_release_assets_default}")"
-wordpress_run_init="$(prompt_bool "是否自动完成首次 WordPress 安装" "${wordpress_run_init_default}")"
+ensure_required_config_value "FRONTEND_DOMAIN" "${frontend_domain}"
+ensure_required_config_value "ADMIN_DOMAIN" "${admin_domain}"
+ensure_required_config_value "WS_DOMAIN" "${ws_domain}"
+ensure_required_config_value "FRONTEND_IMAGE" "${frontend_image}"
+ensure_required_config_value "WEBSOCKET_IMAGE" "${websocket_image}"
+ensure_required_config_value "LETSENCRYPT_EMAIL" "${letsencrypt_email}"
 
 set_env_value "${ENV_FILE}" "FRONTEND_DOMAIN" "${frontend_domain}"
 set_env_value "${ENV_FILE}" "ADMIN_DOMAIN" "${admin_domain}"
@@ -369,16 +423,29 @@ ensure_secret_value "PUSH_SECRET" "${PUSH_SECRET:-}"
 ensure_secret_value "REVALIDATE_SECRET" "${REVALIDATE_SECRET:-}"
 
 if [[ "${wordpress_fetch_release_assets}" == "true" ]]; then
-  wordpress_release_owner="$(prompt_required_value "GitHub 发布账号或组织" "${wordpress_release_owner_default}")"
-  fd_theme_release_tag="$(prompt_required_value "fd-theme release tag" "${fd_theme_release_tag_default}")"
-  fd_admin_ui_release_tag="$(prompt_required_value "fd-admin-ui release tag" "${fd_admin_ui_release_tag_default}")"
-  fd_member_release_tag="$(prompt_required_value "fd-member release tag" "${fd_member_release_tag_default}")"
-  fd_payment_release_tag="$(prompt_required_value "fd-payment release tag" "${fd_payment_release_tag_default}")"
-  fd_commerce_release_tag="$(prompt_required_value "fd-commerce release tag" "${fd_commerce_release_tag_default}")"
-  fd_content_types_release_tag="$(prompt_required_value "fd-content-types release tag" "${fd_content_types_release_tag_default}")"
-  fd_websocket_push_release_tag="$(prompt_required_value "fd-websocket-push release tag" "${fd_websocket_push_release_tag_default}")"
-  wpgraphql_jwt_auth_release_tag="$(prompt_required_value "wp-graphql-jwt-authentication release tag" "${wpgraphql_jwt_auth_release_tag_default}")"
-  wpgraphql_tax_query_ref="$(prompt_required_value "wp-graphql-tax-query ref" "${wpgraphql_tax_query_ref_default}")"
+  if [[ "${stack_bootstrap_mode}" == "true" ]]; then
+    wordpress_release_owner="${wordpress_release_owner_default}"
+    fd_theme_release_tag="${fd_theme_release_tag_default}"
+    fd_admin_ui_release_tag="${fd_admin_ui_release_tag_default}"
+    fd_member_release_tag="${fd_member_release_tag_default}"
+    fd_payment_release_tag="${fd_payment_release_tag_default}"
+    fd_commerce_release_tag="${fd_commerce_release_tag_default}"
+    fd_content_types_release_tag="${fd_content_types_release_tag_default}"
+    fd_websocket_push_release_tag="${fd_websocket_push_release_tag_default}"
+    wpgraphql_jwt_auth_release_tag="${wpgraphql_jwt_auth_release_tag_default}"
+    wpgraphql_tax_query_ref="${wpgraphql_tax_query_ref_default}"
+  else
+    wordpress_release_owner="$(prompt_required_value "GitHub 发布账号或组织" "${wordpress_release_owner_default}")"
+    fd_theme_release_tag="$(prompt_required_value "fd-theme release tag" "${fd_theme_release_tag_default}")"
+    fd_admin_ui_release_tag="$(prompt_required_value "fd-admin-ui release tag" "${fd_admin_ui_release_tag_default}")"
+    fd_member_release_tag="$(prompt_required_value "fd-member release tag" "${fd_member_release_tag_default}")"
+    fd_payment_release_tag="$(prompt_required_value "fd-payment release tag" "${fd_payment_release_tag_default}")"
+    fd_commerce_release_tag="$(prompt_required_value "fd-commerce release tag" "${fd_commerce_release_tag_default}")"
+    fd_content_types_release_tag="$(prompt_required_value "fd-content-types release tag" "${fd_content_types_release_tag_default}")"
+    fd_websocket_push_release_tag="$(prompt_required_value "fd-websocket-push release tag" "${fd_websocket_push_release_tag_default}")"
+    wpgraphql_jwt_auth_release_tag="$(prompt_required_value "wp-graphql-jwt-authentication release tag" "${wpgraphql_jwt_auth_release_tag_default}")"
+    wpgraphql_tax_query_ref="$(prompt_required_value "wp-graphql-tax-query ref" "${wpgraphql_tax_query_ref_default}")"
+  fi
 
   set_env_value "${ENV_FILE}" "WORDPRESS_RELEASE_OWNER" "${wordpress_release_owner}"
   set_env_value "${ENV_FILE}" "FD_THEME_RELEASE_TAG" "${fd_theme_release_tag}"
@@ -397,10 +464,22 @@ if [[ "${wordpress_run_init}" == "true" ]]; then
     wordpress_admin_email_default="${letsencrypt_email}"
   fi
 
-  wordpress_title="$(prompt_required_value "WordPress 站点标题" "${wordpress_title_default}")"
-  wordpress_admin_user="$(prompt_required_value "WordPress 管理员用户名" "${wordpress_admin_user_default}")"
-  wordpress_admin_password="$(prompt_required_value "WordPress 管理员密码" "${wordpress_admin_password_default}")"
-  wordpress_admin_email="$(prompt_required_value "WordPress 管理员邮箱" "${wordpress_admin_email_default}")"
+  if [[ "${stack_bootstrap_mode}" == "true" ]]; then
+    wordpress_title="${wordpress_title_default}"
+    wordpress_admin_user="${wordpress_admin_user_default}"
+    wordpress_admin_password="${wordpress_admin_password_default}"
+    wordpress_admin_email="${wordpress_admin_email_default}"
+  else
+    wordpress_title="$(prompt_required_value "WordPress 站点标题" "${wordpress_title_default}")"
+    wordpress_admin_user="$(prompt_required_value "WordPress 管理员用户名" "${wordpress_admin_user_default}")"
+    wordpress_admin_password="$(prompt_required_value "WordPress 管理员密码" "${wordpress_admin_password_default}")"
+    wordpress_admin_email="$(prompt_required_value "WordPress 管理员邮箱" "${wordpress_admin_email_default}")"
+  fi
+
+  if [[ -z "${wordpress_title}" || -z "${wordpress_admin_user}" || -z "${wordpress_admin_password}" || -z "${wordpress_admin_email}" ]]; then
+    echo "缺少 WordPress 初始化配置，无法继续。"
+    exit 1
+  fi
 
   set_env_value "${ENV_FILE}" "WORDPRESS_TITLE" "${wordpress_title}"
   set_env_value "${ENV_FILE}" "WORDPRESS_ADMIN_USER" "${wordpress_admin_user}"
@@ -410,10 +489,13 @@ fi
 
 echo
 echo "配置已经写入：${ENV_FILE}"
-echo
-echo "建议下一步："
-echo "1. 如果要拉 GitHub release 主题和插件，先运行：gh auth login"
-echo "2. 如果前端和推送镜像在私有 ACR，先运行 docker login"
-echo "3. 运行：bash scripts/preflight-check.sh"
-echo "4. 首次启动：bash scripts/install.sh"
-echo "5. 确认 HTTP 正常后，再运行：bash scripts/setup-https.sh"
+
+if [[ "${stack_bootstrap_mode}" != "true" ]]; then
+  echo
+  echo "建议下一步："
+  echo "1. 如果要拉 GitHub release 主题和插件，先运行：gh auth login"
+  echo "2. 如果前端和推送镜像在私有 ACR，先运行 docker login"
+  echo "3. 运行：bash ${ROOT_DIR}/scripts/preflight-check.sh"
+  echo "4. 首次启动：bash ${ROOT_DIR}/scripts/install.sh"
+  echo "5. 确认 HTTP 正常后，再运行：bash ${ROOT_DIR}/scripts/setup-https.sh"
+fi

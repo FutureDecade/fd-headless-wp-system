@@ -102,7 +102,7 @@ exchange_stack_bootstrap() {
 load_stack_bootstrap() {
   if [[ -n "${FD_STACK_BOOTSTRAP_JSON:-}" ]]; then
     apply_stack_bootstrap_defaults "${FD_STACK_BOOTSTRAP_JSON}"
-    return 0
+    return $?
   fi
 
   if [[ -n "${FD_STACK_DEPLOY_TOKEN:-}" ]]; then

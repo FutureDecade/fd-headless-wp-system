@@ -28,5 +28,7 @@ replace_value "JWT_SECRET" "$(generate_secret)"
 replace_value "PUSH_SECRET" "$(generate_secret)"
 replace_value "REVALIDATE_SECRET" "$(generate_secret)"
 
-echo "Generated ${ENV_FILE}"
-echo "Edit the domain and image settings before deployment."
+if [[ "${BOOTSTRAP_ENV_SILENT:-false}" != "true" ]]; then
+  echo "Generated ${ENV_FILE}"
+  echo "Edit the domain and image settings before deployment."
+fi
