@@ -6,17 +6,13 @@ ENV_FILE="${ENV_FILE:-${ROOT_DIR}/.env}"
 
 # shellcheck source=/dev/null
 source "${ROOT_DIR}/scripts/common.sh"
+# shellcheck source=/dev/null
+source "${ROOT_DIR}/scripts/stack-bootstrap.sh"
 
 if ! command -v openssl >/dev/null 2>&1; then
   echo "Missing required command: openssl"
   exit 1
 fi
-
-if [[ ! -f "${ENV_FILE}" ]]; then
-  ENV_FILE="${ENV_FILE}" bash "${ROOT_DIR}/scripts/bootstrap-env.sh"
-fi
-
-load_env_file "${ENV_FILE}"
 
 generate_secret() {
   openssl rand -hex 32
@@ -51,6 +47,25 @@ normalize_bool() {
       ;;
     *)
       return 1
+      ;;
+  esac
+}
+
+normalize_base_domain_input() {
+  local value="$1"
+
+  case "${value}" in
+    www.*)
+      printf '%s\n' "${value#www.}"
+      ;;
+    admin.*)
+      printf '%s\n' "${value#admin.}"
+      ;;
+    ws.*)
+      printf '%s\n' "${value#ws.}"
+      ;;
+    *)
+      printf '%s\n' "${value}"
       ;;
   esac
 }
@@ -148,7 +163,74 @@ ensure_secret_value() {
   set_env_value "${ENV_FILE}" "${key}" "${current}"
 }
 
+should_apply_bootstrap_default() {
+  local key="$1"
+  local current="$2"
+
+  case "${key}" in
+    FRONTEND_DOMAIN|ADMIN_DOMAIN|WS_DOMAIN)
+      is_placeholder_domain "${current}"
+      ;;
+    FRONTEND_IMAGE|WEBSOCKET_IMAGE)
+      [[ -z "${current}" || "${current}" == *CHANGE_ME* ]]
+      ;;
+    LETSENCRYPT_EMAIL|WORDPRESS_ADMIN_EMAIL)
+      is_placeholder_email "${current}"
+      ;;
+    WORDPRESS_ADMIN_PASSWORD|MYSQL_PASSWORD|MYSQL_ROOT_PASSWORD|JWT_SECRET|PUSH_SECRET|REVALIDATE_SECRET)
+      is_placeholder_secret "${current}"
+      ;;
+    *)
+      [[ -z "${current}" ]]
+      ;;
+  esac
+}
+
+prime_env_from_stack_bootstrap() {
+  local overwrite_all="$1"
+  local key=""
+  local value=""
+  local current=""
+
+  if [[ -z "${FD_STACK_BOOTSTRAP_JSON:-}" && -z "${FD_STACK_DEPLOY_TOKEN:-}" ]]; then
+    return 0
+  fi
+
+  if ! load_stack_bootstrap; then
+    echo "FD Stack 部署预设加载失败，无法继续配置。"
+    exit 1
+  fi
+
+  while IFS=$'\t' read -r key value; do
+    if [[ -z "${key}" ]]; then
+      continue
+    fi
+
+    case "${key}" in
+      ACR_USERNAME|ACR_PASSWORD|GH_TOKEN|GITHUB_TOKEN)
+        continue
+        ;;
+    esac
+
+    current="${!key:-}"
+    if [[ "${overwrite_all}" == "true" ]] || should_apply_bootstrap_default "${key}" "${current}"; then
+      set_env_value "${ENV_FILE}" "${key}" "${value}"
+      export "${key}=${value}"
+    fi
+  done < <(printf '%s' "${FD_STACK_BOOTSTRAP_JSON}" | jq -r '.bootstrap.envDefaults // {} | to_entries[] | [.key, (.value | tostring)] | @tsv')
+}
+
 fresh_env_guess="false"
+env_file_created="false"
+
+if [[ ! -f "${ENV_FILE}" ]]; then
+  ENV_FILE="${ENV_FILE}" bash "${ROOT_DIR}/scripts/bootstrap-env.sh"
+  env_file_created="true"
+fi
+
+load_env_file "${ENV_FILE}"
+prime_env_from_stack_bootstrap "${env_file_created}"
+load_env_file "${ENV_FILE}"
 
 if is_placeholder_domain "${FRONTEND_DOMAIN:-}" && \
    is_placeholder_domain "${ADMIN_DOMAIN:-}" && \
@@ -241,6 +323,7 @@ echo "这一步只会修改配置文件，不会启动任何服务。"
 echo
 
 base_domain="$(prompt_value "主域名，例如 futuredecade.com" "${base_domain_default}")"
+base_domain="$(normalize_base_domain_input "${base_domain}")"
 
 if [[ -n "${base_domain}" ]]; then
   if [[ -z "${frontend_default}" ]]; then

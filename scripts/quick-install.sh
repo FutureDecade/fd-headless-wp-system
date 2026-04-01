@@ -176,7 +176,12 @@ echo "1. 生成或更新 .env"
 echo "2. 收集首次安装需要的凭据"
 echo "3. 调用已经验证过的 install.sh 完成首装"
 
-if load_stack_bootstrap; then
+if [[ -n "${FD_STACK_BOOTSTRAP_JSON:-}" || -n "${FD_STACK_DEPLOY_TOKEN:-}" ]]; then
+  if ! load_stack_bootstrap; then
+    echo "FD Stack 部署预设加载失败，安装已停止。"
+    exit 1
+  fi
+
   echo
   echo "已从 FD Stack deploy token 载入部署预设。"
   echo "安装目录：${INSTALL_DIR:-${ROOT_DIR}}"

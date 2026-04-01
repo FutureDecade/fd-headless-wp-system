@@ -59,6 +59,7 @@ apply_stack_bootstrap_defaults() {
 exchange_stack_bootstrap() {
   local exchange_url=""
   local response=""
+  local curl_stderr=""
 
   if [[ -z "${FD_STACK_DEPLOY_TOKEN:-}" ]]; then
     return 1
@@ -79,11 +80,21 @@ exchange_stack_bootstrap() {
     return 1
   fi
 
-  response="$(
+  curl_stderr="$(mktemp)"
+  if ! response="$(
     curl -fsSL -X POST "${exchange_url}" \
       -H 'content-type: application/json' \
-      -d "{\"token\":\"${FD_STACK_DEPLOY_TOKEN}\"}"
-  )"
+      -d "{\"token\":\"${FD_STACK_DEPLOY_TOKEN}\"}" \
+      2>"${curl_stderr}"
+  )"; then
+    echo "FD Stack 部署预设拉取失败，请检查 deploy token 是否有效或是否已过期。" >&2
+    if [[ -s "${curl_stderr}" ]]; then
+      cat "${curl_stderr}" >&2
+    fi
+    rm -f "${curl_stderr}"
+    return 1
+  fi
+  rm -f "${curl_stderr}"
 
   apply_stack_bootstrap_defaults "${response}"
 }
@@ -96,7 +107,7 @@ load_stack_bootstrap() {
 
   if [[ -n "${FD_STACK_DEPLOY_TOKEN:-}" ]]; then
     exchange_stack_bootstrap
-    return 0
+    return $?
   fi
 
   return 1
