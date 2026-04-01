@@ -6,6 +6,8 @@ ENV_FILE="${ENV_FILE:-${ROOT_DIR}/.env}"
 
 # shellcheck source=/dev/null
 source "${ROOT_DIR}/scripts/common.sh"
+# shellcheck source=/dev/null
+source "${ROOT_DIR}/scripts/stack-bootstrap.sh"
 
 prompt_value() {
   local prompt="$1"
@@ -173,6 +175,15 @@ echo "这一步会按顺序做 3 件事："
 echo "1. 生成或更新 .env"
 echo "2. 收集首次安装需要的凭据"
 echo "3. 调用已经验证过的 install.sh 完成首装"
+
+if load_stack_bootstrap; then
+  echo
+  echo "已从 FD Stack deploy token 载入部署预设。"
+  echo "安装目录：${INSTALL_DIR:-${ROOT_DIR}}"
+  echo "前台域名预设：${FRONTEND_DOMAIN:-未提供}"
+  echo "后台域名预设：${ADMIN_DOMAIN:-未提供}"
+  echo "推送域名预设：${WS_DOMAIN:-未提供}"
+fi
 
 echo
 echo "先进入配置向导。"

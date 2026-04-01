@@ -1,9 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+INSTALL_DIR_WAS_SET="${INSTALL_DIR+x}"
+REPO_URL_WAS_SET="${REPO_URL+x}"
+REPO_BRANCH_WAS_SET="${REPO_BRANCH+x}"
 INSTALL_DIR="${INSTALL_DIR:-/opt/fd-headless-wp-system}"
 REPO_URL="${REPO_URL:-https://github.com/FutureDecade/fd-headless-wp-system.git}"
 REPO_BRANCH="${REPO_BRANCH:-main}"
+FD_STACK_BOOTSTRAP_JSON="${FD_STACK_BOOTSTRAP_JSON:-}"
 
 run_root_cmd() {
   if [[ "${EUID}" -eq 0 ]]; then
@@ -26,7 +30,70 @@ ensure_minimal_packages() {
   fi
 
   run_root_cmd apt-get update
-  run_root_cmd apt-get install -y git curl ca-certificates
+  run_root_cmd apt-get install -y git curl ca-certificates jq
+}
+
+resolve_stack_exchange_url() {
+  if [[ -n "${FD_STACK_EXCHANGE_URL:-}" ]]; then
+    printf '%s\n' "${FD_STACK_EXCHANGE_URL}"
+    return 0
+  fi
+
+  if [[ -n "${FD_STACK_PUBLIC_BASE_URL:-}" ]]; then
+    printf '%s/v1/deployments/bootstrap/exchange\n' "${FD_STACK_PUBLIC_BASE_URL%/}"
+    return 0
+  fi
+
+  return 1
+}
+
+apply_stack_bootstrap_defaults() {
+  local bootstrap_json="$1"
+  local install_path=""
+  local repo_url=""
+  local repo_branch=""
+
+  FD_STACK_BOOTSTRAP_JSON="${bootstrap_json}"
+  export FD_STACK_BOOTSTRAP_JSON
+
+  install_path="$(printf '%s' "${bootstrap_json}" | jq -r '.bootstrap.installPath // empty')"
+  repo_url="$(printf '%s' "${bootstrap_json}" | jq -r '.bootstrap.repository.url // empty')"
+  repo_branch="$(printf '%s' "${bootstrap_json}" | jq -r '.bootstrap.repository.branch // empty')"
+
+  if [[ -n "${install_path}" && -z "${INSTALL_DIR_WAS_SET:-}" ]]; then
+    INSTALL_DIR="${install_path}"
+    export INSTALL_DIR
+  fi
+
+  if [[ -n "${repo_url}" && -z "${REPO_URL_WAS_SET:-}" ]]; then
+    REPO_URL="${repo_url}"
+    export REPO_URL
+  fi
+
+  if [[ -n "${repo_branch}" && -z "${REPO_BRANCH_WAS_SET:-}" ]]; then
+    REPO_BRANCH="${repo_branch}"
+    export REPO_BRANCH
+  fi
+}
+
+exchange_stack_bootstrap_if_needed() {
+  local exchange_url=""
+
+  if [[ -z "${FD_STACK_DEPLOY_TOKEN:-}" ]]; then
+    return 0
+  fi
+
+  if ! exchange_url="$(resolve_stack_exchange_url)"; then
+    echo "检测到 FD_STACK_DEPLOY_TOKEN，但没有提供 FD_STACK_EXCHANGE_URL 或 FD_STACK_PUBLIC_BASE_URL。"
+    exit 1
+  fi
+
+  echo "检测到 FD Stack deploy token，正在拉取部署预设..."
+  apply_stack_bootstrap_defaults "$(
+    curl -fsSL -X POST "${exchange_url}" \
+      -H 'content-type: application/json' \
+      -d "{\"token\":\"${FD_STACK_DEPLOY_TOKEN}\"}"
+  )"
 }
 
 repo_is_dirty() {
@@ -80,10 +147,19 @@ clone_or_update_repo() {
 
 echo
 echo "空白服务器首装入口开始。"
-echo "目标目录：${INSTALL_DIR}"
 
 ensure_minimal_packages
+exchange_stack_bootstrap_if_needed
+echo "目标目录：${INSTALL_DIR}"
 clone_or_update_repo
 
 run_root_cmd bash "${INSTALL_DIR}/scripts/prepare-server.sh"
-run_root_cmd bash "${INSTALL_DIR}/scripts/quick-install.sh"
+run_root_cmd env \
+  FD_STACK_BOOTSTRAP_JSON="${FD_STACK_BOOTSTRAP_JSON:-}" \
+  FD_STACK_DEPLOY_TOKEN="${FD_STACK_DEPLOY_TOKEN:-}" \
+  FD_STACK_EXCHANGE_URL="${FD_STACK_EXCHANGE_URL:-}" \
+  FD_STACK_PUBLIC_BASE_URL="${FD_STACK_PUBLIC_BASE_URL:-}" \
+  INSTALL_DIR="${INSTALL_DIR}" \
+  REPO_URL="${REPO_URL}" \
+  REPO_BRANCH="${REPO_BRANCH}" \
+  bash "${INSTALL_DIR}/scripts/quick-install.sh"
