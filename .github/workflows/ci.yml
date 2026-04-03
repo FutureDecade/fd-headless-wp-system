@@ -33,6 +33,16 @@ jobs:
       - name: Validate asset mode with GH token env
         run: |
           cp .env.example .env.asset
+          perl -0pi -e 's/^FRONTEND_DOMAIN=.*/FRONTEND_DOMAIN=store.test.example.com/m' .env.asset
+          perl -0pi -e 's/^ADMIN_DOMAIN=.*/ADMIN_DOMAIN=admin.test.example.com/m' .env.asset
+          perl -0pi -e 's/^WS_DOMAIN=.*/WS_DOMAIN=ws.test.example.com/m' .env.asset
+          perl -0pi -e 's#^FRONTEND_IMAGE=.*#FRONTEND_IMAGE=ghcr.io/futuredecade/fd-frontend:test-build#m' .env.asset
+          perl -0pi -e 's#^WEBSOCKET_IMAGE=.*#WEBSOCKET_IMAGE=ghcr.io/futuredecade/fd-websocket:test-build#m' .env.asset
+          perl -0pi -e 's/^MYSQL_PASSWORD=.*/MYSQL_PASSWORD=test-db-password/m' .env.asset
+          perl -0pi -e 's/^MYSQL_ROOT_PASSWORD=.*/MYSQL_ROOT_PASSWORD=test-root-password/m' .env.asset
+          perl -0pi -e 's/^JWT_SECRET=.*/JWT_SECRET=test-jwt-secret/m' .env.asset
+          perl -0pi -e 's/^PUSH_SECRET=.*/PUSH_SECRET=test-push-secret/m' .env.asset
+          perl -0pi -e 's/^REVALIDATE_SECRET=.*/REVALIDATE_SECRET=test-revalidate-secret/m' .env.asset
           perl -0pi -e 's/WORDPRESS_FETCH_RELEASE_ASSETS=false/WORDPRESS_FETCH_RELEASE_ASSETS=true/' .env.asset
           ENV_FILE=.env.asset GH_TOKEN=dummy bash scripts/preflight-check.sh
 
