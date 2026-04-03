@@ -1,0 +1,238 @@
+{
+  "version": "1",
+  "installer": {
+    "repoUrl": "https://github.com/FutureDecade/fd-headless-wp-system.git",
+    "repoBranch": "main",
+    "remoteInstallScriptUrl": "https://raw.githubusercontent.com/FutureDecade/fd-headless-wp-system/main/scripts/remote-install.sh",
+    "installPath": "/opt/fd-headless-wp-system"
+  },
+  "groups": [
+    {
+      "key": "images",
+      "label": "镜像与仓库"
+    },
+    {
+      "key": "credentials",
+      "label": "凭据与证书"
+    },
+    {
+      "key": "release",
+      "label": "版本与发布",
+      "description": "默认情况下只展示需要用户填写的字段；这组预设字段应放在高级设置里。"
+    }
+  ],
+  "domainSlots": [
+    {
+      "key": "frontend",
+      "label": "前台域名",
+      "envKey": "FRONTEND_DOMAIN",
+      "sourceField": "primaryDomain",
+      "required": true,
+      "placeholder": "www.futuredecade.com"
+    },
+    {
+      "key": "admin",
+      "label": "后台域名",
+      "envKey": "ADMIN_DOMAIN",
+      "sourceField": "adminDomain",
+      "required": true,
+      "placeholder": "admin.futuredecade.com"
+    },
+    {
+      "key": "ws",
+      "label": "WS 域名",
+      "envKey": "WS_DOMAIN",
+      "sourceField": "wsDomain",
+      "required": true,
+      "placeholder": "ws.futuredecade.com"
+    }
+  ],
+  "envFields": [
+    {
+      "key": "FRONTEND_IMAGE",
+      "label": "Frontend Image",
+      "type": "text",
+      "scope": "user_input",
+      "required": true,
+      "group": "images"
+    },
+    {
+      "key": "WEBSOCKET_IMAGE",
+      "label": "WebSocket Image",
+      "type": "text",
+      "scope": "user_input",
+      "required": true,
+      "group": "images"
+    },
+    {
+      "key": "LETSENCRYPT_EMAIL",
+      "label": "证书通知邮箱",
+      "type": "email",
+      "scope": "user_input",
+      "required": true,
+      "group": "credentials"
+    },
+    {
+      "key": "ACR_USERNAME",
+      "label": "ACR 用户名",
+      "type": "text",
+      "scope": "user_input",
+      "required": true,
+      "group": "credentials"
+    },
+    {
+      "key": "WORDPRESS_FETCH_RELEASE_ASSETS",
+      "label": "自动拉取 WordPress Release 资产",
+      "type": "boolean",
+      "scope": "preset",
+      "required": true,
+      "editable": true,
+      "advanced": true,
+      "defaultValue": true,
+      "group": "release"
+    },
+    {
+      "key": "WORDPRESS_RUN_INIT",
+      "label": "自动执行 WordPress 首次初始化",
+      "type": "boolean",
+      "scope": "preset",
+      "required": true,
+      "editable": true,
+      "advanced": true,
+      "defaultValue": true,
+      "group": "release"
+    },
+    {
+      "key": "WORDPRESS_RELEASE_OWNER",
+      "label": "WordPress Release Owner",
+      "type": "text",
+      "scope": "preset",
+      "required": true,
+      "editable": true,
+      "advanced": true,
+      "defaultValue": "FutureDecade",
+      "group": "release"
+    },
+    {
+      "key": "FD_THEME_RELEASE_TAG",
+      "label": "fd-theme Release Tag",
+      "type": "text",
+      "scope": "preset",
+      "required": true,
+      "editable": true,
+      "advanced": true,
+      "defaultValue": "v1.0.7",
+      "group": "release"
+    },
+    {
+      "key": "FD_ADMIN_UI_RELEASE_TAG",
+      "label": "fd-admin-ui Release Tag",
+      "type": "text",
+      "scope": "preset",
+      "required": true,
+      "editable": true,
+      "advanced": true,
+      "defaultValue": "v1.3.1",
+      "group": "release"
+    },
+    {
+      "key": "FD_MEMBER_RELEASE_TAG",
+      "label": "fd-member Release Tag",
+      "type": "text",
+      "scope": "preset",
+      "required": true,
+      "editable": true,
+      "advanced": true,
+      "defaultValue": "v1.0.1",
+      "group": "release"
+    },
+    {
+      "key": "FD_PAYMENT_RELEASE_TAG",
+      "label": "fd-payment Release Tag",
+      "type": "text",
+      "scope": "preset",
+      "required": true,
+      "editable": true,
+      "advanced": true,
+      "defaultValue": "v1.0.0",
+      "group": "release"
+    },
+    {
+      "key": "FD_COMMERCE_RELEASE_TAG",
+      "label": "fd-commerce Release Tag",
+      "type": "text",
+      "scope": "preset",
+      "required": true,
+      "editable": true,
+      "advanced": true,
+      "defaultValue": "v1.0.0",
+      "group": "release"
+    },
+    {
+      "key": "FD_CONTENT_TYPES_RELEASE_TAG",
+      "label": "fd-content-types Release Tag",
+      "type": "text",
+      "scope": "preset",
+      "required": true,
+      "editable": true,
+      "advanced": true,
+      "defaultValue": "v0.1.0",
+      "group": "release"
+    },
+    {
+      "key": "FD_WEBSOCKET_PUSH_RELEASE_TAG",
+      "label": "fd-websocket-push Release Tag",
+      "type": "text",
+      "scope": "preset",
+      "required": true,
+      "editable": true,
+      "advanced": true,
+      "defaultValue": "v1.0.0",
+      "group": "release"
+    },
+    {
+      "key": "WPGRAPHQL_JWT_AUTH_RELEASE_TAG",
+      "label": "WPGraphQL JWT Auth Release Tag",
+      "type": "text",
+      "scope": "preset",
+      "required": true,
+      "editable": true,
+      "advanced": true,
+      "defaultValue": "v0.7.2",
+      "group": "release"
+    },
+    {
+      "key": "WPGRAPHQL_TAX_QUERY_REF",
+      "label": "WPGraphQL Tax Query Ref",
+      "type": "text",
+      "scope": "preset",
+      "required": true,
+      "editable": true,
+      "advanced": true,
+      "defaultValue": "v0.2.0",
+      "group": "release"
+    }
+  ],
+  "secretFields": [
+    {
+      "key": "ACR_PASSWORD",
+      "label": "ACR 密码",
+      "type": "secret",
+      "scope": "user_input",
+      "required": true,
+      "group": "credentials"
+    },
+    {
+      "key": "GH_TOKEN",
+      "label": "GitHub Token",
+      "type": "secret",
+      "scope": "user_input",
+      "required": true,
+      "group": "credentials"
+    }
+  ],
+  "notes": [
+    "This manifest is the canonical delivery contract for the FutureDecade delivery repo.",
+    "Only user_input fields should be shown by default in fd-core-stack."
+  ]
+}

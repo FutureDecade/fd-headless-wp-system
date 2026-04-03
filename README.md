@@ -27,6 +27,38 @@
 - `wp-content/uploads`
 - 生产 `.env`
 
+## 产品交付声明
+
+仓库根目录包含：
+
+- `fd-delivery.manifest.json`
+
+这个文件用于让 `fd-core-stack` 自动识别当前产品的部署合同，包括：
+
+- 安装器入口
+- 仓库与分支
+- 域名槽位
+- 用户需要填写的字段
+- 高级预设字段
+
+目标是让控制平面只渲染当前产品真正需要的字段，而不是给所有产品展示一套固定的大表单。
+
+## 产品交付声明
+
+仓库根目录包含：
+
+- `fd-delivery.manifest.json`
+
+这个文件用于让 `fd-core-stack` 自动识别当前产品的部署合同，包括：
+
+- 安装器入口
+- 仓库与分支
+- 域名槽位
+- 用户需要填写的字段
+- 高级预设字段
+
+目标是让控制平面只渲染当前产品真正需要的字段，而不是给所有产品展示一套固定的大表单。
+
 ## 管理方式
 
 采用“多仓库 + 一个交付仓库”的方式：
@@ -170,9 +202,10 @@ bash scripts/configure-env.sh
 - 空白服务器首次启动，建议先使用 `PUBLIC_SCHEME=http` 和 `WEBSOCKET_PUBLIC_SCHEME=ws`，先把整套服务跑通
 - 真正切到 HTTPS 前，要先重新构建一版前端交付镜像，把 `site_url` 改成 `https://...`，把 `websocket_url` 改成 `wss://...`
 - `scripts/setup-https.sh` 现在会自动申请证书，并把 `.env` 里的 `HTTPS_ENABLED`、`HTTPS_PORT`、`PUBLIC_SCHEME`、`WEBSOCKET_PUBLIC_SCHEME` 一起改到正确值
-- `WORDPRESS_RUN_INIT=true` 时，会自动完成 WordPress 首次安装，并安装激活 `WPGraphQL`、`redis-cache`，同时启用交付链里挂载的核心插件
+- `WORDPRESS_RUN_INIT=true` 时，会自动完成 WordPress 首次安装，并安装激活 `WPGraphQL`、`redis-cache`、`Classic Editor`，同时启用交付链里挂载的核心插件
+- 默认交付链路不再安装 `ACF` 或 `WPGraphQL for ACF`，当前内容模型默认按纯代码插件运行
 - 初始化还会自动设置 `WORDPRESS_PERMALINK_STRUCTURE`，确保 `/graphql` 这种地址能直接使用
-- 如果服务器不能直接从 WordPress 官方源下载插件，可以把 `WORDPRESS_WPGRAPHQL_SOURCE` 改成你自己的 zip 地址
+- 如果服务器不能直接从 WordPress 官方源下载插件，可以把 `WORDPRESS_WPGRAPHQL_SOURCE`、`WORDPRESS_CLASSIC_EDITOR_SOURCE` 改成你自己的 zip 地址
 - 如果要在测试服务器拉取私有 WordPress release 资产，需要把 `WORDPRESS_FETCH_RELEASE_ASSETS=true`
 - 如果 WordPress 资产版本没有变化，`scripts/update-stack.sh` 会自动跳过重复下载；只有需要强制重拉时，才把 `FORCE_WORDPRESS_ASSET_FETCH=true`
 - 测试服务器更新建议直接运行 `bash scripts/update-stack.sh`
