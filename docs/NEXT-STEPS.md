@@ -51,7 +51,7 @@
 3. `fd-payment`
 4. `fd-commerce`
 5. 其余关键 `fd-*`
-6. ACF 配置
+6. 旧 ACF 兼容链清理
 
 接下来目标：
 

@@ -41,6 +41,7 @@
 - `wp-graphql-jwt-authentication`
 - `wp-graphql-tax-query-develop`
 - `redis-cache`
+- `classic-editor`
 
 ## 你要先准备什么
 

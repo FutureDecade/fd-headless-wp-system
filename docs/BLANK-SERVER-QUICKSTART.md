@@ -254,14 +254,17 @@ bash scripts/update-stack.sh
 
 ## 当前已经确认的真实状态
 
-截至 `2026-03-29`，下面这套链路已经在空白 Debian 12 服务器 `144.48.8.218` 上跑通并验收过：
+截至 `2026-03-31`，下面这套链路已经在空白 Debian 12 服务器 `144.48.8.218` 上跑通并验收过：
 
 - 首次安装
+- `docker compose down -v` 后的卷级重装
 - WordPress 自动初始化
 - `fd-websocket-push`
 - `wp-graphql-jwt-authentication`
 - `wp-graphql-tax-query-develop`
 - `redis-cache`
+- `classic-editor`
+- 无 `ACF` / `WPGraphQL for ACF` 的纯代码内容模型首装
 - GraphQL 可用
 - 示例页面可访问
 - HTTPS 证书申请
@@ -277,7 +280,7 @@ bash scripts/update-stack.sh
 
 现在已经不是“架构方向不行”，而是还剩最后几项交付收尾：
 
-- ACF 还没正式并入这条 release 交付链
+- 默认交付链已经切到纯代码内容模型，不再默认安装 ACF / WPGraphQL for ACF；剩余是把旧兼容代码继续清理干净
 - 付费授权链路还没有接上你未来的授权中台
 - 还没有做成最终的客户授权安装器
 

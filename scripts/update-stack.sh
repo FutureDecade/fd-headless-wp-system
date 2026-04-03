@@ -78,6 +78,42 @@ need_wordpress_asset_sync() {
     return 0
   fi
 
+  if [[ ! -f "${ROOT_DIR}/runtime/wp-content/themes/fd-theme/style.css" ]]; then
+    return 0
+  fi
+
+  if [[ ! -f "${ROOT_DIR}/runtime/wp-content/plugins/fd-admin-ui/fd-admin-ui.php" ]]; then
+    return 0
+  fi
+
+  if [[ ! -f "${ROOT_DIR}/runtime/wp-content/plugins/fd-member/index.php" ]]; then
+    return 0
+  fi
+
+  if [[ ! -f "${ROOT_DIR}/runtime/wp-content/plugins/fd-payment/index.php" ]]; then
+    return 0
+  fi
+
+  if [[ ! -f "${ROOT_DIR}/runtime/wp-content/plugins/fd-commerce/fd-commerce.php" ]]; then
+    return 0
+  fi
+
+  if [[ ! -f "${ROOT_DIR}/runtime/wp-content/plugins/fd-content-types/fd-content-types.php" ]]; then
+    return 0
+  fi
+
+  if [[ ! -f "${ROOT_DIR}/runtime/wp-content/plugins/fd-websocket-push/fd-websocket-push.php" ]]; then
+    return 0
+  fi
+
+  if [[ ! -f "${ROOT_DIR}/runtime/wp-content/plugins/wp-graphql-jwt-authentication/wp-graphql-jwt-authentication.php" ]]; then
+    return 0
+  fi
+
+  if [[ ! -f "${ROOT_DIR}/runtime/wp-content/plugins/wp-graphql-tax-query-develop/wp-graphql-tax-query.php" ]]; then
+    return 0
+  fi
+
   local current_lock
   current_lock="$(cat "${lock_file}")"
 

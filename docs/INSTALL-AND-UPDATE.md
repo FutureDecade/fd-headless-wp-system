@@ -386,7 +386,7 @@ ACR_USERNAME=你的阿里云账号 ACR_PASSWORD=你的ACR密码 bash scripts/ren
 
 但目前还不能说“已经完全最终版可商用交付”，因为还剩这些收尾项：
 
-- ACF 还没并入当前 release 交付链路
+- 默认 release 交付链已经不再安装 ACF / WPGraphQL for ACF，但旧业务仓库里还有少量兼容代码待继续清理
 - 一些次级页面的 SEO 文案、Twitter 元信息里还残留旧品牌文字
 - 联系方式这类前端公开信息，后面还要整理成更清晰的交付参数
 - 还没有做真正的客户级一键安装脚本
