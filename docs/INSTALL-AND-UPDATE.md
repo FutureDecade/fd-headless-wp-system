@@ -53,7 +53,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/FutureDecade/fd-headless-wp-
 当前测试机使用的关键版本：
 
 - `fd-theme`: `v1.0.7`
-- `fd-admin-ui`: `v1.3.1`
+- `fd-admin-ui`: `v1.3.2`
 - `fd-content-types`: `v0.4.0`
 - `fd-frontend`: `crpi-8y82lbqoc1haiday.cn-beijing.personal.cr.aliyuncs.com/futuredecade/fd-frontend:futuredecade-https-8862356`
 - `fd-websocket`: `crpi-8y82lbqoc1haiday.cn-beijing.personal.cr.aliyuncs.com/futuredecade/fd-websocket:248efba2800ce856e043d673233bc5f5205e2a40`
@@ -242,7 +242,7 @@ bash scripts/configure-env.sh
 
 - `WORDPRESS_FETCH_RELEASE_ASSETS=true`
 - `FD_THEME_RELEASE_TAG=v1.0.7`
-- `FD_ADMIN_UI_RELEASE_TAG=v1.3.1`
+- `FD_ADMIN_UI_RELEASE_TAG=v1.3.2`
 - `FD_MEMBER_RELEASE_TAG=...`
 - `FD_PAYMENT_RELEASE_TAG=...`
 - `FD_COMMERCE_RELEASE_TAG=...`
