@@ -176,7 +176,7 @@
       "required": true,
       "editable": true,
       "advanced": true,
-      "defaultValue": "v0.1.0",
+      "defaultValue": "v0.4.0",
       "group": "release"
     },
     {
