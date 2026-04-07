@@ -222,6 +222,7 @@ bash scripts/configure-env.sh
 - 如果已经换成正式域名并准备启用 HTTPS，可以运行 `ACR_USERNAME=你的账号 ACR_PASSWORD=你的密码 bash scripts/setup-https.sh`
 - 后续证书续期可以运行 `ACR_USERNAME=你的账号 ACR_PASSWORD=你的密码 bash scripts/renew-https.sh`
 - 如果只想更新 WordPress 交付资产版本，可以运行 `FD_THEME_RELEASE_TAG=v1.0.7 FD_CONTENT_TYPES_RELEASE_TAG=v0.4.0 FD_WEBSOCKET_PUSH_RELEASE_TAG=v1.0.0 WPGRAPHQL_JWT_AUTH_RELEASE_TAG=v0.7.2 WPGRAPHQL_TAX_QUERY_REF=v0.2.0 bash scripts/update-wordpress-release-tags.sh`
+- 也可以手动触发 GitHub Actions 里的 `Sync WordPress Release Tags`，自动查询 latest release 并回写 manifest 与默认脚本版本
 - GitHub Actions 里的 `Deploy Test Server` 现在支持手动填写这些 release tag，服务器会先改 `.env`，再自动重拉并更新
 - 截至 `2026-03-28`，测试机 `144.48.8.218` 已经完成 `www.futuredecade.com`、`admin.futuredecade.com`、`ws.futuredecade.com` 的正式 HTTPS 验证
 - 这版仓库的目标是先固定系统边界，不是立即完成生产可用的一键部署

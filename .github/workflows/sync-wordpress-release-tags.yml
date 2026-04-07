@@ -1,0 +1,38 @@
+name: Sync WordPress Release Tags
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    name: Sync Latest Release Tags
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Sync release tags
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: python3 scripts/sync-wordpress-release-tags.py
+
+      - name: Show git diff
+        run: git diff --stat
+
+      - name: Commit changes
+        run: |
+          if git diff --quiet; then
+            echo "No tag updates detected."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .env.example README.md docs/INSTALL-AND-UPDATE.md docs/RELEASE-AND-VERSIONING.md fd-delivery.manifest.json scripts/configure-env.sh scripts/fetch-wordpress-assets.sh scripts/preflight-check.sh scripts/sync-wordpress-release-tags.py scripts/update-stack.sh
+          git commit -m "chore: sync WordPress release tags"
+          git push
