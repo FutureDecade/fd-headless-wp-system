@@ -158,9 +158,9 @@ bash scripts/install.sh
 - `/health` 能返回 `{"status":"ok"...}`
 - `/graphql` 能正常响应
 
-如果你保留了初始化示例页面，还可以再打开：
+如果保留了默认演示数据，还可以再打开：
 
-- `http://www.你的域名/sample-page`
+- `http://www.你的域名/about-us`
 
 ## 第 7 步：再切 HTTPS
 
@@ -219,7 +219,7 @@ bash scripts/setup-https.sh
 - `https://www.你的域名`
 - `https://admin.你的域名`
 - `https://ws.你的域名/health`
-- `https://www.你的域名/sample-page`
+- `https://www.你的域名/about-us`
 
 ## 第 9 步：以后怎么更新
 

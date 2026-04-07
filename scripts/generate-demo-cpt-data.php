@@ -1,0 +1,1328 @@
+<?php
+/**
+ * Generate a self-contained demo content package for current CPTs.
+ */
+
+declare(strict_types=1);
+
+$repoRoot = dirname(__DIR__);
+$outputPath = $repoRoot . '/demo-data/demo-cpt-content.v1.json';
+
+function demo_asset_ref(string $key, string $alt = ''): array
+{
+    return [
+        'asset_key' => $key,
+        'alt' => $alt,
+    ];
+}
+
+function demo_svg_asset(
+    string $key,
+    string $title,
+    string $subtitle,
+    int $width,
+    int $height,
+    array $palette
+): array {
+    $colors = array_values(array_pad($palette, 4, '#FFFFFF'));
+    $title = htmlspecialchars($title, ENT_QUOTES | ENT_XML1, 'UTF-8');
+    $subtitle = htmlspecialchars($subtitle, ENT_QUOTES | ENT_XML1, 'UTF-8');
+
+    $svg = sprintf(
+        <<<'SVG'
+<svg xmlns="http://www.w3.org/2000/svg" width="%1$d" height="%2$d" viewBox="0 0 %1$d %2$d" fill="none">
+  <defs>
+    <linearGradient id="bg-%3$s" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%%" stop-color="%4$s" />
+      <stop offset="100%%" stop-color="%5$s" />
+    </linearGradient>
+    <radialGradient id="orb-%3$s" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(%6$d %7$d) rotate(90) scale(%8$d %9$d)">
+      <stop stop-color="%10$s" stop-opacity="0.95" />
+      <stop offset="1" stop-color="%10$s" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+  <rect width="%1$d" height="%2$d" rx="36" fill="url(#bg-%3$s)" />
+  <circle cx="%6$d" cy="%7$d" r="%11$d" fill="url(#orb-%3$s)" />
+  <circle cx="%12$d" cy="%13$d" r="%14$d" fill="%15$s" fill-opacity="0.18" />
+  <path d="M%16$d %17$d C%18$d %19$d, %20$d %21$d, %22$d %23$d" stroke="%15$s" stroke-opacity="0.35" stroke-width="10" stroke-linecap="round" />
+  <text x="%24$d" y="%25$d" fill="%15$s" fill-opacity="0.88" font-family="'Noto Sans SC', 'PingFang SC', sans-serif" font-size="%26$d" font-weight="600">%27$s</text>
+  <text x="%24$d" y="%28$d" fill="%15$s" font-family="'Noto Sans SC', 'PingFang SC', sans-serif" font-size="%29$d" font-weight="700">%30$s</text>
+  <text x="%24$d" y="%31$d" fill="%15$s" fill-opacity="0.9" font-family="'Noto Sans SC', 'PingFang SC', sans-serif" font-size="%32$d" font-weight="500">%33$s</text>
+</svg>
+SVG,
+        $width,
+        $height,
+        preg_replace('/[^a-z0-9\-]+/i', '-', $key),
+        $colors[0],
+        $colors[1],
+        (int) round($width * 0.78),
+        (int) round($height * 0.18),
+        (int) round($height * 0.52),
+        (int) round($width * 0.38),
+        $colors[2],
+        (int) round(min($width, $height) * 0.26),
+        (int) round($width * 0.14),
+        (int) round($height * 0.84),
+        (int) round(min($width, $height) * 0.18),
+        $colors[3],
+        (int) round($width * 0.05),
+        (int) round($height * 0.7),
+        (int) round($width * 0.32),
+        (int) round($height * 0.52),
+        (int) round($width * 0.62),
+        (int) round($height * 0.92),
+        (int) round($width * 0.94),
+        (int) round($height * 0.66),
+        (int) round($width * 0.08),
+        (int) round($height * 0.16),
+        $width >= 700 ? 28 : 24,
+        'FutureDecade Demo',
+        (int) round($height * 0.52),
+        $width >= 700 ? 64 : 42,
+        $title,
+        (int) round($height * 0.67),
+        $width >= 700 ? 28 : 20,
+        $subtitle
+    );
+
+    return [
+        'key' => $key,
+        'source_type' => 'inline_svg',
+        'filename' => $key . '.svg',
+        'mime_type' => 'image/svg+xml',
+        'width' => $width,
+        'height' => $height,
+        'title' => $title,
+        'svg' => $svg,
+    ];
+}
+
+$assets = [
+    demo_svg_asset('note-ai-workflow-cover', 'AI 工作流', '上线前三层检查', 1200, 630, ['#0D3B66', '#1E6091', '#8ECAE6', '#F1FAEE']),
+    demo_svg_asset('note-interview-cards-cover', '访谈卡片', '把原始记录变成知识资产', 1200, 630, ['#3A5A40', '#588157', '#A3B18A', '#F4F1DE']),
+    demo_svg_asset('note-async-weekly-cover', '异步周报', '团队协作的信息粒度', 1200, 630, ['#5E3023', '#895737', '#C08552', '#FFF4E6']),
+
+    demo_svg_asset('app-signal-desk-cover', 'Signal Desk', '研究资料聚合工作台', 1200, 630, ['#1B4332', '#2D6A4F', '#95D5B2', '#F1FAEE']),
+    demo_svg_asset('app-signal-desk-icon', 'SD', 'APP ICON', 512, 512, ['#081C15', '#1B4332', '#74C69D', '#F1FAEE']),
+    demo_svg_asset('app-signal-desk-screen', 'Signal Desk', '洞察卡片与素材流', 1440, 900, ['#0B1F33', '#134074', '#8DA9C4', '#EAF4F4']),
+
+    demo_svg_asset('app-pulse-board-cover', 'Pulse Board', '团队节奏与交付仪表盘', 1200, 630, ['#4A1942', '#893168', '#E0A2C7', '#FFF0F6']),
+    demo_svg_asset('app-pulse-board-icon', 'PB', 'APP ICON', 512, 512, ['#2E0F26', '#4A1942', '#C77D9B', '#FFF0F6']),
+    demo_svg_asset('app-pulse-board-screen', 'Pulse Board', '目标、风险与周节奏', 1440, 900, ['#3C1642', '#6A0572', '#C77DFF', '#F8F0FF']),
+
+    demo_svg_asset('app-atlas-capture-cover', 'Atlas Capture', '跨端剪藏与结构化标注', 1200, 630, ['#264653', '#2A9D8F', '#94D2BD', '#FAF9F6']),
+    demo_svg_asset('app-atlas-capture-icon', 'AC', 'APP ICON', 512, 512, ['#1D3557', '#457B9D', '#A8DADC', '#F1FAEE']),
+    demo_svg_asset('app-atlas-capture-screen', 'Atlas Capture', '网页、图片与语音摘录', 1440, 900, ['#264653', '#2A9D8F', '#E9C46A', '#F1FAEE']),
+
+    demo_svg_asset('event-strategy-open-class-banner', 'AI 产品策略公开课', '把灵感整理为可执行路线图', 1440, 720, ['#102A43', '#243B53', '#9FB3C8', '#F0F4F8']),
+    demo_svg_asset('event-strategy-open-class-logo', '策略课', 'EVENT LOGO', 512, 512, ['#102A43', '#243B53', '#D9E2EC', '#F0F4F8']),
+    demo_svg_asset('event-strategy-open-class-photo', '公开课现场', '实时演示与问答', 1440, 900, ['#243B53', '#486581', '#BCCCDC', '#F0F4F8']),
+
+    demo_svg_asset('event-city-salon-banner', '城市创新者沙龙', '从案例拆解到现场连接', 1440, 720, ['#7F5539', '#9C6644', '#DDB892', '#FFF7ED']),
+    demo_svg_asset('event-city-salon-logo', '沙龙', 'EVENT LOGO', 512, 512, ['#7F5539', '#9C6644', '#E6CCB2', '#FFF7ED']),
+    demo_svg_asset('event-city-salon-photo', '沙龙现场', '案例墙与圆桌讨论', 1440, 900, ['#9C6644', '#B08968', '#E6CCB2', '#FFF7ED']),
+
+    demo_svg_asset('event-content-bootcamp-banner', '内容系统训练营', '用两天搭建可复用内容框架', 1440, 720, ['#003049', '#1D3557', '#A8DADC', '#F1FAEE']),
+    demo_svg_asset('event-content-bootcamp-logo', '训练营', 'EVENT LOGO', 512, 512, ['#003049', '#1D3557', '#D6F0F2', '#F1FAEE']),
+    demo_svg_asset('event-content-bootcamp-photo', '训练营课堂', '模板拆解与小组练习', 1440, 900, ['#1D3557', '#457B9D', '#A8DADC', '#F1FAEE']),
+
+    demo_svg_asset('event-speaker-lin', '林若水', 'Speaker', 512, 512, ['#5B8E7D', '#2F5D50', '#B7E4C7', '#F1FAEE']),
+    demo_svg_asset('event-speaker-he', '何一川', 'Speaker', 512, 512, ['#8D6A9F', '#6D597A', '#E0B1CB', '#FFF0F6']),
+    demo_svg_asset('event-speaker-zhou', '周明序', 'Speaker', 512, 512, ['#355070', '#6D597A', '#B56576', '#FFE5EC']),
+    demo_svg_asset('event-organizer-logo', 'FD Lab', 'ORGANIZER', 512, 512, ['#0B132B', '#1C2541', '#5BC0BE', '#F1FAEE']),
+
+    demo_svg_asset('product-trend-brief-cover', '趋势周报', '一年期订阅产品', 1200, 630, ['#16425B', '#2F6690', '#81C3D7', '#F7FBFC']),
+    demo_svg_asset('product-trend-brief-gallery', '周报样张', '图表、观点与行动建议', 1440, 900, ['#16425B', '#3A7CA5', '#81C3D7', '#F7FBFC']),
+
+    demo_svg_asset('product-interview-kit-cover', '访谈模板包', '即买即用的研究资产', 1200, 630, ['#7B2CBF', '#9D4EDD', '#C77DFF', '#FAF5FF']),
+    demo_svg_asset('product-interview-kit-gallery', '模板预览', '问题清单、记录表与总结框架', 1440, 900, ['#5A189A', '#7B2CBF', '#C77DFF', '#FAF5FF']),
+
+    demo_svg_asset('product-desk-mat-cover', 'Desk Mat', '桌面工作垫', 1200, 630, ['#6B705C', '#A5A58D', '#DDBEA9', '#FFF6ED']),
+    demo_svg_asset('product-desk-mat-gallery', '材质细节', '纤维表层与防滑底面', 1440, 900, ['#6B705C', '#A5A58D', '#FFE8D6', '#FFF6ED']),
+
+    demo_svg_asset('post-editorial-system-cover', '编辑系统', 'AI 时代的内容生产底座', 1200, 630, ['#1D3557', '#457B9D', '#A8DADC', '#F1FAEE']),
+    demo_svg_asset('post-distribution-engine-cover', '分发引擎', '让一篇内容进入多个触点', 1200, 630, ['#5F0F40', '#9A031E', '#FB8B24', '#FFF6E9']),
+    demo_svg_asset('post-membership-loop-cover', '会员闭环', '从内容消费走向关系经营', 1200, 630, ['#283618', '#606C38', '#DDA15E', '#FEFAE0']),
+    demo_svg_asset('post-creative-metrics-cover', '创作指标', '哪些数据值得团队长期看', 1200, 630, ['#003049', '#669BBC', '#F77F00', '#FCBF49']),
+    demo_svg_asset('post-small-team-ops-cover', '小团队运营', '如何减少无效同步', 1200, 630, ['#264653', '#2A9D8F', '#E9C46A', '#F1FAEE']),
+    demo_svg_asset('post-knowledge-routing-cover', '知识路由', '从素材采集到发布的连接方式', 1200, 630, ['#4C1D95', '#7C3AED', '#C4B5FD', '#F5F3FF']),
+];
+
+$terms = [
+    ['taxonomy' => 'note_category', 'name' => '方法论', 'slug' => 'methods', 'description' => '工作流程、判断框架与操作方法。', 'parent_slug' => null],
+    ['taxonomy' => 'note_category', 'name' => '研究记录', 'slug' => 'research-log', 'description' => '把素材、访谈与观察转成结构化记录。', 'parent_slug' => null],
+    ['taxonomy' => 'note_category', 'name' => '团队运营', 'slug' => 'team-ops', 'description' => '适合小团队的协作机制与节奏设计。', 'parent_slug' => null],
+
+    ['taxonomy' => 'app_category', 'name' => '研究工具', 'slug' => 'research-tools', 'description' => '帮助整理素材、生成洞察的应用。', 'parent_slug' => null],
+    ['taxonomy' => 'app_category', 'name' => '团队协作', 'slug' => 'team-collaboration', 'description' => '围绕目标、节奏与分工的协作应用。', 'parent_slug' => null],
+    ['taxonomy' => 'app_category', 'name' => '创作效率', 'slug' => 'creative-productivity', 'description' => '支持剪藏、写作与内容搭建的创作工具。', 'parent_slug' => null],
+
+    ['taxonomy' => 'event_category', 'name' => '公开课', 'slug' => 'open-class', 'description' => '面向广泛用户的开放活动。', 'parent_slug' => null],
+    ['taxonomy' => 'event_category', 'name' => '线下沙龙', 'slug' => 'offline-salon', 'description' => '更强调连接和交流的线下活动。', 'parent_slug' => null],
+    ['taxonomy' => 'event_category', 'name' => '训练营', 'slug' => 'bootcamp', 'description' => '以落地成果为目标的系统化训练。', 'parent_slug' => null],
+
+    ['taxonomy' => 'product_category', 'name' => '数字产品', 'slug' => 'digital-goods', 'description' => '订阅、课程、数字资源等可即时交付的商品。', 'parent_slug' => null],
+    ['taxonomy' => 'product_category', 'name' => '模板资源', 'slug' => 'template-kits', 'description' => '适合直接复用的模板包与表单套件。', 'parent_slug' => null],
+    ['taxonomy' => 'product_category', 'name' => '办公周边', 'slug' => 'office-essentials', 'description' => '适合长期办公与创作场景的实体周边。', 'parent_slug' => null],
+
+    ['taxonomy' => 'product_brand', 'name' => 'FutureDecade Lab', 'slug' => 'futuredecade-lab', 'description' => 'FutureDecade 自有品牌。', 'parent_slug' => null],
+    ['taxonomy' => 'product_brand', 'name' => 'Signal Works', 'slug' => 'signal-works', 'description' => '偏产品化的实验品牌线。', 'parent_slug' => null],
+
+    ['taxonomy' => 'product_tag', 'name' => '编辑推荐', 'slug' => 'editor-choice', 'description' => '', 'parent_slug' => null],
+    ['taxonomy' => 'product_tag', 'name' => '立即交付', 'slug' => 'instant-delivery', 'description' => '', 'parent_slug' => null],
+    ['taxonomy' => 'product_tag', 'name' => '限量发售', 'slug' => 'limited-release', 'description' => '', 'parent_slug' => null],
+    ['taxonomy' => 'product_tag', 'name' => '线下搭配', 'slug' => 'offline-bundle', 'description' => '', 'parent_slug' => null],
+
+    ['taxonomy' => 'category', 'name' => 'AI洞察', 'slug' => 'ai-insights', 'description' => '围绕 AI 工具、内容生产和工作流的观察。', 'parent_slug' => null],
+    ['taxonomy' => 'category', 'name' => '内容策略', 'slug' => 'content-strategy', 'description' => '关于选题、编辑系统与内容框架的实践。', 'parent_slug' => null],
+    ['taxonomy' => 'category', 'name' => '团队方法', 'slug' => 'team-methods', 'description' => '适合小团队的协作、节奏和运营方法。', 'parent_slug' => null],
+
+    ['taxonomy' => 'post_tag', 'name' => 'AI效率', 'slug' => 'ai-productivity', 'description' => '', 'parent_slug' => null],
+    ['taxonomy' => 'post_tag', 'name' => '研究方法', 'slug' => 'research-methods', 'description' => '', 'parent_slug' => null],
+    ['taxonomy' => 'post_tag', 'name' => '团队协作', 'slug' => 'team-collaboration', 'description' => '', 'parent_slug' => null],
+    ['taxonomy' => 'post_tag', 'name' => '数字工具', 'slug' => 'digital-tools', 'description' => '', 'parent_slug' => null],
+];
+
+$pages = [
+    [
+        'title' => '关于我们',
+        'slug' => 'about-us',
+        'status' => 'publish',
+        'date' => '2026-04-01T08:00:00+08:00',
+        'excerpt' => 'FutureDecade 是一个围绕内容系统、产品方法与 AI 工作流展开的演示站点。',
+        'content' => <<<'HTML'
+<p>FutureDecade 演示站用于展示一套 headless WordPress 内容系统在真实部署后的基本样貌。</p>
+<p>这里包含文章、页面、笔记、应用、活动和商品等多种内容形态，目标不是提供真实业务数据，而是帮助你验证主题、插件和前端在新环境中的联动是否完整。</p>
+<h2>我们关注什么</h2>
+<ul>
+  <li>内容如何被稳定生产、管理和分发。</li>
+  <li>小团队如何用更轻的流程获得更高的交付确定性。</li>
+  <li>AI 如何嵌入真实工作流，而不是停留在概念演示。</li>
+</ul>
+HTML,
+        'featured_media' => null,
+        'taxonomies' => [],
+        'template' => 'default',
+    ],
+    [
+        'title' => '联系我们',
+        'slug' => 'contact-us',
+        'status' => 'publish',
+        'date' => '2026-04-01T08:10:00+08:00',
+        'excerpt' => '用于演示公共联系信息与页脚页面结构。',
+        'content' => <<<'HTML'
+<ul>
+  <li><strong>团队</strong>：FutureDecade Demo</li>
+  <li><strong>邮箱</strong>：hello@futuredecade.local</li>
+  <li><strong>合作咨询</strong>：partner@futuredecade.local</li>
+  <li><strong>站点说明</strong>：本页信息仅用于演示，不对应真实商业实体。</li>
+</ul>
+HTML,
+        'featured_media' => null,
+        'taxonomies' => [],
+        'template' => 'default',
+    ],
+    [
+        'title' => '交流公约',
+        'slug' => 'communication-terms',
+        'status' => 'publish',
+        'date' => '2026-04-01T08:20:00+08:00',
+        'excerpt' => '用于演示长文本页面与法务/说明类页面的渲染效果。',
+        'content' => <<<'HTML'
+<p>本页面用于演示社区说明类内容在前台的展示效果。</p>
+<ol>
+  <li>尊重他人，避免攻击性表达。</li>
+  <li>尽量提供有依据的观点与信息来源。</li>
+  <li>不要发布广告、垃圾信息或误导性内容。</li>
+  <li>如发现异常内容，请通过后台管理或人工方式处理。</li>
+</ol>
+HTML,
+        'featured_media' => null,
+        'taxonomies' => [],
+        'template' => 'default',
+    ],
+    [
+        'title' => '隐私条款',
+        'slug' => 'privacy',
+        'status' => 'publish',
+        'date' => '2026-04-01T08:30:00+08:00',
+        'excerpt' => '用于演示政策页的占位内容。',
+        'content' => <<<'HTML'
+<p>这是一个演示环境中的隐私条款示例页面。</p>
+<p>页面文本仅用于验证部署后的页面结构、菜单链接和富文本渲染能力，不构成真实法律承诺。</p>
+<p>如果你要用于正式环境，请替换为自己的真实条款内容。</p>
+HTML,
+        'featured_media' => null,
+        'taxonomies' => [],
+        'template' => 'default',
+    ],
+    [
+        'title' => '版权声明',
+        'slug' => 'copyright-claim',
+        'status' => 'publish',
+        'date' => '2026-04-01T08:40:00+08:00',
+        'excerpt' => '用于演示站点的版权说明页面。',
+        'content' => <<<'HTML'
+<p>本演示站中的文本、图形和结构仅用于产品展示和测试验证。</p>
+<p>如果你在正式环境中使用本站点方案，请根据自己的业务情况替换为真实版权说明。</p>
+HTML,
+        'featured_media' => null,
+        'taxonomies' => [],
+        'template' => 'default',
+    ],
+    [
+        'title' => '服务条款',
+        'slug' => 'terms',
+        'status' => 'publish',
+        'date' => '2026-04-01T08:50:00+08:00',
+        'excerpt' => '用于演示另一类政策页与页脚结构。',
+        'content' => <<<'HTML'
+<p>本服务条款页面仅用于演示部署完成后页面层是否完整。</p>
+<p>测试环境中的所有内容都不对应真实交易关系，正式上线前请替换为你的实际条款。</p>
+HTML,
+        'featured_media' => null,
+        'taxonomies' => [],
+        'template' => 'default',
+    ],
+];
+
+$posts = [
+    [
+        'title' => 'AI 时代，内容团队为什么仍然需要编辑系统',
+        'slug' => 'why-editorial-systems-still-matter-in-ai-era',
+        'status' => 'publish',
+        'date' => '2026-03-22T09:00:00+08:00',
+        'excerpt' => '模型可以加速写作，但不能替代选题判断、结构标准和发布节奏，因此内容团队反而更需要清晰的编辑系统。',
+        'content' => <<<'HTML'
+<p>当 AI 工具快速进入内容生产链条后，很多团队误以为“只要接入模型，内容产能就能自动提升”。但真正决定产出质量的，仍然是编辑系统本身。</p>
+<p>一个成熟的编辑系统至少要回答三个问题：什么值得做、如何稳定做、做完以后如何复盘。AI 可以参与这三件事，但不能替代这三件事。</p>
+<h2>系统感来自哪里</h2>
+<p>它来自选题标准、信息来源、角色分工、审校规则和分发节奏。如果这些结构缺失，再先进的模型也只是在放大混乱。</p>
+HTML,
+        'featured_media' => demo_asset_ref('post-editorial-system-cover', 'AI 时代，内容团队为什么仍然需要编辑系统'),
+        'taxonomies' => [
+            'category' => [
+                ['name' => '内容策略', 'slug' => 'content-strategy'],
+            ],
+            'post_tag' => [
+                ['name' => 'AI效率', 'slug' => 'ai-productivity'],
+                ['name' => '研究方法', 'slug' => 'research-methods'],
+            ],
+        ],
+        'meta' => [
+            'template_type' => 'standard',
+            'article_author' => 'FutureDecade 编辑部',
+            'article_source' => 'Demo Editorial',
+            'copyright_type' => 'default',
+            'video_url' => '',
+            'additional_images' => [],
+        ],
+    ],
+    [
+        'title' => '内容分发不是发得更多，而是路由更清晰',
+        'slug' => 'content-distribution-needs-routing-not-volume',
+        'status' => 'publish',
+        'date' => '2026-03-24T10:30:00+08:00',
+        'excerpt' => '同一份内容进入不同渠道时，真正重要的是目标、受众和动作是否匹配，而不是简单复制粘贴到更多平台。',
+        'content' => <<<'HTML'
+<p>很多团队把“多渠道分发”理解成把同一篇文章复制到更多地方，但实际效果往往很弱。原因不是平台太多，而是每个触点承接的动作不同。</p>
+<p>首页要承担品牌感和导航，邮件更适合做节奏提醒，社媒适合传播单点观点，站内专题页则更像长期资产库。</p>
+<p>当你把一份内容看作一个“可路由对象”，分发策略就会比简单转发有效得多。</p>
+HTML,
+        'featured_media' => demo_asset_ref('post-distribution-engine-cover', '内容分发不是发得更多，而是路由更清晰'),
+        'taxonomies' => [
+            'category' => [
+                ['name' => '内容策略', 'slug' => 'content-strategy'],
+            ],
+            'post_tag' => [
+                ['name' => '数字工具', 'slug' => 'digital-tools'],
+                ['name' => '团队协作', 'slug' => 'team-collaboration'],
+            ],
+        ],
+        'meta' => [
+            'template_type' => 'standard',
+            'article_author' => 'FutureDecade 编辑部',
+            'article_source' => 'Distribution Notes',
+            'copyright_type' => 'default',
+            'video_url' => '',
+            'additional_images' => [],
+        ],
+    ],
+    [
+        'title' => '会员产品的关键，不是权益堆叠，而是关系闭环',
+        'slug' => 'membership-products-need-relational-loops',
+        'status' => 'publish',
+        'date' => '2026-03-26T14:00:00+08:00',
+        'excerpt' => '用户续费从来不是因为你列了更多权益，而是因为内容、服务和互动能形成稳定的信任循环。',
+        'content' => <<<'HTML'
+<p>很多会员产品上线时最容易犯的错，是不断堆叠权益：更多文章、更多群、更多活动、更多标签，但很少解释这些权益之间如何形成闭环。</p>
+<p>真正能提升续费率的，往往是三件事：</p>
+<ul>
+  <li>内容本身持续可用。</li>
+  <li>服务反馈可感知。</li>
+  <li>用户参与能带来新的价值沉淀。</li>
+</ul>
+<p>当这三件事被串起来，会员才更像一种持续关系，而不是一次性促销包。</p>
+HTML,
+        'featured_media' => demo_asset_ref('post-membership-loop-cover', '会员产品的关键，不是权益堆叠，而是关系闭环'),
+        'taxonomies' => [
+            'category' => [
+                ['name' => 'AI洞察', 'slug' => 'ai-insights'],
+            ],
+            'post_tag' => [
+                ['name' => '团队协作', 'slug' => 'team-collaboration'],
+                ['name' => '数字工具', 'slug' => 'digital-tools'],
+            ],
+        ],
+        'meta' => [
+            'template_type' => 'standard',
+            'article_author' => 'FutureDecade 编辑部',
+            'article_source' => 'Membership Lab',
+            'copyright_type' => 'default',
+            'video_url' => '',
+            'additional_images' => [],
+        ],
+    ],
+    [
+        'title' => '创作团队到底该看哪些指标',
+        'slug' => 'which-metrics-creative-teams-should-track',
+        'status' => 'publish',
+        'date' => '2026-03-28T11:15:00+08:00',
+        'excerpt' => '阅读量当然重要，但如果它成为唯一指标，团队会逐渐失去对结构质量和长期价值的判断能力。',
+        'content' => <<<'HTML'
+<p>创作团队的指标不应该只有“流量表现”。如果所有判断都围绕短期阅读量，团队就会越来越倾向于做容易获得点击、但难以沉淀价值的内容。</p>
+<p>更合理的做法，是把指标拆成三层：</p>
+<ol>
+  <li>被看见没有。</li>
+  <li>被消费到什么程度。</li>
+  <li>有没有形成后续动作与复用价值。</li>
+</ol>
+<p>一旦团队拥有这三层指标，复盘时讨论的内容会明显更接近业务，而不是情绪。</p>
+HTML,
+        'featured_media' => demo_asset_ref('post-creative-metrics-cover', '创作团队到底该看哪些指标'),
+        'taxonomies' => [
+            'category' => [
+                ['name' => '团队方法', 'slug' => 'team-methods'],
+            ],
+            'post_tag' => [
+                ['name' => 'AI效率', 'slug' => 'ai-productivity'],
+                ['name' => '团队协作', 'slug' => 'team-collaboration'],
+            ],
+        ],
+        'meta' => [
+            'template_type' => 'standard',
+            'article_author' => 'FutureDecade 编辑部',
+            'article_source' => 'Ops Review',
+            'copyright_type' => 'default',
+            'video_url' => '',
+            'additional_images' => [],
+        ],
+    ],
+    [
+        'title' => '小团队运营里最容易被忽略的，是同步成本',
+        'slug' => 'small-teams-often-ignore-sync-cost',
+        'status' => 'publish',
+        'date' => '2026-03-29T16:40:00+08:00',
+        'excerpt' => '项目推进慢不一定是因为人不够，也可能是每次推进都要重新补上下文，导致真正做事的时间被沟通吞掉。',
+        'content' => <<<'HTML'
+<p>在人员不多的团队里，大家往往会默认“沟通一下就好了”。但如果没有稳定的同步机制，每次沟通都意味着重新加载上下文。</p>
+<p>同步成本一高，项目推进速度就会被悄悄拖慢。常见表现包括：会议越来越多、文档越来越散、负责人越来越累。</p>
+<p>解决这个问题，不一定需要更复杂的管理软件，先把节奏、责任和输出格式固定下来，通常就能立刻改善。</p>
+HTML,
+        'featured_media' => demo_asset_ref('post-small-team-ops-cover', '小团队运营里最容易被忽略的，是同步成本'),
+        'taxonomies' => [
+            'category' => [
+                ['name' => '团队方法', 'slug' => 'team-methods'],
+            ],
+            'post_tag' => [
+                ['name' => '团队协作', 'slug' => 'team-collaboration'],
+                ['name' => '研究方法', 'slug' => 'research-methods'],
+            ],
+        ],
+        'meta' => [
+            'template_type' => 'standard',
+            'article_author' => 'FutureDecade 编辑部',
+            'article_source' => 'Team Ops Notes',
+            'copyright_type' => 'default',
+            'video_url' => '',
+            'additional_images' => [],
+        ],
+    ],
+    [
+        'title' => '知识路由：为什么内容资产需要可追溯的路径',
+        'slug' => 'knowledge-routing-needs-traceable-paths',
+        'status' => 'publish',
+        'date' => '2026-03-31T09:45:00+08:00',
+        'excerpt' => '一条观点如果不能回到它的原始证据，团队就很难长期复用它，最终只能不断重复采集和重复讨论。',
+        'content' => <<<'HTML'
+<p>内容资产真正难的，不是“保存下来”，而是以后还能不能找到、看懂、复用。很多团队的问题不是没有资料，而是资料之间没有路径。</p>
+<p>所谓知识路由，就是让一篇文章能回到它的卡片、引用、来源、专题页和分发节点。这样在重做选题、整理产品说明或准备活动时，团队不需要从零开始。</p>
+<p>当内容路径可追溯时，知识就更像系统，而不是一堆分散文件。</p>
+HTML,
+        'featured_media' => demo_asset_ref('post-knowledge-routing-cover', '知识路由：为什么内容资产需要可追溯的路径'),
+        'taxonomies' => [
+            'category' => [
+                ['name' => 'AI洞察', 'slug' => 'ai-insights'],
+            ],
+            'post_tag' => [
+                ['name' => '研究方法', 'slug' => 'research-methods'],
+                ['name' => '数字工具', 'slug' => 'digital-tools'],
+            ],
+        ],
+        'meta' => [
+            'template_type' => 'standard',
+            'article_author' => 'FutureDecade 编辑部',
+            'article_source' => 'Knowledge Routing',
+            'copyright_type' => 'default',
+            'video_url' => '',
+            'additional_images' => [],
+        ],
+    ],
+];
+
+$notes = [
+    [
+        'title' => 'AI 工作流上线前的三层检查',
+        'slug' => 'ai-workflow-three-layer-check',
+        'status' => 'publish',
+        'date' => '2026-04-02T09:30:00+08:00',
+        'excerpt' => '在把 AI 工作流交给真实用户之前，先检查输入、判断和回退三层结构，能显著减少后续返工。',
+        'content' => <<<'HTML'
+<p>很多团队把 AI 流程做成了“能跑起来”的样子，就急着交付给真实用户，但真正影响体验的，往往是那些没有被明确写进流程图的边角处。</p>
+<h2>第一层：输入是否稳定</h2>
+<p>先确认用户输入的格式、上下文和噪音范围。一个工作流如果只在理想输入下成立，实际上还没有准备好上线。</p>
+<h2>第二层：判断是否可解释</h2>
+<p>对于每一步分类、筛选或总结，最好能说清楚“为什么是这个结果”。如果团队自己都解释不清，后续就很难优化。</p>
+<h2>第三层：回退是否温和</h2>
+<p>当模型判断失败时，系统应该回退到可执行的人类流程，而不是直接把错误结果暴露给用户。</p>
+HTML,
+        'featured_media' => demo_asset_ref('note-ai-workflow-cover', 'AI 工作流上线前的三层检查'),
+        'taxonomies' => [
+            'note_category' => [
+                ['name' => '方法论', 'slug' => 'methods'],
+            ],
+        ],
+        'meta' => [
+            'note_source' => 'FutureDecade 编辑部',
+        ],
+    ],
+    [
+        'title' => '把访谈记录变成团队知识卡片',
+        'slug' => 'turn-interviews-into-knowledge-cards',
+        'status' => 'publish',
+        'date' => '2026-04-04T10:15:00+08:00',
+        'excerpt' => '访谈不是做完就结束，真正有复用价值的是把零散原话折叠成标准化卡片，让后续选题、产品和运营都能反复调用。',
+        'content' => <<<'HTML'
+<p>访谈记录最大的浪费，不在于问题问得不够深，而在于结果只停留在录音和逐字稿里，没有进入团队可检索、可拼接、可引用的知识层。</p>
+<ul>
+  <li>先拆分原话与结论，避免“解释”污染素材。</li>
+  <li>再给每张卡片补上场景、角色、触发条件和行动建议。</li>
+  <li>最后建立统一标签，让不同项目之间也能复用。</li>
+</ul>
+<p>当卡片足够稳定时，它会成为选题库、产品需求池和销售材料之间的公共底座。</p>
+HTML,
+        'featured_media' => demo_asset_ref('note-interview-cards-cover', '把访谈记录变成团队知识卡片'),
+        'taxonomies' => [
+            'note_category' => [
+                ['name' => '研究记录', 'slug' => 'research-log'],
+            ],
+        ],
+        'meta' => [
+            'note_source' => '研究手记',
+        ],
+    ],
+    [
+        'title' => '异步协作周报应该写到什么粒度',
+        'slug' => 'async-weekly-report-granularity',
+        'status' => 'publish',
+        'date' => '2026-04-06T18:20:00+08:00',
+        'excerpt' => '好的异步周报不是流水账，而是用固定粒度交代本周推进、关键阻塞和下周动作，让团队不在会里重复同步。',
+        'content' => <<<'HTML'
+<p>很多周报之所以没人看，不是因为大家不重视，而是因为内容要么太粗，只剩口号；要么太细，像把即时通讯记录再抄一遍。</p>
+<p>更合适的写法通常包含三段：</p>
+<ol>
+  <li>本周完成了什么，以及为什么这件事值得记住。</li>
+  <li>目前最大的阻塞是什么，需要谁来协同。</li>
+  <li>下周明确会推进哪一步，交付物是什么。</li>
+</ol>
+<p>这样写出来的周报，既能减少例会时的重复发言，也能帮助后来者快速补全项目上下文。</p>
+HTML,
+        'featured_media' => demo_asset_ref('note-async-weekly-cover', '异步协作周报应该写到什么粒度'),
+        'taxonomies' => [
+            'note_category' => [
+                ['name' => '团队运营', 'slug' => 'team-ops'],
+            ],
+        ],
+        'meta' => [
+            'note_source' => '团队实践',
+        ],
+    ],
+];
+
+$apps = [
+    [
+        'title' => 'Signal Desk',
+        'slug' => 'signal-desk',
+        'status' => 'publish',
+        'date' => '2026-03-28T11:00:00+08:00',
+        'excerpt' => '把网页、访谈与文档片段整理成可复用洞察卡片的研究工作台。',
+        'content' => <<<'HTML'
+<p>Signal Desk 面向内容团队、研究团队和产品团队，帮助你把分散的网页、采访纪要、PDF 标注与语音片段整理成统一的素材流。</p>
+<p>应用强调“先结构化，再生成”，因此非常适合需要反复复用观点、案例和证据的工作场景。</p>
+HTML,
+        'featured_media' => demo_asset_ref('app-signal-desk-cover', 'Signal Desk 封面'),
+        'taxonomies' => [
+            'app_category' => [
+                ['name' => '研究工具', 'slug' => 'research-tools'],
+            ],
+            'post_tag' => [
+                ['name' => 'AI效率', 'slug' => 'ai-productivity'],
+                ['name' => '研究方法', 'slug' => 'research-methods'],
+            ],
+        ],
+        'meta' => [
+            'app_short_description' => '把分散素材归并成可检索、可拼接、可追溯的洞察卡片。',
+            'app_developer' => 'FutureDecade Lab',
+            'app_version' => '1.6.0',
+            'app_update_date' => '2026-03-28',
+            'app_platforms' => ['web', 'macos'],
+            'app_size' => 'Web 应用 / 桌面端 92 MB',
+            'app_languages' => "简体中文\nEnglish",
+            'app_system_requirements' => "Chrome 122+ 或 Safari 17+\nmacOS 13 或更高版本",
+            'app_technical_notes' => '<p>采用分段索引与卡片级引用结构，适合中小团队按项目沉淀研究资产。</p>',
+            'app_purchase_type' => 'onsite_subscription',
+            'app_price' => '39',
+            'app_purchase_url' => 'https://demo.futuredecade.local/apps/signal-desk',
+            'app_usage_instructions' => '<ol><li>创建项目空间。</li><li>导入网页、访谈或 PDF 摘录。</li><li>为卡片补充标签与结论。</li></ol>',
+            'app_trial_days' => 14,
+            'app_website' => 'https://demo.futuredecade.local/apps/signal-desk',
+            'app_notes' => '<p>适合作为研究团队的统一素材池，也适合编辑团队做周选题与案例库。</p>',
+            'app_download_count' => 2680,
+            'app_view_count' => 9130,
+            'app_sales_count' => 312,
+            'app_review_count' => 128,
+            'app_rating_sum' => 602.8,
+            'app_average_rating' => 4.71,
+            'app_last_stats_update' => '2026-04-06 09:00:00',
+            'app_features' => [
+                ['icon' => 'cards', 'title' => '卡片式资料库', 'description' => '把素材拆成可复用的证据单元，而不是堆在长文档里。'],
+                ['icon' => 'trace', 'title' => '引用可追溯', 'description' => '每条摘要都能回到原始链接、访谈或文件片段。'],
+                ['icon' => 'workflow', 'title' => '项目级工作流', 'description' => '围绕主题、栏目或客户项目组织资料与结论。'],
+            ],
+            'app_download_links' => [
+                ['platform' => 'Web', 'url' => 'https://demo.futuredecade.local/apps/signal-desk'],
+                ['platform' => 'macOS', 'url' => 'https://demo.futuredecade.local/downloads/signal-desk-macos'],
+            ],
+            'app_subscription_plans' => [
+                ['period' => '月付', 'price' => '39', 'description' => '适合单人研究与轻量使用。'],
+                ['period' => '年付', 'price' => '399', 'description' => '适合稳定使用，含团队共享空间。'],
+            ],
+        ],
+        'media' => [
+            'icon' => demo_asset_ref('app-signal-desk-icon', 'Signal Desk 图标'),
+            'screenshots' => [
+                demo_asset_ref('app-signal-desk-screen', 'Signal Desk 界面预览'),
+            ],
+        ],
+    ],
+    [
+        'title' => 'Pulse Board',
+        'slug' => 'pulse-board',
+        'status' => 'publish',
+        'date' => '2026-03-30T14:20:00+08:00',
+        'excerpt' => '围绕目标、风险、交付节奏建立可视化团队状态板。',
+        'content' => <<<'HTML'
+<p>Pulse Board 不是用来管理每一个任务细节的，而是帮助团队在一页里看到当前目标、进度、风险和下周动作。</p>
+<p>它特别适合异步协作较多、成员分散在不同城市或时区的小团队。</p>
+HTML,
+        'featured_media' => demo_asset_ref('app-pulse-board-cover', 'Pulse Board 封面'),
+        'taxonomies' => [
+            'app_category' => [
+                ['name' => '团队协作', 'slug' => 'team-collaboration'],
+            ],
+            'post_tag' => [
+                ['name' => '团队协作', 'slug' => 'team-collaboration'],
+                ['name' => '数字工具', 'slug' => 'digital-tools'],
+            ],
+        ],
+        'meta' => [
+            'app_short_description' => '把周节奏、项目风险和协作重点压缩到一个共享看板里。',
+            'app_developer' => 'Signal Works',
+            'app_version' => '2.1.3',
+            'app_update_date' => '2026-04-01',
+            'app_platforms' => ['web', 'windows'],
+            'app_size' => 'Windows 118 MB / Web 应用',
+            'app_languages' => "简体中文\nEnglish\n日本語",
+            'app_system_requirements' => "Chrome 122+\nWindows 11 或更高版本",
+            'app_technical_notes' => '<p>支持项目、团队和周期三个视角切换，适合总览而不是细枝末节的任务分配。</p>',
+            'app_purchase_type' => 'free',
+            'app_price' => '0',
+            'app_purchase_url' => 'https://demo.futuredecade.local/apps/pulse-board',
+            'app_usage_instructions' => '<ol><li>建立团队空间。</li><li>设置季度目标。</li><li>每周更新阻塞与承诺事项。</li></ol>',
+            'app_trial_days' => 0,
+            'app_website' => 'https://demo.futuredecade.local/apps/pulse-board',
+            'app_notes' => '<p>如果团队已经有任务系统，Pulse Board 更适合作为“管理层视角”的汇总层。</p>',
+            'app_download_count' => 4210,
+            'app_view_count' => 11740,
+            'app_sales_count' => 0,
+            'app_review_count' => 96,
+            'app_rating_sum' => 451.2,
+            'app_average_rating' => 4.7,
+            'app_last_stats_update' => '2026-04-06 09:10:00',
+            'app_features' => [
+                ['icon' => 'target', 'title' => '目标聚焦', 'description' => '用一页视图关联目标、负责人和时间窗口。'],
+                ['icon' => 'risk', 'title' => '风险提醒', 'description' => '显式记录阻塞和依赖，避免坏消息只存在聊天记录里。'],
+                ['icon' => 'weekly', 'title' => '周节奏模板', 'description' => '固定化团队同步结构，降低沟通摩擦。'],
+            ],
+            'app_download_links' => [
+                ['platform' => 'Web', 'url' => 'https://demo.futuredecade.local/apps/pulse-board'],
+                ['platform' => 'Windows', 'url' => 'https://demo.futuredecade.local/downloads/pulse-board-windows'],
+            ],
+            'app_subscription_plans' => [],
+        ],
+        'media' => [
+            'icon' => demo_asset_ref('app-pulse-board-icon', 'Pulse Board 图标'),
+            'screenshots' => [
+                demo_asset_ref('app-pulse-board-screen', 'Pulse Board 界面预览'),
+            ],
+        ],
+    ],
+    [
+        'title' => 'Atlas Capture',
+        'slug' => 'atlas-capture',
+        'status' => 'publish',
+        'date' => '2026-04-01T16:40:00+08:00',
+        'excerpt' => '支持网页、图片和语音摘录的跨端剪藏与结构化标注工具。',
+        'content' => <<<'HTML'
+<p>Atlas Capture 适合做“先收集，再整理”的内容工作。它能快速保存网页片段、图像说明、会议语音和截图，并把这些内容统一转成结构化笔记。</p>
+<p>如果你的团队经常在移动端看到灵感，却很难回到桌面后继续使用，这类工具会很有价值。</p>
+HTML,
+        'featured_media' => demo_asset_ref('app-atlas-capture-cover', 'Atlas Capture 封面'),
+        'taxonomies' => [
+            'app_category' => [
+                ['name' => '创作效率', 'slug' => 'creative-productivity'],
+            ],
+            'post_tag' => [
+                ['name' => 'AI效率', 'slug' => 'ai-productivity'],
+                ['name' => '数字工具', 'slug' => 'digital-tools'],
+            ],
+        ],
+        'meta' => [
+            'app_short_description' => '跨端剪藏、语音摘录与结构化标注，减少灵感丢失。',
+            'app_developer' => 'FutureDecade Lab',
+            'app_version' => '0.9.8',
+            'app_update_date' => '2026-04-01',
+            'app_platforms' => ['ios', 'web', 'android'],
+            'app_size' => 'iOS 76 MB / Android 81 MB',
+            'app_languages' => "简体中文\nEnglish",
+            'app_system_requirements' => "iOS 17 或更高版本\nAndroid 13 或更高版本",
+            'app_technical_notes' => '<p>适合轻量采集场景，强调快速记录和后续整理，而不是复杂数据库管理。</p>',
+            'app_purchase_type' => 'offsite',
+            'app_price' => '19 / 月',
+            'app_purchase_url' => 'https://demo.futuredecade.local/apps/atlas-capture',
+            'app_usage_instructions' => '<ol><li>在浏览器或移动端保存素材。</li><li>补充标签、来源与一句话结论。</li><li>回到桌面端统一编排。</li></ol>',
+            'app_trial_days' => 7,
+            'app_website' => 'https://demo.futuredecade.local/apps/atlas-capture',
+            'app_notes' => '<p>适合内容采编、趋势观察和日常研究工作，不适合做重度项目管理。</p>',
+            'app_download_count' => 1930,
+            'app_view_count' => 6840,
+            'app_sales_count' => 141,
+            'app_review_count' => 74,
+            'app_rating_sum' => 346.5,
+            'app_average_rating' => 4.68,
+            'app_last_stats_update' => '2026-04-06 09:20:00',
+            'app_features' => [
+                ['icon' => 'capture', 'title' => '一键摘录', 'description' => '网页、图片和语音内容都可以快速存档。'],
+                ['icon' => 'tag', 'title' => '结构化标注', 'description' => '记录来源、主题、角色与触发条件。'],
+                ['icon' => 'sync', 'title' => '跨端延续', 'description' => '移动端发现，桌面端继续处理与写作。'],
+            ],
+            'app_download_links' => [
+                ['platform' => 'iOS', 'url' => 'https://demo.futuredecade.local/downloads/atlas-capture-ios'],
+                ['platform' => 'Android', 'url' => 'https://demo.futuredecade.local/downloads/atlas-capture-android'],
+                ['platform' => 'Web', 'url' => 'https://demo.futuredecade.local/apps/atlas-capture'],
+            ],
+            'app_subscription_plans' => [
+                ['period' => '月付', 'price' => '19', 'description' => '适合轻量个人采集使用。'],
+            ],
+        ],
+        'media' => [
+            'icon' => demo_asset_ref('app-atlas-capture-icon', 'Atlas Capture 图标'),
+            'screenshots' => [
+                demo_asset_ref('app-atlas-capture-screen', 'Atlas Capture 界面预览'),
+            ],
+        ],
+    ],
+];
+
+$events = [
+    [
+        'title' => 'AI 产品策略公开课',
+        'slug' => 'ai-product-strategy-open-class',
+        'status' => 'publish',
+        'date' => '2026-04-03T10:00:00+08:00',
+        'excerpt' => '一场面向产品经理与内容团队的在线公开课，讲清从需求信号到策略路线图的整理方法。',
+        'content' => <<<'HTML'
+<p>这场公开课会围绕“如何把零散需求整理成可执行策略”展开。课程不是泛泛讲 AI 趋势，而是直接拆解真实工作流。</p>
+<p>适合正在负责产品定位、内容规划或服务设计的从业者。</p>
+HTML,
+        'featured_media' => demo_asset_ref('event-strategy-open-class-banner', 'AI 产品策略公开课横幅'),
+        'taxonomies' => [
+            'event_category' => [
+                ['name' => '公开课', 'slug' => 'open-class'],
+            ],
+            'post_tag' => [
+                ['name' => 'AI效率', 'slug' => 'ai-productivity'],
+                ['name' => '研究方法', 'slug' => 'research-methods'],
+            ],
+        ],
+        'meta' => [
+            'event_short_description' => '从需求信号整理、问题聚类到路线图表达，梳理一套更适合 AI 产品的策略框架。',
+            'event_start_date' => '2026-05-18 19:30:00',
+            'event_end_date' => '2026-05-18 21:00:00',
+            'event_registration_start' => '2026-04-10 10:00:00',
+            'event_registration_deadline' => '2026-05-18 18:00:00',
+            'event_status' => '',
+            'event_venue_name' => 'FutureDecade Live',
+            'event_venue_address' => '线上直播间',
+            'event_location_coordinates' => '',
+            'event_is_online' => true,
+            'event_online_platform' => 'Zoom Webinar',
+            'event_online_link' => 'https://demo.futuredecade.local/live/ai-product-strategy',
+            'event_speakers' => [
+                [
+                    'speaker_name' => '林若水',
+                    'speaker_title' => 'FutureDecade Lab 研究负责人',
+                    'speaker_avatar' => demo_asset_ref('event-speaker-lin', '林若水'),
+                    'speaker_bio' => '长期关注 AI 工作流、知识系统与小团队产品化。',
+                ],
+                [
+                    'speaker_name' => '何一川',
+                    'speaker_title' => '独立产品顾问',
+                    'speaker_avatar' => demo_asset_ref('event-speaker-he', '何一川'),
+                    'speaker_bio' => '聚焦策略表达、需求判断与产品路线图设计。',
+                ],
+            ],
+            'event_agenda' => '<ul><li>问题信号如何归并</li><li>策略假设怎样落地</li><li>案例拆解与问答</li></ul>',
+            'event_organizer' => 'FutureDecade Lab',
+            'event_co_organizers' => 'Signal Works',
+            'event_sponsors' => 'FutureDecade Community',
+            'event_partners' => 'Open Build Group',
+            'event_official_website' => 'https://demo.futuredecade.local/events/ai-product-strategy-open-class',
+            'event_contact_email' => 'events@futuredecade.local',
+            'event_contact_phone' => '400-010-2030',
+            'event_capacity' => 300,
+            'event_offline_registered_count' => 0,
+            'event_registered_count' => 126,
+            'event_registration_form' => null,
+            'event_tickets' => [
+                [
+                    'ticket_name' => '公开课席位',
+                    'ticket_price' => 0,
+                    'ticket_quantity' => 300,
+                    'ticket_sold' => 126,
+                    'ticket_status' => 'on_sale',
+                    'ticket_description' => '报名成功后发送直播入口。',
+                    'ticket_sale_start' => '2026-04-10 10:00:00',
+                    'ticket_sale_end' => '2026-05-18 18:00:00',
+                ],
+            ],
+            'event_refund_policy' => 'no_refund',
+            'event_invoice_issuer' => 'platform',
+            'event_refund_rules' => [],
+            'event_registration_notice' => '<p>报名成功后将收到邮件确认，活动开始前 24 小时和 1 小时会再次提醒。</p>',
+            'event_faq' => '<p>活动提供回放，报名后 7 天内可查看。</p>',
+            'event_terms' => "报名信息仅用于活动通知与服务沟通。\n严禁转售直播链接。",
+        ],
+        'media' => [
+            'banner' => demo_asset_ref('event-strategy-open-class-banner', 'AI 产品策略公开课横幅'),
+            'logo' => demo_asset_ref('event-strategy-open-class-logo', 'AI 产品策略公开课标识'),
+            'organizer_logo' => demo_asset_ref('event-organizer-logo', 'FutureDecade Lab'),
+            'photos' => [
+                demo_asset_ref('event-strategy-open-class-photo', 'AI 产品策略公开课活动图'),
+            ],
+        ],
+    ],
+    [
+        'title' => '城市创新者线下沙龙',
+        'slug' => 'city-innovators-offline-salon',
+        'status' => 'publish',
+        'date' => '2026-04-05T12:00:00+08:00',
+        'excerpt' => '围绕案例拆解、产品展示和面对面连接展开的半日线下活动。',
+        'content' => <<<'HTML'
+<p>我们希望把“线上看过很多、线下却很少真正交流”的状态打破，因此设计了这场小规模线下沙龙。</p>
+<p>活动会安排案例墙、圆桌讨论与自由交流环节，适合对创新产品、内容系统与小团队增长感兴趣的参与者。</p>
+HTML,
+        'featured_media' => demo_asset_ref('event-city-salon-banner', '城市创新者线下沙龙横幅'),
+        'taxonomies' => [
+            'event_category' => [
+                ['name' => '线下沙龙', 'slug' => 'offline-salon'],
+            ],
+            'post_tag' => [
+                ['name' => '团队协作', 'slug' => 'team-collaboration'],
+                ['name' => '研究方法', 'slug' => 'research-methods'],
+            ],
+        ],
+        'meta' => [
+            'event_short_description' => '一场更重连接和案例讨论的半日线下活动。',
+            'event_start_date' => '2026-06-06 14:00:00',
+            'event_end_date' => '2026-06-06 17:30:00',
+            'event_registration_start' => '2026-04-20 10:00:00',
+            'event_registration_deadline' => '2026-06-04 23:59:00',
+            'event_status' => '',
+            'event_venue_name' => '上海徐汇滨江·Studio 204',
+            'event_venue_address' => '上海市徐汇区龙腾大道 204 号',
+            'event_location_coordinates' => '31.1801,121.4510',
+            'event_is_online' => false,
+            'event_online_platform' => '',
+            'event_online_link' => '',
+            'event_speakers' => [
+                [
+                    'speaker_name' => '周明序',
+                    'speaker_title' => 'Signal Works 产品负责人',
+                    'speaker_avatar' => demo_asset_ref('event-speaker-zhou', '周明序'),
+                    'speaker_bio' => '关注产品体验、社区活动与线下场景设计。',
+                ],
+            ],
+            'event_agenda' => '<ul><li>案例墙导览</li><li>圆桌讨论：小团队如何保持创造力</li><li>自由交流与作品展示</li></ul>',
+            'event_organizer' => 'FutureDecade Lab',
+            'event_co_organizers' => 'Signal Works',
+            'event_sponsors' => 'FutureDecade Community',
+            'event_partners' => 'City Lab Network',
+            'event_official_website' => 'https://demo.futuredecade.local/events/city-innovators-offline-salon',
+            'event_contact_email' => 'offline@futuredecade.local',
+            'event_contact_phone' => '400-010-2031',
+            'event_capacity' => 80,
+            'event_offline_registered_count' => 42,
+            'event_registered_count' => 42,
+            'event_registration_form' => null,
+            'event_tickets' => [
+                [
+                    'ticket_name' => '标准票',
+                    'ticket_price' => 199,
+                    'ticket_quantity' => 60,
+                    'ticket_sold' => 28,
+                    'ticket_status' => 'on_sale',
+                    'ticket_description' => '含现场茶歇与资料包。',
+                    'ticket_sale_start' => '2026-04-20 10:00:00',
+                    'ticket_sale_end' => '2026-06-04 23:59:00',
+                ],
+                [
+                    'ticket_name' => '早鸟票',
+                    'ticket_price' => 149,
+                    'ticket_quantity' => 20,
+                    'ticket_sold' => 14,
+                    'ticket_status' => 'sold_out',
+                    'ticket_description' => '限量发售，先到先得。',
+                    'ticket_sale_start' => '2026-04-20 10:00:00',
+                    'ticket_sale_end' => '2026-05-05 23:59:00',
+                ],
+            ],
+            'event_refund_policy' => 'conditional',
+            'event_invoice_issuer' => 'organizer',
+            'event_refund_rules' => [
+                [
+                    'refund_rule_deadline' => '2026-05-30 23:59:00',
+                    'refund_rule_fee_percent' => '10',
+                ],
+                [
+                    'refund_rule_deadline' => '2026-06-04 12:00:00',
+                    'refund_rule_fee_percent' => '30',
+                ],
+            ],
+            'event_registration_notice' => '<p>活动开始前会发送签到二维码与交通指引。</p>',
+            'event_faq' => '<p>如需发票，请在报名页填写开票信息，活动后一周内发送。</p>',
+            'event_terms' => "活动席位有限，报名成功后请尽量按时参加。\n现场禁止未经允许的商业录制。",
+        ],
+        'media' => [
+            'banner' => demo_asset_ref('event-city-salon-banner', '城市创新者线下沙龙横幅'),
+            'logo' => demo_asset_ref('event-city-salon-logo', '城市创新者线下沙龙标识'),
+            'organizer_logo' => demo_asset_ref('event-organizer-logo', 'FutureDecade Lab'),
+            'photos' => [
+                demo_asset_ref('event-city-salon-photo', '城市创新者线下沙龙活动图'),
+            ],
+        ],
+    ],
+    [
+        'title' => '内容系统训练营',
+        'slug' => 'content-system-bootcamp',
+        'status' => 'publish',
+        'date' => '2026-04-06T15:00:00+08:00',
+        'excerpt' => '两天完成内容框架拆解、模板搭建与发布流程编排的系统化训练。',
+        'content' => <<<'HTML'
+<p>训练营不是单纯教你“如何写内容”，而是带你从选题结构、资料组织、模板设计、协作分工一路搭建到发布。</p>
+<p>课程结束后，每位参与者都能拿到一套可继续复用的内容系统骨架。</p>
+HTML,
+        'featured_media' => demo_asset_ref('event-content-bootcamp-banner', '内容系统训练营横幅'),
+        'taxonomies' => [
+            'event_category' => [
+                ['name' => '训练营', 'slug' => 'bootcamp'],
+            ],
+            'post_tag' => [
+                ['name' => '研究方法', 'slug' => 'research-methods'],
+                ['name' => '数字工具', 'slug' => 'digital-tools'],
+            ],
+        ],
+        'meta' => [
+            'event_short_description' => '围绕内容选题、资料结构与发布工作流做一次完整搭建。',
+            'event_start_date' => '2026-06-20 10:00:00',
+            'event_end_date' => '2026-06-21 18:00:00',
+            'event_registration_start' => '2026-04-15 10:00:00',
+            'event_registration_deadline' => '2026-06-16 23:59:00',
+            'event_status' => '',
+            'event_venue_name' => 'FutureDecade Workshop Room',
+            'event_venue_address' => '线上小班直播 + 远程协作平台',
+            'event_location_coordinates' => '',
+            'event_is_online' => true,
+            'event_online_platform' => 'Lark + Zoom',
+            'event_online_link' => 'https://demo.futuredecade.local/events/content-system-bootcamp/live',
+            'event_speakers' => [
+                [
+                    'speaker_name' => '林若水',
+                    'speaker_title' => 'FutureDecade Lab 研究负责人',
+                    'speaker_avatar' => demo_asset_ref('event-speaker-lin', '林若水'),
+                    'speaker_bio' => '关注内容系统设计、知识资产整理与团队协作流程。',
+                ],
+                [
+                    'speaker_name' => '周明序',
+                    'speaker_title' => 'Signal Works 产品负责人',
+                    'speaker_avatar' => demo_asset_ref('event-speaker-zhou', '周明序'),
+                    'speaker_bio' => '长期协助团队搭建模板、工具与发布流程。',
+                ],
+            ],
+            'event_agenda' => '<ul><li>Day 1：框架拆解与模板设计</li><li>Day 2：协作流程与发布编排</li><li>作业点评与成果复盘</li></ul>',
+            'event_organizer' => 'FutureDecade Lab',
+            'event_co_organizers' => '',
+            'event_sponsors' => 'FutureDecade Community',
+            'event_partners' => '',
+            'event_official_website' => 'https://demo.futuredecade.local/events/content-system-bootcamp',
+            'event_contact_email' => 'bootcamp@futuredecade.local',
+            'event_contact_phone' => '400-010-2032',
+            'event_capacity' => 60,
+            'event_offline_registered_count' => 0,
+            'event_registered_count' => 19,
+            'event_registration_form' => null,
+            'event_tickets' => [
+                [
+                    'ticket_name' => '训练营席位',
+                    'ticket_price' => 899,
+                    'ticket_quantity' => 60,
+                    'ticket_sold' => 19,
+                    'ticket_status' => 'on_sale',
+                    'ticket_description' => '含两天直播课程、模板包与课后回放。',
+                    'ticket_sale_start' => '2026-04-15 10:00:00',
+                    'ticket_sale_end' => '2026-06-16 23:59:00',
+                ],
+            ],
+            'event_refund_policy' => 'refundable',
+            'event_invoice_issuer' => 'platform',
+            'event_refund_rules' => [
+                [
+                    'refund_rule_deadline' => '2026-06-10 23:59:00',
+                    'refund_rule_fee_percent' => '0',
+                ],
+                [
+                    'refund_rule_deadline' => '2026-06-16 23:59:00',
+                    'refund_rule_fee_percent' => '20',
+                ],
+            ],
+            'event_registration_notice' => '<p>报名后会进入学员群，提前领取模板资源与准备材料。</p>',
+            'event_faq' => '<p>课程提供回放与作业点评，不需要提前准备复杂软件环境。</p>',
+            'event_terms' => "课程资料仅供报名者个人学习使用。\n严禁未经授权的二次传播。",
+        ],
+        'media' => [
+            'banner' => demo_asset_ref('event-content-bootcamp-banner', '内容系统训练营横幅'),
+            'logo' => demo_asset_ref('event-content-bootcamp-logo', '内容系统训练营标识'),
+            'organizer_logo' => demo_asset_ref('event-organizer-logo', 'FutureDecade Lab'),
+            'photos' => [
+                demo_asset_ref('event-content-bootcamp-photo', '内容系统训练营活动图'),
+            ],
+        ],
+    ],
+];
+
+$products = [
+    [
+        'title' => '趋势观察周报年订阅',
+        'slug' => 'trend-brief-annual-subscription',
+        'status' => 'publish',
+        'date' => '2026-04-01T09:00:00+08:00',
+        'excerpt' => '面向内容团队、产品团队和独立研究者的年度趋势观察订阅服务。',
+        'content' => <<<'HTML'
+<p>这是一份强调“信息压缩与行动建议”的周报订阅，不追求海量聚合，而是把重点案例、背景脉络和可执行判断整理成稳定输出。</p>
+<p>适合希望建立行业感知、又没有时间每天筛选素材的人。</p>
+HTML,
+        'featured_media' => demo_asset_ref('product-trend-brief-cover', '趋势观察周报年订阅封面'),
+        'taxonomies' => [
+            'product_category' => [
+                ['name' => '数字产品', 'slug' => 'digital-goods'],
+            ],
+            'product_brand' => [
+                ['name' => 'FutureDecade Lab', 'slug' => 'futuredecade-lab'],
+            ],
+            'product_tag' => [
+                ['name' => '编辑推荐', 'slug' => 'editor-choice'],
+                ['name' => '立即交付', 'slug' => 'instant-delivery'],
+            ],
+        ],
+        'meta' => [
+            '_fd_product_type' => 'digital',
+            '_fd_product_unit' => '年',
+            '_fd_product_barcode' => 'FDBRIEF-2026-ANNUAL',
+            '_fd_product_cost_price' => 88,
+            '_fd_product_original_price' => 499,
+            '_fd_product_sale_price' => 299,
+            '_fd_product_member_price' => 249,
+            '_fd_product_member_discount' => 16,
+            '_fd_product_stock' => -1,
+            '_fd_product_stock_status' => 'in_stock',
+            '_fd_product_sales_count' => 189,
+            '_fd_product_purchase_min' => 1,
+            '_fd_product_purchase_max' => 1,
+            '_fd_product_shipping_fee' => 0,
+            '_fd_product_delivery_time' => '付款后 5 分钟内开通阅读权限',
+            '_fd_product_free_shipping_threshold' => 0,
+            '_fd_product_return_policy' => '数字订阅服务开通后不支持退款，重复购买可联系客服处理。',
+            '_fd_product_warranty' => '订阅期内持续更新，每周固定推送。',
+            '_fd_product_service_notes' => '支持邮件、站内阅读与精选索引页面。',
+            '_fd_product_digital_delivery_type' => 'instruction',
+            '_fd_product_digital_download_url' => '',
+            '_fd_product_digital_codes' => '',
+            '_fd_product_digital_validity' => '365 天',
+            '_fd_product_digital_instructions' => '下单后在会员中心查看本年度全部更新内容。',
+            '_fd_product_status' => 'on_sale',
+            '_fd_product_sale_start' => '2026-04-01 00:00:00',
+            '_fd_product_sale_end' => '',
+            '_fd_product_badges' => ['编辑推荐', '立即交付'],
+            '_fd_product_sort_order' => 30,
+            '_fd_product_preorder_deposit' => 0,
+            '_fd_product_attributes' => [
+                ['name' => '更新频率', 'value' => '每周 1 期'],
+                ['name' => '交付形式', 'value' => '邮件 + 站内阅读'],
+                ['name' => '适用对象', 'value' => '内容、产品、研究团队'],
+            ],
+            '_fd_product_video_url' => '',
+            '_fd_product_related' => [],
+        ],
+        'media' => [
+            'gallery' => [
+                demo_asset_ref('product-trend-brief-gallery', '趋势观察周报样张'),
+            ],
+        ],
+    ],
+    [
+        'title' => '用户访谈模板包',
+        'slug' => 'user-interview-template-kit',
+        'status' => 'publish',
+        'date' => '2026-04-02T11:00:00+08:00',
+        'excerpt' => '包含访谈提纲、记录表、整理模板和结论框架的即用型资料包。',
+        'content' => <<<'HTML'
+<p>如果你已经知道要做访谈，但总在提纲、记录方式和整理输出上反复重来，这套模板包能帮你节省大量前期整理成本。</p>
+<p>内容既适合产品研究，也适合品牌内容、用户增长和社区运营场景。</p>
+HTML,
+        'featured_media' => demo_asset_ref('product-interview-kit-cover', '用户访谈模板包封面'),
+        'taxonomies' => [
+            'product_category' => [
+                ['name' => '模板资源', 'slug' => 'template-kits'],
+            ],
+            'product_brand' => [
+                ['name' => 'FutureDecade Lab', 'slug' => 'futuredecade-lab'],
+            ],
+            'product_tag' => [
+                ['name' => '编辑推荐', 'slug' => 'editor-choice'],
+                ['name' => '立即交付', 'slug' => 'instant-delivery'],
+            ],
+        ],
+        'meta' => [
+            '_fd_product_type' => 'digital',
+            '_fd_product_unit' => '套',
+            '_fd_product_barcode' => 'FDKIT-INTERVIEW-2026',
+            '_fd_product_cost_price' => 26,
+            '_fd_product_original_price' => 169,
+            '_fd_product_sale_price' => 129,
+            '_fd_product_member_price' => 99,
+            '_fd_product_member_discount' => 23,
+            '_fd_product_stock' => -1,
+            '_fd_product_stock_status' => 'in_stock',
+            '_fd_product_sales_count' => 264,
+            '_fd_product_purchase_min' => 1,
+            '_fd_product_purchase_max' => 3,
+            '_fd_product_shipping_fee' => 0,
+            '_fd_product_delivery_time' => '支付完成后立即可下载',
+            '_fd_product_free_shipping_threshold' => 0,
+            '_fd_product_return_policy' => '模板资源为数字商品，下载后不支持退款。',
+            '_fd_product_warranty' => '一年内小版本更新免费。',
+            '_fd_product_service_notes' => '含访谈前准备、访谈记录、整理归档和复盘框架。',
+            '_fd_product_digital_delivery_type' => 'download',
+            '_fd_product_digital_download_url' => 'https://demo.futuredecade.local/downloads/user-interview-template-kit.zip',
+            '_fd_product_digital_codes' => '',
+            '_fd_product_digital_validity' => '长期有效',
+            '_fd_product_digital_instructions' => '购买后可在订单详情中下载模板包。',
+            '_fd_product_status' => 'on_sale',
+            '_fd_product_sale_start' => '2026-04-02 00:00:00',
+            '_fd_product_sale_end' => '',
+            '_fd_product_badges' => ['立即交付'],
+            '_fd_product_sort_order' => 20,
+            '_fd_product_preorder_deposit' => 0,
+            '_fd_product_attributes' => [
+                ['name' => '文件格式', 'value' => 'Notion + Markdown + PDF'],
+                ['name' => '适用场景', 'value' => '用户访谈、品牌访谈、需求研究'],
+                ['name' => '更新策略', 'value' => '购买后一年内免费更新'],
+            ],
+            '_fd_product_video_url' => '',
+            '_fd_product_related' => [],
+        ],
+        'media' => [
+            'gallery' => [
+                demo_asset_ref('product-interview-kit-gallery', '用户访谈模板包预览'),
+            ],
+        ],
+    ],
+    [
+        'title' => 'FutureDecade 桌垫',
+        'slug' => 'futuredecade-desk-mat',
+        'status' => 'publish',
+        'date' => '2026-04-03T13:30:00+08:00',
+        'excerpt' => '适合长时间阅读、写作和设备摆放的桌面工作垫。',
+        'content' => <<<'HTML'
+<p>这款桌垫面向长期伏案工作的人设计，强调稳定的书写手感、干净的视觉界面和耐用的底层材质。</p>
+<p>它既可以单独使用，也适合作为线下活动或工作空间的延展周边。</p>
+HTML,
+        'featured_media' => demo_asset_ref('product-desk-mat-cover', 'FutureDecade 桌垫封面'),
+        'taxonomies' => [
+            'product_category' => [
+                ['name' => '办公周边', 'slug' => 'office-essentials'],
+            ],
+            'product_brand' => [
+                ['name' => 'Signal Works', 'slug' => 'signal-works'],
+            ],
+            'product_tag' => [
+                ['name' => '限量发售', 'slug' => 'limited-release'],
+                ['name' => '线下搭配', 'slug' => 'offline-bundle'],
+            ],
+        ],
+        'meta' => [
+            '_fd_product_type' => 'physical',
+            '_fd_product_unit' => '件',
+            '_fd_product_barcode' => 'FDMAT-2026-SAND',
+            '_fd_product_cost_price' => 72,
+            '_fd_product_original_price' => 229,
+            '_fd_product_sale_price' => 169,
+            '_fd_product_member_price' => 149,
+            '_fd_product_member_discount' => 12,
+            '_fd_product_stock' => 48,
+            '_fd_product_stock_status' => 'in_stock',
+            '_fd_product_sales_count' => 39,
+            '_fd_product_purchase_min' => 1,
+            '_fd_product_purchase_max' => 2,
+            '_fd_product_shipping_fee' => 12,
+            '_fd_product_delivery_time' => '48 小时内发货',
+            '_fd_product_free_shipping_threshold' => 199,
+            '_fd_product_return_policy' => '签收后 7 天内支持无理由退货，需保持商品完好。',
+            '_fd_product_warranty' => '实体商品不提供保修服务，质量问题支持换新。',
+            '_fd_product_service_notes' => '适合鼠标、键盘与笔记本组合摆放。',
+            '_fd_product_digital_delivery_type' => '',
+            '_fd_product_digital_download_url' => '',
+            '_fd_product_digital_codes' => '',
+            '_fd_product_digital_validity' => '',
+            '_fd_product_digital_instructions' => '',
+            '_fd_product_status' => 'on_sale',
+            '_fd_product_sale_start' => '2026-04-03 00:00:00',
+            '_fd_product_sale_end' => '',
+            '_fd_product_badges' => ['限量发售'],
+            '_fd_product_sort_order' => 10,
+            '_fd_product_preorder_deposit' => 0,
+            '_fd_product_attributes' => [
+                ['name' => '尺寸', 'value' => '800 x 300 mm'],
+                ['name' => '材质', 'value' => '纤维表层 + 防滑橡胶底面'],
+                ['name' => '颜色', 'value' => 'Sand / Graphite'],
+            ],
+            '_fd_product_video_url' => '',
+            '_fd_product_related' => [],
+        ],
+        'media' => [
+            'gallery' => [
+                demo_asset_ref('product-desk-mat-gallery', 'FutureDecade 桌垫细节图'),
+            ],
+        ],
+    ],
+];
+
+$document = [
+    'manifest' => [
+        'schema_version' => 1,
+        'generated_at' => gmdate('c'),
+        'source' => [
+            'type' => 'synthetic',
+            'generator' => 'scripts/generate-demo-cpt-data.php',
+        ],
+        'selection' => [
+            'post_types' => ['post', 'page', 'note', 'app', 'event', 'product'],
+            'items_per_type' => 3,
+            'media_strategy' => 'Inline SVG assets keep the demo package self-contained and importable without legacy media.',
+        ],
+    ],
+    'site' => [
+        'show_on_front' => 'posts',
+        'page_on_front' => 0,
+        'page_for_posts' => 0,
+        'stylesheet' => 'fd-theme',
+        'template' => 'fd-theme',
+    ],
+    'menus' => [
+        'primary' => [
+            'location' => 'primary-menu',
+            'label' => '主菜单',
+            'items' => [
+                ['title' => '首页', 'kind' => 'custom_path', 'path' => '/', 'parent' => null, 'order' => 1],
+                ['title' => '文章', 'kind' => 'custom_path', 'path' => '/', 'parent' => null, 'order' => 2],
+                ['title' => '笔记', 'kind' => 'custom_path', 'path' => '/note', 'parent' => null, 'order' => 3],
+                ['title' => '应用', 'kind' => 'custom_path', 'path' => '/app', 'parent' => null, 'order' => 4],
+                ['title' => '活动', 'kind' => 'custom_path', 'path' => '/event', 'parent' => null, 'order' => 5],
+                ['title' => '商品', 'kind' => 'custom_path', 'path' => '/product', 'parent' => null, 'order' => 6],
+                ['title' => '关于我们', 'kind' => 'page_ref', 'page_slug' => 'about-us', 'parent' => null, 'order' => 7],
+            ],
+        ],
+        'footer' => [
+            'location' => 'footer-menu',
+            'label' => '底部菜单',
+            'items' => [
+                ['title' => '关于我们', 'kind' => 'page_ref', 'page_slug' => 'about-us', 'parent' => null, 'order' => 1],
+                ['title' => '联系我们', 'kind' => 'page_ref', 'page_slug' => 'contact-us', 'parent' => null, 'order' => 2],
+                ['title' => '隐私条款', 'kind' => 'page_ref', 'page_slug' => 'privacy', 'parent' => null, 'order' => 3],
+                ['title' => '版权声明', 'kind' => 'page_ref', 'page_slug' => 'copyright-claim', 'parent' => null, 'order' => 4],
+            ],
+        ],
+    ],
+    'assets' => $assets,
+    'terms' => $terms,
+    'pages' => $pages,
+    'posts' => $posts,
+    'notes' => $notes,
+    'apps' => $apps,
+    'events' => $events,
+    'products' => $products,
+    'counts' => [
+        'assets' => count($assets),
+        'terms' => count($terms),
+        'pages' => count($pages),
+        'posts' => count($posts),
+        'notes' => count($notes),
+        'apps' => count($apps),
+        'events' => count($events),
+        'products' => count($products),
+    ],
+];
+
+$json = json_encode($document, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+if ($json === false) {
+    fwrite(STDERR, "Failed to encode demo content package.\n");
+    exit(1);
+}
+
+if (file_put_contents($outputPath, $json . PHP_EOL) === false) {
+    fwrite(STDERR, "Failed to write demo content package to {$outputPath}.\n");
+    exit(1);
+}
+
+fwrite(STDOUT, "Generated {$outputPath}\n");

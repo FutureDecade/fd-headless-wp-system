@@ -259,6 +259,8 @@ bash scripts/configure-env.sh
 - `WORDPRESS_ADMIN_EMAIL=你的后台管理员邮箱`
 - `WORDPRESS_INSTALL_REDIS_CACHE=true`
 - `WORDPRESS_ENABLE_REDIS_OBJECT_CACHE=true`
+- `WORDPRESS_IMPORT_DEMO_DATA=true`
+- `WORDPRESS_DEMO_DATA_FILE=demo-data/demo-cpt-content.v1.json`
 
 ### 第六步：登录 ACR
 
@@ -379,7 +381,7 @@ ACR_USERNAME=你的阿里云账号 ACR_PASSWORD=你的ACR密码 bash scripts/ren
 已经确认正常：
 
 - 前台首页能打开
-- `/sample-page` 能打开
+- `/about-us` 能打开
 - WebSocket `/health` 正常
 - GraphQL 路由正常
 - WordPress 主题和核心插件都处于启用状态

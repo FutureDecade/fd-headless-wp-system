@@ -52,7 +52,7 @@
       "key": "FRONTEND_IMAGE",
       "label": "Frontend Image",
       "type": "text",
-      "scope": "user_input",
+      "scope": "preset",
       "required": true,
       "group": "images"
     },
@@ -60,7 +60,7 @@
       "key": "WEBSOCKET_IMAGE",
       "label": "WebSocket Image",
       "type": "text",
-      "scope": "user_input",
+      "scope": "preset",
       "required": true,
       "group": "images"
     },
@@ -76,7 +76,7 @@
       "key": "ACR_USERNAME",
       "label": "ACR 用户名",
       "type": "text",
-      "scope": "user_input",
+      "scope": "preset",
       "required": true,
       "group": "credentials"
     },
@@ -218,7 +218,7 @@
       "key": "ACR_PASSWORD",
       "label": "ACR 密码",
       "type": "secret",
-      "scope": "user_input",
+      "scope": "preset",
       "required": true,
       "group": "credentials"
     },
@@ -226,7 +226,7 @@
       "key": "GH_TOKEN",
       "label": "GitHub Token",
       "type": "secret",
-      "scope": "user_input",
+      "scope": "preset",
       "required": true,
       "group": "credentials"
     }

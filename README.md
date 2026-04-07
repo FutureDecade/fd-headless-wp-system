@@ -202,9 +202,11 @@ bash scripts/configure-env.sh
 - 空白服务器首次启动，建议先使用 `PUBLIC_SCHEME=http` 和 `WEBSOCKET_PUBLIC_SCHEME=ws`，先把整套服务跑通
 - 真正切到 HTTPS 前，要先重新构建一版前端交付镜像，把 `site_url` 改成 `https://...`，把 `websocket_url` 改成 `wss://...`
 - `scripts/setup-https.sh` 现在会自动申请证书，并把 `.env` 里的 `HTTPS_ENABLED`、`HTTPS_PORT`、`PUBLIC_SCHEME`、`WEBSOCKET_PUBLIC_SCHEME` 一起改到正确值
-- `WORDPRESS_RUN_INIT=true` 时，会自动完成 WordPress 首次安装，并安装激活 `WPGraphQL`、`redis-cache`、`Classic Editor`，同时启用交付链里挂载的核心插件
+- `WORDPRESS_RUN_INIT=true` 时，会自动完成 WordPress 首次安装，并安装激活 `WPGraphQL`、`redis-cache`、`Classic Editor`，同时启用交付链里挂载的核心插件；全新安装还会把 `WPGraphQL` 与 `Classic Editor` 对齐到旧站默认配置，并保持 `Redis Cache` 的 object cache 启用状态与旧站一致
+- 默认还会导入 `WORDPRESS_DEMO_DATA_FILE` 指向的演示数据包；如果不想导入，把 `WORDPRESS_IMPORT_DEMO_DATA=false`
 - 默认交付链路不再安装 `ACF` 或 `WPGraphQL for ACF`，当前内容模型默认按纯代码插件运行
 - 初始化还会自动设置 `WORDPRESS_PERMALINK_STRUCTURE`，确保 `/graphql` 这种地址能直接使用
+- 如果需要在已有站点上强制重导演示数据，可以把 `WORDPRESS_FORCE_DEMO_DATA_IMPORT=true`
 - 如果服务器不能直接从 WordPress 官方源下载插件，可以把 `WORDPRESS_WPGRAPHQL_SOURCE`、`WORDPRESS_CLASSIC_EDITOR_SOURCE` 改成你自己的 zip 地址
 - 如果要在测试服务器拉取私有 WordPress release 资产，需要把 `WORDPRESS_FETCH_RELEASE_ASSETS=true`
 - 如果 WordPress 资产版本没有变化，`scripts/update-stack.sh` 会自动跳过重复下载；只有需要强制重拉时，才把 `FORCE_WORDPRESS_ASSET_FETCH=true`

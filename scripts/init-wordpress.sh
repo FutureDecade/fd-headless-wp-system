@@ -26,6 +26,9 @@ WORDPRESS_INSTALL_CLASSIC_EDITOR="${WORDPRESS_INSTALL_CLASSIC_EDITOR:-true}"
 WORDPRESS_CLASSIC_EDITOR_SOURCE="${WORDPRESS_CLASSIC_EDITOR_SOURCE:-classic-editor}"
 WORDPRESS_ENABLE_REDIS_OBJECT_CACHE="${WORDPRESS_ENABLE_REDIS_OBJECT_CACHE:-true}"
 WORDPRESS_PERMALINK_STRUCTURE="${WORDPRESS_PERMALINK_STRUCTURE:-/%postname%/}"
+WORDPRESS_IMPORT_DEMO_DATA="${WORDPRESS_IMPORT_DEMO_DATA:-true}"
+WORDPRESS_DEMO_DATA_FILE="${WORDPRESS_DEMO_DATA_FILE:-demo-data/demo-cpt-content.v1.json}"
+WORDPRESS_FORCE_DEMO_DATA_IMPORT="${WORDPRESS_FORCE_DEMO_DATA_IMPORT:-false}"
 PUBLIC_SCHEME="${PUBLIC_SCHEME:-http}"
 
 if [[ "${WORDPRESS_RUN_INIT}" != "true" ]]; then
@@ -136,6 +139,50 @@ enable_redis_object_cache() {
   fi
 }
 
+apply_legacy_plugin_defaults() {
+  if [[ "${WORDPRESS_INSTALL_CLASSIC_EDITOR}" == "true" ]] && run_wp plugin is-active "classic-editor" >/dev/null 2>&1; then
+    echo "Applying legacy Classic Editor defaults..."
+    run_wp option update "classic-editor-replace" "classic" >/dev/null
+    run_wp option update "classic-editor-allow-users" "disallow" >/dev/null
+  fi
+
+  if [[ "${WORDPRESS_INSTALL_WPGRAPHQL}" == "true" ]] && run_wp plugin is-active "wp-graphql" >/dev/null 2>&1; then
+    echo "Applying legacy WPGraphQL defaults..."
+    run_wp eval '
+update_option( "graphql_general_settings", array(
+    "query_depth_enabled" => "on",
+    "query_depth_max" => 10,
+) );
+
+update_option( "graphql_cache_section", array(
+    "global_max_age" => null,
+    "cache_toggle" => "off",
+    "global_ttl" => null,
+    "log_purge_events" => "off",
+    "purge_all" => false,
+) );
+
+update_option( "graphql_persisted_queries_section", array(
+    "grant_mode" => "public",
+    "editor_display" => "off",
+    "query_garbage_collect" => "off",
+    "query_garbage_collect_age" => 30,
+) );
+' >/dev/null
+  fi
+
+  if [[ "${WORDPRESS_INSTALL_REDIS_CACHE}" == "true" ]] && run_wp plugin is-active "redis-cache" >/dev/null 2>&1; then
+    if redis_object_cache_is_enabled; then
+      echo "Legacy Redis Cache defaults already match: object cache drop-in is enabled."
+    elif [[ "${WORDPRESS_ENABLE_REDIS_OBJECT_CACHE}" == "true" ]]; then
+      echo "Applying legacy Redis Cache defaults..."
+      enable_redis_object_cache
+    else
+      echo "Legacy Redis Cache defaults expect object cache enabled, but WORDPRESS_ENABLE_REDIS_OBJECT_CACHE=false."
+    fi
+  fi
+}
+
 ensure_permalink_structure() {
   local target_structure="$1"
   local current_structure=""
@@ -198,6 +245,20 @@ seed_delivery_sample_page() {
     --post_status=publish \
     --post_title="Sample Page" \
     --post_content="${sample_page_content}" >/dev/null
+}
+
+import_demo_data() {
+  if [[ "${WORDPRESS_IMPORT_DEMO_DATA}" != "true" ]]; then
+    echo "WORDPRESS_IMPORT_DEMO_DATA is disabled. Skipping demo data import."
+    return 1
+  fi
+
+  echo "Importing demo data package: ${WORDPRESS_DEMO_DATA_FILE}"
+  WORDPRESS_FETCH_RELEASE_ASSETS="${WORDPRESS_FETCH_RELEASE_ASSETS}" \
+  WORDPRESS_DEMO_DATA_FILE="${WORDPRESS_DEMO_DATA_FILE}" \
+  WORDPRESS_FORCE_DEMO_DATA_IMPORT="${WORDPRESS_FORCE_DEMO_DATA_IMPORT}" \
+  ENV_FILE="${ENV_FILE}" \
+  bash "${ROOT_DIR}/scripts/import-wordpress-demo-data.sh"
 }
 
 verify_graphql_route_mapping() {
@@ -306,7 +367,14 @@ if [[ "${WORDPRESS_ACTIVATE_CORE_PLUGINS}" == "true" ]]; then
 fi
 
 if [[ "${fresh_install}" == "true" ]]; then
-  seed_delivery_sample_page
+  apply_legacy_plugin_defaults
+
+  if ! import_demo_data; then
+    seed_delivery_sample_page
+  fi
+elif [[ "${WORDPRESS_IMPORT_DEMO_DATA}" == "true" && "${WORDPRESS_FORCE_DEMO_DATA_IMPORT}" == "true" ]]; then
+  apply_legacy_plugin_defaults
+  import_demo_data
 fi
 
 ensure_permalink_structure "${WORDPRESS_PERMALINK_STRUCTURE}"

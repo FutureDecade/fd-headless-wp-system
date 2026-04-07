@@ -176,9 +176,9 @@ bash <(curl -fsSL https://raw.githubusercontent.com/FutureDecade/fd-headless-wp-
 - `/health` 返回正常
 - `/graphql` 能正常响应
 
-如果保留了初始化示例页，还可以再确认：
+如果保留了默认演示数据，还可以再确认：
 
-- `http://www.你的域名/sample-page`
+- `http://www.你的域名/about-us`
 
 ## 再切 HTTPS
 
