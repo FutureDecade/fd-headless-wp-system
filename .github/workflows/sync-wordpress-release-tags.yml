@@ -2,6 +2,12 @@ name: Sync WordPress Release Tags
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: "17 */6 * * *"
+
+concurrency:
+  group: sync-wordpress-release-tags
+  cancel-in-progress: false
 
 permissions:
   contents: write
