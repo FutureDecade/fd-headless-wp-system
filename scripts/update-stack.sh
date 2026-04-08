@@ -6,10 +6,19 @@ ENV_FILE="${ENV_FILE:-${ROOT_DIR}/.env}"
 
 # shellcheck source=/dev/null
 source "${ROOT_DIR}/scripts/common.sh"
+# shellcheck source=/dev/null
+source "${ROOT_DIR}/scripts/stack-bootstrap.sh"
 
 if [[ ! -f "${ENV_FILE}" ]]; then
   echo "Missing .env file. Run: cp .env.example .env"
   exit 1
+fi
+
+if [[ -n "${FD_STACK_BOOTSTRAP_JSON:-}" || -n "${FD_STACK_DEPLOY_TOKEN:-}" ]]; then
+  if ! load_stack_bootstrap; then
+    echo "FD Stack 部署预设加载失败，无法继续更新。"
+    exit 1
+  fi
 fi
 
 ENV_FILE="${ENV_FILE}" bash "${ROOT_DIR}/scripts/preflight-check.sh"

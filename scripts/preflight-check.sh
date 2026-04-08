@@ -6,10 +6,19 @@ ENV_FILE="${ENV_FILE:-${ROOT_DIR}/.env}"
 
 # shellcheck source=/dev/null
 source "${ROOT_DIR}/scripts/common.sh"
+# shellcheck source=/dev/null
+source "${ROOT_DIR}/scripts/stack-bootstrap.sh"
 
 if [[ ! -f "${ENV_FILE}" ]]; then
   echo "Missing .env file. Run: bash scripts/bootstrap-env.sh"
   exit 1
+fi
+
+if [[ -n "${FD_STACK_BOOTSTRAP_JSON:-}" || -n "${FD_STACK_DEPLOY_TOKEN:-}" ]]; then
+  if ! load_stack_bootstrap; then
+    echo "FD Stack 部署预设加载失败，无法完成预检查。"
+    exit 1
+  fi
 fi
 
 required_commands=(
@@ -263,7 +272,7 @@ if [[ "${WORDPRESS_FETCH_RELEASE_ASSETS}" == "true" ]]; then
     done
 
     if [[ -z "${GH_TOKEN:-}" && -z "${GITHUB_TOKEN:-}" ]] && ! gh auth status >/dev/null 2>&1; then
-      echo "GitHub CLI is not authenticated. Run: gh auth login"
+      echo "GitHub CLI is not authenticated. Provide a temporary GH_TOKEN or a fresh FD Stack deploy token."
       exit 1
     fi
   fi

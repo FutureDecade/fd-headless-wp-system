@@ -100,6 +100,23 @@ prompt_yes_no() {
   esac
 }
 
+remove_persisted_delivery_credentials() {
+  unset_env_keys "${ENV_FILE}" \
+    "ACR_USERNAME" \
+    "ACR_PASSWORD" \
+    "GH_TOKEN" \
+    "GITHUB_TOKEN"
+}
+
+cleanup_bootstrap_state() {
+  if [[ "${stack_bootstrap_mode:-false}" == "true" ]]; then
+    remove_persisted_delivery_credentials
+  fi
+
+  unset FD_STACK_BOOTSTRAP_JSON FD_STACK_DEPLOY_TOKEN FD_STACK_EXCHANGE_URL FD_STACK_PUBLIC_BASE_URL
+  unset ACR_USERNAME ACR_PASSWORD GH_TOKEN GITHUB_TOKEN
+}
+
 detect_registry_host() {
   local image="$1"
 
@@ -202,7 +219,7 @@ print_final_summary() {
 
   if [[ "${WORDPRESS_RUN_INIT:-false}" == "true" ]]; then
     echo "WordPress 管理员用户名：${WORDPRESS_ADMIN_USER}"
-    echo "WordPress 管理员密码：${WORDPRESS_ADMIN_PASSWORD}"
+    echo "WordPress 管理员密码：出于安全原因不在终端回显。"
     echo "WordPress 管理员邮箱：${WORDPRESS_ADMIN_EMAIL}"
   fi
 }
@@ -230,6 +247,10 @@ if [[ -n "${FD_STACK_BOOTSTRAP_JSON:-}" || -n "${FD_STACK_DEPLOY_TOKEN:-}" ]]; t
   echo "推送域名预设：${WS_DOMAIN:-未提供}"
 fi
 
+if [[ "${stack_bootstrap_mode}" == "true" ]]; then
+  trap cleanup_bootstrap_state EXIT
+fi
+
 echo
 echo "先进入配置向导。"
 ENV_FILE="${ENV_FILE}" bash "${ROOT_DIR}/scripts/configure-env.sh"
@@ -237,6 +258,10 @@ ENV_FILE="${ENV_FILE}" bash "${ROOT_DIR}/scripts/configure-env.sh"
 if [[ ! -f "${ENV_FILE}" ]]; then
   echo "配置文件不存在：${ENV_FILE}"
   exit 1
+fi
+
+if [[ "${stack_bootstrap_mode}" == "true" ]]; then
+  remove_persisted_delivery_credentials
 fi
 
 load_env_file "${ENV_FILE}"

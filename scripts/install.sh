@@ -4,6 +4,9 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 ENV_FILE="${ENV_FILE:-${ROOT_DIR}/.env}"
 
+# shellcheck source=/dev/null
+source "${ROOT_DIR}/scripts/stack-bootstrap.sh"
+
 if [[ ! -f "${ENV_FILE}" ]]; then
   bash "${ROOT_DIR}/scripts/bootstrap-env.sh"
 
@@ -24,6 +27,13 @@ if [[ ! -f "${ENV_FILE}" ]]; then
   echo "你也可以先运行：bash scripts/configure-env.sh"
   echo "改完后，再重新运行这条命令即可。"
   exit 1
+fi
+
+if [[ -n "${FD_STACK_BOOTSTRAP_JSON:-}" || -n "${FD_STACK_DEPLOY_TOKEN:-}" ]]; then
+  if ! load_stack_bootstrap; then
+    echo "FD Stack 部署预设加载失败，安装已停止。"
+    exit 1
+  fi
 fi
 
 echo "Running preflight check..."

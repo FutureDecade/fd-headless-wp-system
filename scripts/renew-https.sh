@@ -6,10 +6,19 @@ ENV_FILE="${ENV_FILE:-${ROOT_DIR}/.env}"
 
 # shellcheck source=/dev/null
 source "${ROOT_DIR}/scripts/common.sh"
+# shellcheck source=/dev/null
+source "${ROOT_DIR}/scripts/stack-bootstrap.sh"
 
 if [[ ! -f "${ENV_FILE}" ]]; then
   echo "Missing .env file. Run: cp .env.example .env"
   exit 1
+fi
+
+if [[ -n "${FD_STACK_BOOTSTRAP_JSON:-}" || -n "${FD_STACK_DEPLOY_TOKEN:-}" ]]; then
+  if ! load_stack_bootstrap; then
+    echo "FD Stack 部署预设加载失败，无法继续证书续期。"
+    exit 1
+  fi
 fi
 
 load_env_file "${ENV_FILE}"
@@ -50,8 +59,9 @@ login_registry_if_needed() {
   fi
 
   if [[ -z "${ACR_USERNAME}" || -z "${ACR_PASSWORD}" ]]; then
-    echo "CERTBOT_IMAGE uses ACR, but ACR_USERNAME / ACR_PASSWORD were not provided."
-    exit 1
+    echo "CERTBOT_IMAGE uses ACR."
+    echo "No ACR credentials were provided. Continuing with existing docker login state."
+    return 0
   fi
 
   echo "Logging in to ACR: ${registry}"

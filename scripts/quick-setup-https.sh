@@ -6,6 +6,8 @@ ENV_FILE="${ENV_FILE:-${ROOT_DIR}/.env}"
 
 # shellcheck source=/dev/null
 source "${ROOT_DIR}/scripts/common.sh"
+# shellcheck source=/dev/null
+source "${ROOT_DIR}/scripts/stack-bootstrap.sh"
 
 prompt_value() {
   local prompt="$1"
@@ -98,6 +100,23 @@ prompt_yes_no() {
   esac
 }
 
+remove_persisted_delivery_credentials() {
+  unset_env_keys "${ENV_FILE}" \
+    "ACR_USERNAME" \
+    "ACR_PASSWORD" \
+    "GH_TOKEN" \
+    "GITHUB_TOKEN"
+}
+
+cleanup_bootstrap_state() {
+  if [[ "${stack_bootstrap_mode:-false}" == "true" ]]; then
+    remove_persisted_delivery_credentials
+  fi
+
+  unset FD_STACK_BOOTSTRAP_JSON FD_STACK_DEPLOY_TOKEN FD_STACK_EXCHANGE_URL FD_STACK_PUBLIC_BASE_URL
+  unset ACR_USERNAME ACR_PASSWORD GH_TOKEN GITHUB_TOKEN
+}
+
 detect_registry_host() {
   local image="$1"
 
@@ -172,6 +191,20 @@ if [[ ! -f "${ENV_FILE}" ]]; then
   echo "缺少配置文件：${ENV_FILE}"
   echo "请先完成首次安装。"
   exit 1
+fi
+
+stack_bootstrap_mode="false"
+if [[ -n "${FD_STACK_BOOTSTRAP_JSON:-}" || -n "${FD_STACK_DEPLOY_TOKEN:-}" ]]; then
+  stack_bootstrap_mode="true"
+  if ! load_stack_bootstrap; then
+    echo "FD Stack 部署预设加载失败，无法继续 HTTPS 切换。"
+    exit 1
+  fi
+  trap cleanup_bootstrap_state EXIT
+fi
+
+if [[ "${stack_bootstrap_mode}" == "true" ]]; then
+  remove_persisted_delivery_credentials
 fi
 
 load_env_file "${ENV_FILE}"

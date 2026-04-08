@@ -59,3 +59,36 @@ set_env_value() {
 
   mv "${tmp_file}" "${env_file}"
 }
+
+unset_env_value() {
+  local env_file="$1"
+  local key="$2"
+  local tmp_file=""
+
+  if [[ ! -f "${env_file}" ]]; then
+    return 0
+  fi
+
+  tmp_file="$(mktemp "${env_file}.XXXXXX")"
+
+  awk -v key="${key}" '
+    $0 ~ ("^" key "=") {
+      next
+    }
+    {
+      print
+    }
+  ' "${env_file}" > "${tmp_file}"
+
+  mv "${tmp_file}" "${env_file}"
+}
+
+unset_env_keys() {
+  local env_file="$1"
+  shift
+  local key=""
+
+  for key in "$@"; do
+    unset_env_value "${env_file}" "${key}"
+  done
+}
