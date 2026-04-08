@@ -29,6 +29,8 @@ WORDPRESS_PERMALINK_STRUCTURE="${WORDPRESS_PERMALINK_STRUCTURE:-/%postname%/}"
 WORDPRESS_IMPORT_DEMO_DATA="${WORDPRESS_IMPORT_DEMO_DATA:-true}"
 WORDPRESS_DEMO_DATA_FILE="${WORDPRESS_DEMO_DATA_FILE:-demo-data/demo-cpt-content.v1.json}"
 WORDPRESS_FORCE_DEMO_DATA_IMPORT="${WORDPRESS_FORCE_DEMO_DATA_IMPORT:-false}"
+WP_APP_USER="${WP_APP_USER:-}"
+WP_APP_PASS="${WP_APP_PASS:-}"
 PUBLIC_SCHEME="${PUBLIC_SCHEME:-http}"
 
 if [[ "${WORDPRESS_RUN_INIT}" != "true" ]]; then
@@ -261,6 +263,35 @@ import_demo_data() {
   bash "${ROOT_DIR}/scripts/import-wordpress-demo-data.sh"
 }
 
+ensure_wordpress_application_password() {
+  local app_user="${WP_APP_USER:-${WORDPRESS_ADMIN_USER}}"
+  local app_password="${WP_APP_PASS:-}"
+  local app_name="fd-frontend-delivery"
+
+  if ! run_wp user get "${app_user}" --field=ID >/dev/null 2>&1; then
+    app_user="${WORDPRESS_ADMIN_USER}"
+    app_password=""
+  fi
+
+  if [[ -n "${app_user}" && -n "${app_password}" ]]; then
+    echo "WordPress application password already configured for frontend."
+    return 0
+  fi
+
+  echo "Generating WordPress application password for frontend runtime..."
+  app_password="$(run_wp user application-password create "${app_user}" "${app_name}" --porcelain | tr -d '[:space:]')"
+
+  if [[ -z "${app_password}" ]]; then
+    echo "Failed to generate WordPress application password."
+    exit 1
+  fi
+
+  set_env_value "${ENV_FILE}" "WP_APP_USER" "${app_user}"
+  set_env_value "${ENV_FILE}" "WP_APP_PASS" "${app_password}"
+  export "WP_APP_USER=${app_user}"
+  export "WP_APP_PASS=${app_password}"
+}
+
 verify_graphql_route_mapping() {
   local attempts=6
   local delay=2
@@ -366,6 +397,8 @@ if [[ "${WORDPRESS_ACTIVATE_CORE_PLUGINS}" == "true" ]]; then
   activate_plugin_if_present "wp-graphql-jwt-authentication"
   activate_plugin_if_present "wp-graphql-tax-query-develop"
 fi
+
+ensure_wordpress_application_password
 
 if [[ "${fresh_install}" == "true" ]]; then
   apply_legacy_plugin_defaults

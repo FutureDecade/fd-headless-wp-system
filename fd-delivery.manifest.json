@@ -16,6 +16,10 @@
       "label": "凭据与证书"
     },
     {
+      "key": "site",
+      "label": "站点公开信息"
+    },
+    {
       "key": "release",
       "label": "版本与发布",
       "description": "默认情况下只展示需要用户填写的字段；这组预设字段应放在高级设置里。"
@@ -79,6 +83,38 @@
       "scope": "preset",
       "required": true,
       "group": "credentials"
+    },
+    {
+      "key": "NEXT_PUBLIC_CONTACT_EMAIL",
+      "label": "公开联系邮箱",
+      "type": "email",
+      "scope": "user_input",
+      "required": false,
+      "group": "site"
+    },
+    {
+      "key": "NEXT_PUBLIC_CONTACT_PHONE",
+      "label": "公开联系电话",
+      "type": "text",
+      "scope": "user_input",
+      "required": false,
+      "group": "site"
+    },
+    {
+      "key": "NEXT_PUBLIC_CONTACT_ADDRESS",
+      "label": "公开联系地址",
+      "type": "text",
+      "scope": "user_input",
+      "required": false,
+      "group": "site"
+    },
+    {
+      "key": "NEXT_PUBLIC_TWITTER_HANDLE",
+      "label": "X / Twitter 账号",
+      "type": "text",
+      "scope": "user_input",
+      "required": false,
+      "group": "site"
     },
     {
       "key": "WORDPRESS_FETCH_RELEASE_ASSETS",
