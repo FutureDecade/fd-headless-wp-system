@@ -17,7 +17,7 @@
     },
     {
       "key": "site",
-      "label": "站点公开信息"
+      "label": "站点信息"
     },
     {
       "key": "release",
@@ -85,35 +85,11 @@
       "group": "credentials"
     },
     {
-      "key": "NEXT_PUBLIC_CONTACT_EMAIL",
-      "label": "公开联系邮箱",
-      "type": "email",
-      "scope": "user_input",
-      "required": false,
-      "group": "site"
-    },
-    {
-      "key": "NEXT_PUBLIC_CONTACT_PHONE",
-      "label": "公开联系电话",
+      "key": "WORDPRESS_TITLE",
+      "label": "站点名称",
       "type": "text",
       "scope": "user_input",
-      "required": false,
-      "group": "site"
-    },
-    {
-      "key": "NEXT_PUBLIC_CONTACT_ADDRESS",
-      "label": "公开联系地址",
-      "type": "text",
-      "scope": "user_input",
-      "required": false,
-      "group": "site"
-    },
-    {
-      "key": "NEXT_PUBLIC_TWITTER_HANDLE",
-      "label": "X / Twitter 账号",
-      "type": "text",
-      "scope": "user_input",
-      "required": false,
+      "required": true,
       "group": "site"
     },
     {
