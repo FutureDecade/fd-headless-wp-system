@@ -27,6 +27,11 @@ is_placeholder_domain() {
   [[ -z "${value}" || "${value}" == "www.example.com" || "${value}" == "admin.example.com" || "${value}" == "ws.example.com" ]]
 }
 
+is_placeholder_binding_source() {
+  local value="$1"
+  [[ -z "${value}" || "${value}" == "none" || "${value}" == "primaryDomain" ]]
+}
+
 is_placeholder_email() {
   local value="$1"
   [[ -z "${value}" || "${value}" == "admin@example.com" ]]
@@ -185,6 +190,12 @@ should_apply_bootstrap_default() {
     FRONTEND_DOMAIN|ADMIN_DOMAIN|WS_DOMAIN)
       is_placeholder_domain "${current}"
       ;;
+    FD_BOUND_HOST)
+      is_placeholder_domain "${current}"
+      ;;
+    FD_DOMAIN_BINDING_SOURCE)
+      is_placeholder_binding_source "${current}"
+      ;;
     FRONTEND_IMAGE|WEBSOCKET_IMAGE)
       [[ -z "${current}" || "${current}" == *CHANGE_ME* ]]
       ;;
@@ -271,6 +282,8 @@ fi
 frontend_default="${FRONTEND_DOMAIN:-}"
 admin_default="${ADMIN_DOMAIN:-}"
 ws_default="${WS_DOMAIN:-}"
+fd_domain_binding_source_default="${FD_DOMAIN_BINDING_SOURCE:-primaryDomain}"
+fd_bound_host_default="${FD_BOUND_HOST:-}"
 
 if is_placeholder_domain "${frontend_default}"; then
   frontend_default=""
@@ -282,6 +295,14 @@ fi
 
 if is_placeholder_domain "${ws_default}"; then
   ws_default=""
+fi
+
+if is_placeholder_binding_source "${fd_domain_binding_source_default}"; then
+  fd_domain_binding_source_default="primaryDomain"
+fi
+
+if is_placeholder_domain "${fd_bound_host_default}"; then
+  fd_bound_host_default=""
 fi
 
 frontend_image_default="${FRONTEND_IMAGE:-}"
@@ -403,9 +424,31 @@ ensure_required_config_value "FRONTEND_IMAGE" "${frontend_image}"
 ensure_required_config_value "WEBSOCKET_IMAGE" "${websocket_image}"
 ensure_required_config_value "LETSENCRYPT_EMAIL" "${letsencrypt_email}"
 
+fd_domain_binding_source="${fd_domain_binding_source_default}"
+fd_bound_host="${fd_bound_host_default}"
+
+if [[ "${fd_domain_binding_source}" == "none" ]]; then
+  fd_bound_host=""
+elif [[ -z "${fd_bound_host}" ]]; then
+  case "${fd_domain_binding_source}" in
+    adminDomain)
+      fd_bound_host="${admin_domain}"
+      ;;
+    wsDomain)
+      fd_bound_host="${ws_domain}"
+      ;;
+    primaryDomain|*)
+      fd_domain_binding_source="primaryDomain"
+      fd_bound_host="${frontend_domain}"
+      ;;
+  esac
+fi
+
 set_env_value "${ENV_FILE}" "FRONTEND_DOMAIN" "${frontend_domain}"
 set_env_value "${ENV_FILE}" "ADMIN_DOMAIN" "${admin_domain}"
 set_env_value "${ENV_FILE}" "WS_DOMAIN" "${ws_domain}"
+set_env_value "${ENV_FILE}" "FD_DOMAIN_BINDING_SOURCE" "${fd_domain_binding_source}"
+set_env_value "${ENV_FILE}" "FD_BOUND_HOST" "${fd_bound_host}"
 set_env_value "${ENV_FILE}" "FRONTEND_IMAGE" "${frontend_image}"
 set_env_value "${ENV_FILE}" "WEBSOCKET_IMAGE" "${websocket_image}"
 set_env_value "${ENV_FILE}" "LETSENCRYPT_EMAIL" "${letsencrypt_email}"

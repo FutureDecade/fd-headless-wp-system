@@ -25,6 +25,7 @@ fi
 
 backup_file="${ENV_FILE}.backup-domains-$(date +%Y%m%d-%H%M%S)"
 cp "${ENV_FILE}" "${backup_file}"
+load_env_file "${ENV_FILE}"
 
 if [[ -n "${NEW_FRONTEND_DOMAIN}" ]]; then
   set_env_value "${ENV_FILE}" "FRONTEND_DOMAIN" "${NEW_FRONTEND_DOMAIN}"
@@ -46,6 +47,29 @@ if [[ -n "${NEW_WEBSOCKET_PUBLIC_SCHEME}" ]]; then
   set_env_value "${ENV_FILE}" "WEBSOCKET_PUBLIC_SCHEME" "${NEW_WEBSOCKET_PUBLIC_SCHEME}"
 fi
 
+active_binding_source="${FD_DOMAIN_BINDING_SOURCE:-primaryDomain}"
+case "${active_binding_source}" in
+  adminDomain)
+    if [[ -n "${NEW_ADMIN_DOMAIN}" ]]; then
+      set_env_value "${ENV_FILE}" "FD_BOUND_HOST" "${NEW_ADMIN_DOMAIN}"
+    fi
+    ;;
+  wsDomain)
+    if [[ -n "${NEW_WS_DOMAIN}" ]]; then
+      set_env_value "${ENV_FILE}" "FD_BOUND_HOST" "${NEW_WS_DOMAIN}"
+    fi
+    ;;
+  none)
+    set_env_value "${ENV_FILE}" "FD_BOUND_HOST" ""
+    ;;
+  primaryDomain|*)
+    if [[ -n "${NEW_FRONTEND_DOMAIN}" ]]; then
+      set_env_value "${ENV_FILE}" "FD_DOMAIN_BINDING_SOURCE" "primaryDomain"
+      set_env_value "${ENV_FILE}" "FD_BOUND_HOST" "${NEW_FRONTEND_DOMAIN}"
+    fi
+    ;;
+esac
+
 echo "Updated domain settings."
 echo "Backup: ${backup_file}"
-grep -E '^(FRONTEND_DOMAIN|ADMIN_DOMAIN|WS_DOMAIN|PUBLIC_SCHEME|WEBSOCKET_PUBLIC_SCHEME)=' "${ENV_FILE}"
+grep -E '^(FRONTEND_DOMAIN|ADMIN_DOMAIN|WS_DOMAIN|FD_DOMAIN_BINDING_SOURCE|FD_BOUND_HOST|PUBLIC_SCHEME|WEBSOCKET_PUBLIC_SCHEME)=' "${ENV_FILE}"
