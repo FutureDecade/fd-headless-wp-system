@@ -231,12 +231,6 @@ prime_env_from_stack_bootstrap() {
       continue
     fi
 
-    case "${key}" in
-      ACR_USERNAME|ACR_PASSWORD|GH_TOKEN|GITHUB_TOKEN)
-        continue
-        ;;
-    esac
-
     current="${!key:-}"
     if [[ "${overwrite_all}" == "true" ]] || should_apply_bootstrap_default "${key}" "${current}"; then
       set_env_value "${ENV_FILE}" "${key}" "${value}"
