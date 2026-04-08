@@ -18,6 +18,7 @@
 - `fd-payment`：`v1.0.0`
 - `fd-commerce`：`v1.0.0`
 - `fd-content-types`：`v0.4.0`
+- `fd-ai-router`：`v2.2`
 
 ## 当前推荐默认版本
 
@@ -26,6 +27,7 @@
 - `fd-payment`：`v1.0.0`
 - `fd-commerce`：`v1.0.0`
 - `fd-content-types`：`v0.4.0`
+- `fd-ai-router`：`v2.2`
 
 对应 release asset：
 
@@ -34,6 +36,7 @@
 - `fd-payment.zip`
 - `fd-commerce.zip`
 - `fd-content-types.zip`
+- `fd-ai-router.zip`
 
 ## 推荐发布顺序
 

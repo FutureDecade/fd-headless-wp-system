@@ -36,6 +36,7 @@
 - `fd-payment`
 - `fd-commerce`
 - `fd-content-types`
+- `fd-ai-router`
 - `fd-websocket-push`
 - `wp-graphql`
 - `wp-graphql-jwt-authentication`
@@ -145,6 +146,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/FutureDecade/fd-headless-wp-
 - `fd-payment`
 - `fd-commerce`
 - `fd-content-types`
+- `fd-ai-router`
 - `fd-websocket-push`
 - `wp-graphql-jwt-authentication`
 - `wp-graphql-tax-query`
@@ -260,6 +262,7 @@ FD_ADMIN_UI_RELEASE_TAG=v1.3.2 \
 FD_MEMBER_RELEASE_TAG=v1.0.1 \
 FD_PAYMENT_RELEASE_TAG=v1.0.0 \
 FD_COMMERCE_RELEASE_TAG=v1.0.0 \
+FD_AI_ROUTER_RELEASE_TAG=v2.2 \
 FD_WEBSOCKET_PUSH_RELEASE_TAG=v1.0.0 \
 WPGRAPHQL_JWT_AUTH_RELEASE_TAG=v0.7.2 \
 WPGRAPHQL_TAX_QUERY_REF=v0.2.0 \

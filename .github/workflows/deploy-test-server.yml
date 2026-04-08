@@ -29,6 +29,9 @@ on:
       fd_content_types_release_tag:
         description: fd-content-types release tag, blank means keep current value
         required: false
+      fd_ai_router_release_tag:
+        description: fd-ai-router release tag, blank means keep current value
+        required: false
       fd_websocket_push_release_tag:
         description: fd-websocket-push release tag, blank means keep current value
         required: false
@@ -87,6 +90,7 @@ jobs:
       FD_PAYMENT_RELEASE_TAG: ${{ inputs.fd_payment_release_tag || '' }}
       FD_COMMERCE_RELEASE_TAG: ${{ inputs.fd_commerce_release_tag || '' }}
       FD_CONTENT_TYPES_RELEASE_TAG: ${{ inputs.fd_content_types_release_tag || '' }}
+      FD_AI_ROUTER_RELEASE_TAG: ${{ inputs.fd_ai_router_release_tag || '' }}
       FD_WEBSOCKET_PUSH_RELEASE_TAG: ${{ inputs.fd_websocket_push_release_tag || '' }}
       WPGRAPHQL_JWT_AUTH_RELEASE_TAG: ${{ inputs.wpgraphql_jwt_auth_release_tag || '' }}
       WPGRAPHQL_TAX_QUERY_REF: ${{ inputs.wpgraphql_tax_query_ref || '' }}
@@ -128,6 +132,7 @@ jobs:
           validate_release fd-payment "$FD_PAYMENT_RELEASE_TAG"
           validate_release fd-commerce "$FD_COMMERCE_RELEASE_TAG"
           validate_release fd-content-types "$FD_CONTENT_TYPES_RELEASE_TAG"
+          validate_release fd-ai-router "$FD_AI_ROUTER_RELEASE_TAG"
           validate_release fd-websocket-push "$FD_WEBSOCKET_PUSH_RELEASE_TAG"
           if [ -n "$WPGRAPHQL_JWT_AUTH_RELEASE_TAG" ]; then
             echo "Checking wp-graphql/wp-graphql-jwt-authentication $WPGRAPHQL_JWT_AUTH_RELEASE_TAG"

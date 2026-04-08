@@ -43,6 +43,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/FutureDecade/fd-headless-wp-
 - `fd-payment` 已启用
 - `fd-commerce` 已启用
 - `fd-content-types` 已接入交付链
+- `fd-ai-router` 已接入交付链
 - `/graphql` 路由可正常返回 `slugMappingTable`
 - 前台首页和示例页面可正常访问
 - 前端主要旧域名硬编码已经去掉，页面源码里不再残留 `sslip.io`、`http://admin.futuredecade.com`、`ws://ws.futuredecade.com`
@@ -55,6 +56,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/FutureDecade/fd-headless-wp-
 - `fd-theme`: `v1.0.7`
 - `fd-admin-ui`: `v1.3.2`
 - `fd-content-types`: `v0.4.0`
+- `fd-ai-router`: `v2.2`
 - `fd-frontend`: `crpi-8y82lbqoc1haiday.cn-beijing.personal.cr.aliyuncs.com/futuredecade/fd-frontend:futuredecade-https-8862356`
 - `fd-websocket`: `crpi-8y82lbqoc1haiday.cn-beijing.personal.cr.aliyuncs.com/futuredecade/fd-websocket:248efba2800ce856e043d673233bc5f5205e2a40`
 
@@ -246,6 +248,7 @@ bash scripts/configure-env.sh
 - `FD_MEMBER_RELEASE_TAG=...`
 - `FD_PAYMENT_RELEASE_TAG=...`
 - `FD_COMMERCE_RELEASE_TAG=...`
+- `FD_AI_ROUTER_RELEASE_TAG=v2.2`
 - `FD_WEBSOCKET_PUSH_RELEASE_TAG=v1.0.0`
 - `WPGRAPHQL_JWT_AUTH_RELEASE_TAG=v0.7.2`
 - `WPGRAPHQL_TAX_QUERY_REF=v0.2.0`

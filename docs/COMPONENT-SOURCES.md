@@ -41,6 +41,7 @@
 - `fd-payment`
 - `fd-commerce`
 - `fd-content-types`
+- `fd-ai-router`
 - `fd-websocket-push`
 - `wp-graphql-jwt-authentication`
 - `wp-graphql-tax-query`
@@ -55,13 +56,14 @@
   - `https://github.com/FutureDecade/fd-payment`
   - `https://github.com/FutureDecade/fd-commerce`
   - `https://github.com/FutureDecade/fd-content-types`
+  - `https://github.com/FutureDecade/fd-ai-router`
   - `https://github.com/FutureDecade/fd-websocket-push`
 - `wp-graphql-jwt-authentication` 来自官方仓库：
   - `https://github.com/wp-graphql/wp-graphql-jwt-authentication`
 - `wp-graphql-tax-query` 来自官方仓库：
   - `https://github.com/wp-graphql/wp-graphql-tax-query`
 - `redis-cache` 目前直接通过 WordPress 官方插件源安装
-- 七个核心自有仓库都已具备基础版本来源
+- 八个核心自有仓库都已具备基础版本来源
 - 交付仓库已可消费自有 release zip，并补拉外部官方插件
 - 交付仓库已可用 `wp-cli` 做首次安装与启用
 - 线上也有运行中的副本

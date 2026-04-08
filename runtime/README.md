@@ -10,6 +10,7 @@
 - `runtime/wp-content/plugins/fd-payment`
 - `runtime/wp-content/plugins/fd-commerce`
 - `runtime/wp-content/plugins/fd-content-types`
+- `runtime/wp-content/plugins/fd-ai-router`
 - `runtime/wp-content/plugins/fd-websocket-push`
 - `runtime/wp-content/plugins/wp-graphql-jwt-authentication`
 - `runtime/wp-content/plugins/wp-graphql-tax-query-develop`

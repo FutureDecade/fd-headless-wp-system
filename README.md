@@ -71,6 +71,7 @@
 - `fd-payment`
 - `fd-commerce`
 - `fd-content-types`
+- `fd-ai-router`
 - `fd-websocket-push`
 - `fd-headless-wp-system`
 
@@ -203,6 +204,7 @@ bash scripts/configure-env.sh
 - 真正切到 HTTPS 前，要先重新构建一版前端交付镜像，把 `site_url` 改成 `https://...`，把 `websocket_url` 改成 `wss://...`
 - `scripts/setup-https.sh` 现在会自动申请证书，并把 `.env` 里的 `HTTPS_ENABLED`、`HTTPS_PORT`、`PUBLIC_SCHEME`、`WEBSOCKET_PUBLIC_SCHEME` 一起改到正确值
 - `WORDPRESS_RUN_INIT=true` 时，会自动完成 WordPress 首次安装，并安装激活 `WPGraphQL`、`redis-cache`、`Classic Editor`，同时启用交付链里挂载的核心插件；全新安装还会把 `WPGraphQL` 与 `Classic Editor` 对齐到旧站默认配置，并保持 `Redis Cache` 的 object cache 启用状态与旧站一致
+- `fd-ai-router` 现在也作为核心插件纳入交付链，会跟其他私有插件一起挂载并自动启用
 - 默认还会导入 `WORDPRESS_DEMO_DATA_FILE` 指向的演示数据包；如果不想导入，把 `WORDPRESS_IMPORT_DEMO_DATA=false`
 - 默认交付链路不再安装 `ACF` 或 `WPGraphQL for ACF`，当前内容模型默认按纯代码插件运行
 - 初始化还会自动设置 `WORDPRESS_PERMALINK_STRUCTURE`，确保 `/graphql` 这种地址能直接使用
@@ -221,7 +223,7 @@ bash scripts/configure-env.sh
 - 如果前端或推送服务镜像在阿里云 ACR 私有仓库，第一次更新时可这样运行：`ACR_USERNAME=你的账号 ACR_PASSWORD=你的密码 bash scripts/update-stack.sh`
 - 如果已经换成正式域名并准备启用 HTTPS，可以运行 `ACR_USERNAME=你的账号 ACR_PASSWORD=你的密码 bash scripts/setup-https.sh`
 - 后续证书续期可以运行 `ACR_USERNAME=你的账号 ACR_PASSWORD=你的密码 bash scripts/renew-https.sh`
-- 如果只想更新 WordPress 交付资产版本，可以运行 `FD_THEME_RELEASE_TAG=v1.0.7 FD_CONTENT_TYPES_RELEASE_TAG=v0.4.0 FD_WEBSOCKET_PUSH_RELEASE_TAG=v1.0.0 WPGRAPHQL_JWT_AUTH_RELEASE_TAG=v0.7.2 WPGRAPHQL_TAX_QUERY_REF=v0.2.0 bash scripts/update-wordpress-release-tags.sh`
+- 如果只想更新 WordPress 交付资产版本，可以运行 `FD_THEME_RELEASE_TAG=v1.0.7 FD_CONTENT_TYPES_RELEASE_TAG=v0.4.0 FD_AI_ROUTER_RELEASE_TAG=v2.2 FD_WEBSOCKET_PUSH_RELEASE_TAG=v1.0.0 WPGRAPHQL_JWT_AUTH_RELEASE_TAG=v0.7.2 WPGRAPHQL_TAX_QUERY_REF=v0.2.0 bash scripts/update-wordpress-release-tags.sh`
 - GitHub Actions 里的 `Sync WordPress Release Tags` 现在会每 6 小时自动检查一次 latest release；必要时也可以手动触发，自动回写 manifest 与默认脚本版本
 - GitHub Actions 里的 `Deploy Test Server` 现在支持手动填写这些 release tag，服务器会先改 `.env`，再自动重拉并更新
 - 截至 `2026-03-28`，测试机 `144.48.8.218` 已经完成 `www.futuredecade.com`、`admin.futuredecade.com`、`ws.futuredecade.com` 的正式 HTTPS 验证

@@ -180,6 +180,17 @@
       "group": "release"
     },
     {
+      "key": "FD_AI_ROUTER_RELEASE_TAG",
+      "label": "fd-ai-router Release Tag",
+      "type": "text",
+      "scope": "preset",
+      "required": true,
+      "editable": true,
+      "advanced": true,
+      "defaultValue": "v2.2",
+      "group": "release"
+    },
+    {
       "key": "FD_WEBSOCKET_PUSH_RELEASE_TAG",
       "label": "fd-websocket-push Release Tag",
       "type": "text",

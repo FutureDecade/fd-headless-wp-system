@@ -9,6 +9,7 @@
 - `fd-payment`
 - `fd-commerce`
 - `fd-content-types`
+- `fd-ai-router`
 - `fd-websocket-push`
 - `wp-graphql-jwt-authentication`
 - `wp-graphql-tax-query`
@@ -50,6 +51,7 @@
 - `fd-payment.zip`
 - `fd-commerce.zip`
 - `fd-content-types.zip`
+- `fd-ai-router.zip`
 - `fd-websocket-push.zip`
 
 当前状态：
