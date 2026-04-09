@@ -187,6 +187,22 @@ collect_github_token_if_needed() {
   export GH_TOKEN
 }
 
+print_final_summary() {
+  load_env_file "${ENV_FILE}"
+
+  printf '\n'
+  printf '部署完成。\n'
+  printf '前台地址：%s://%s\n' "${PUBLIC_SCHEME:-http}" "${FRONTEND_DOMAIN}"
+  printf '后台地址：%s://%s\n' "${PUBLIC_SCHEME:-http}" "${ADMIN_DOMAIN}"
+  printf '推送健康检查：%s://%s/health\n' "${WEBSOCKET_PUBLIC_SCHEME:-ws}" "${WS_DOMAIN}"
+
+  if [[ "${WORDPRESS_RUN_INIT:-false}" == "true" ]]; then
+    printf 'WordPress 管理员用户名：%s\n' "${WORDPRESS_ADMIN_USER}"
+    printf 'WordPress 管理员密码：%s\n' "${WORDPRESS_ADMIN_PASSWORD}"
+    printf 'WordPress 管理员邮箱：%s\n' "${WORDPRESS_ADMIN_EMAIL}"
+  fi
+}
+
 if [[ ! -f "${ENV_FILE}" ]]; then
   echo "缺少配置文件：${ENV_FILE}"
   echo "请先完成首次安装。"
@@ -239,3 +255,4 @@ bash "${ROOT_DIR}/scripts/setup-https.sh"
 
 echo
 echo "HTTPS 切换入口执行完成。"
+print_final_summary

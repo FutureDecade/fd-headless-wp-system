@@ -211,16 +211,16 @@ auto_https_enabled() {
 print_final_summary() {
   load_env_file "${ENV_FILE}"
 
-  echo
-  echo "部署完成。"
-  echo "前台地址：${PUBLIC_SCHEME:-http}://${FRONTEND_DOMAIN}"
-  echo "后台地址：${PUBLIC_SCHEME:-http}://${ADMIN_DOMAIN}"
-  echo "推送健康检查：${WEBSOCKET_PUBLIC_SCHEME:-ws}://${WS_DOMAIN}/health"
+  printf '\n'
+  printf '部署完成。\n'
+  printf '前台地址：%s://%s\n' "${PUBLIC_SCHEME:-http}" "${FRONTEND_DOMAIN}"
+  printf '后台地址：%s://%s\n' "${PUBLIC_SCHEME:-http}" "${ADMIN_DOMAIN}"
+  printf '推送健康检查：%s://%s/health\n' "${WEBSOCKET_PUBLIC_SCHEME:-ws}" "${WS_DOMAIN}"
 
   if [[ "${WORDPRESS_RUN_INIT:-false}" == "true" ]]; then
-    echo "WordPress 管理员用户名：${WORDPRESS_ADMIN_USER}"
-    echo "WordPress 管理员密码：出于安全原因不在终端回显。"
-    echo "WordPress 管理员邮箱：${WORDPRESS_ADMIN_EMAIL}"
+    printf 'WordPress 管理员用户名：%s\n' "${WORDPRESS_ADMIN_USER}"
+    printf 'WordPress 管理员密码：%s\n' "${WORDPRESS_ADMIN_PASSWORD}"
+    printf 'WordPress 管理员邮箱：%s\n' "${WORDPRESS_ADMIN_EMAIL}"
   fi
 }
 
