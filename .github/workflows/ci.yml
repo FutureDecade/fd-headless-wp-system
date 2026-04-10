@@ -72,8 +72,9 @@ jobs:
       - name: Validate release tag updater
         run: |
           cp .env.example .env.tags
-          ENV_FILE=.env.tags FD_THEME_RELEASE_TAG=v9.9.9 bash scripts/update-wordpress-release-tags.sh
+          ENV_FILE=.env.tags FD_THEME_RELEASE_TAG=v9.9.9 FD_AI_ROUTER_RELEASE_TAG=v9.9.8 bash scripts/update-wordpress-release-tags.sh
           grep -q '^FD_THEME_RELEASE_TAG=v9.9.9$' .env.tags
+          grep -q '^FD_AI_ROUTER_RELEASE_TAG=v9.9.8$' .env.tags
 
       - name: Generate bootstrap env
         run: |

@@ -1,6 +1,9 @@
 name: Deploy Test Server
 
 on:
+  repository_dispatch:
+    types:
+      - deploy-runtime-images
   workflow_dispatch:
     inputs:
       force_wordpress_asset_fetch:
@@ -82,32 +85,48 @@ jobs:
     name: Update Test Server
     runs-on: ubuntu-latest
     env:
-      FORCE_WORDPRESS_ASSET_FETCH: ${{ inputs.force_wordpress_asset_fetch || 'false' }}
-      SKIP_IMAGE_PULL: ${{ inputs.skip_image_pull || 'false' }}
-      FD_THEME_RELEASE_TAG: ${{ inputs.fd_theme_release_tag || '' }}
-      FD_ADMIN_UI_RELEASE_TAG: ${{ inputs.fd_admin_ui_release_tag || '' }}
-      FD_MEMBER_RELEASE_TAG: ${{ inputs.fd_member_release_tag || '' }}
-      FD_PAYMENT_RELEASE_TAG: ${{ inputs.fd_payment_release_tag || '' }}
-      FD_COMMERCE_RELEASE_TAG: ${{ inputs.fd_commerce_release_tag || '' }}
-      FD_CONTENT_TYPES_RELEASE_TAG: ${{ inputs.fd_content_types_release_tag || '' }}
-      FD_AI_ROUTER_RELEASE_TAG: ${{ inputs.fd_ai_router_release_tag || '' }}
-      FD_WEBSOCKET_PUSH_RELEASE_TAG: ${{ inputs.fd_websocket_push_release_tag || '' }}
-      WPGRAPHQL_JWT_AUTH_RELEASE_TAG: ${{ inputs.wpgraphql_jwt_auth_release_tag || '' }}
-      WPGRAPHQL_TAX_QUERY_REF: ${{ inputs.wpgraphql_tax_query_ref || '' }}
-      FRONTEND_IMAGE: ${{ inputs.frontend_image || '' }}
-      WEBSOCKET_IMAGE: ${{ inputs.websocket_image || '' }}
-      FRONTEND_DOMAIN: ${{ inputs.frontend_domain || '' }}
-      ADMIN_DOMAIN: ${{ inputs.admin_domain || '' }}
-      WS_DOMAIN: ${{ inputs.ws_domain || '' }}
-      PUBLIC_SCHEME: ${{ inputs.public_scheme || '' }}
-      WEBSOCKET_PUBLIC_SCHEME: ${{ inputs.websocket_public_scheme || '' }}
-      LETSENCRYPT_EMAIL: ${{ inputs.letsencrypt_email || '' }}
-      LETSENCRYPT_STAGING: ${{ inputs.letsencrypt_staging || '' }}
-      RUN_HTTPS_SETUP: ${{ inputs.run_https_setup || 'false' }}
+      FORCE_WORDPRESS_ASSET_FETCH: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.force_wordpress_asset_fetch || inputs.force_wordpress_asset_fetch || 'false' }}
+      SKIP_IMAGE_PULL: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.skip_image_pull || inputs.skip_image_pull || 'false' }}
+      FD_THEME_RELEASE_TAG: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.fd_theme_release_tag || inputs.fd_theme_release_tag || '' }}
+      FD_ADMIN_UI_RELEASE_TAG: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.fd_admin_ui_release_tag || inputs.fd_admin_ui_release_tag || '' }}
+      FD_MEMBER_RELEASE_TAG: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.fd_member_release_tag || inputs.fd_member_release_tag || '' }}
+      FD_PAYMENT_RELEASE_TAG: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.fd_payment_release_tag || inputs.fd_payment_release_tag || '' }}
+      FD_COMMERCE_RELEASE_TAG: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.fd_commerce_release_tag || inputs.fd_commerce_release_tag || '' }}
+      FD_CONTENT_TYPES_RELEASE_TAG: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.fd_content_types_release_tag || inputs.fd_content_types_release_tag || '' }}
+      FD_AI_ROUTER_RELEASE_TAG: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.fd_ai_router_release_tag || inputs.fd_ai_router_release_tag || '' }}
+      FD_WEBSOCKET_PUSH_RELEASE_TAG: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.fd_websocket_push_release_tag || inputs.fd_websocket_push_release_tag || '' }}
+      WPGRAPHQL_JWT_AUTH_RELEASE_TAG: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.wpgraphql_jwt_auth_release_tag || inputs.wpgraphql_jwt_auth_release_tag || '' }}
+      WPGRAPHQL_TAX_QUERY_REF: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.wpgraphql_tax_query_ref || inputs.wpgraphql_tax_query_ref || '' }}
+      FRONTEND_IMAGE: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.frontend_image || inputs.frontend_image || '' }}
+      WEBSOCKET_IMAGE: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.websocket_image || inputs.websocket_image || '' }}
+      FRONTEND_DOMAIN: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.frontend_domain || inputs.frontend_domain || '' }}
+      ADMIN_DOMAIN: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.admin_domain || inputs.admin_domain || '' }}
+      WS_DOMAIN: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.ws_domain || inputs.ws_domain || '' }}
+      PUBLIC_SCHEME: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.public_scheme || inputs.public_scheme || '' }}
+      WEBSOCKET_PUBLIC_SCHEME: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.websocket_public_scheme || inputs.websocket_public_scheme || '' }}
+      LETSENCRYPT_EMAIL: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.letsencrypt_email || inputs.letsencrypt_email || '' }}
+      LETSENCRYPT_STAGING: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.letsencrypt_staging || inputs.letsencrypt_staging || '' }}
+      RUN_HTTPS_SETUP: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.run_https_setup || inputs.run_https_setup || 'false' }}
+      REQUEST_SOURCE_REPO: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.source_repo || github.repository }}
+      REQUEST_SOURCE_SHA: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.source_sha || github.sha }}
+      REQUEST_SOURCE_RUN_ID: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.source_run_id || '' }}
+      REQUEST_SOURCE_WORKFLOW: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.source_workflow || github.workflow }}
       ACR_USERNAME: ${{ secrets.ACR_USERNAME }}
       ACR_PASSWORD: ${{ secrets.ACR_PASSWORD }}
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
     steps:
+      - name: Show deploy request summary
+        run: |
+          echo "Event: ${{ github.event_name }}"
+          echo "Source repo: ${REQUEST_SOURCE_REPO}"
+          echo "Source workflow: ${REQUEST_SOURCE_WORKFLOW}"
+          echo "Source sha: ${REQUEST_SOURCE_SHA}"
+          echo "Source run id: ${REQUEST_SOURCE_RUN_ID:-n/a}"
+          echo "Frontend image: ${FRONTEND_IMAGE:-<unchanged>}"
+          echo "Websocket image: ${WEBSOCKET_IMAGE:-<unchanged>}"
+          echo "Skip image pull: ${SKIP_IMAGE_PULL}"
+          echo "Run HTTPS setup: ${RUN_HTTPS_SETUP}"
+
       - name: Validate requested release tags
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
@@ -149,7 +168,7 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
-          envs: ACR_USERNAME,ACR_PASSWORD,GH_TOKEN,FORCE_WORDPRESS_ASSET_FETCH,SKIP_IMAGE_PULL,FD_THEME_RELEASE_TAG,FD_ADMIN_UI_RELEASE_TAG,FD_MEMBER_RELEASE_TAG,FD_PAYMENT_RELEASE_TAG,FD_COMMERCE_RELEASE_TAG,FD_CONTENT_TYPES_RELEASE_TAG,FD_WEBSOCKET_PUSH_RELEASE_TAG,WPGRAPHQL_JWT_AUTH_RELEASE_TAG,WPGRAPHQL_TAX_QUERY_REF,FRONTEND_IMAGE,WEBSOCKET_IMAGE,FRONTEND_DOMAIN,ADMIN_DOMAIN,WS_DOMAIN,PUBLIC_SCHEME,WEBSOCKET_PUBLIC_SCHEME,LETSENCRYPT_EMAIL,LETSENCRYPT_STAGING,RUN_HTTPS_SETUP
+          envs: ACR_USERNAME,ACR_PASSWORD,GH_TOKEN,FORCE_WORDPRESS_ASSET_FETCH,SKIP_IMAGE_PULL,FD_THEME_RELEASE_TAG,FD_ADMIN_UI_RELEASE_TAG,FD_MEMBER_RELEASE_TAG,FD_PAYMENT_RELEASE_TAG,FD_COMMERCE_RELEASE_TAG,FD_CONTENT_TYPES_RELEASE_TAG,FD_AI_ROUTER_RELEASE_TAG,FD_WEBSOCKET_PUSH_RELEASE_TAG,WPGRAPHQL_JWT_AUTH_RELEASE_TAG,WPGRAPHQL_TAX_QUERY_REF,FRONTEND_IMAGE,WEBSOCKET_IMAGE,FRONTEND_DOMAIN,ADMIN_DOMAIN,WS_DOMAIN,PUBLIC_SCHEME,WEBSOCKET_PUBLIC_SCHEME,LETSENCRYPT_EMAIL,LETSENCRYPT_STAGING,RUN_HTTPS_SETUP
           command_timeout: 40m
           script: |
             set -e
@@ -183,7 +202,7 @@ jobs:
               bash scripts/update-runtime-images.sh
             fi
 
-            if [ -n "$FD_THEME_RELEASE_TAG" ] || [ -n "$FD_ADMIN_UI_RELEASE_TAG" ] || [ -n "$FD_MEMBER_RELEASE_TAG" ] || [ -n "$FD_PAYMENT_RELEASE_TAG" ] || [ -n "$FD_COMMERCE_RELEASE_TAG" ] || [ -n "$FD_CONTENT_TYPES_RELEASE_TAG" ] || [ -n "$FD_WEBSOCKET_PUSH_RELEASE_TAG" ] || [ -n "$WPGRAPHQL_JWT_AUTH_RELEASE_TAG" ] || [ -n "$WPGRAPHQL_TAX_QUERY_REF" ]; then
+            if [ -n "$FD_THEME_RELEASE_TAG" ] || [ -n "$FD_ADMIN_UI_RELEASE_TAG" ] || [ -n "$FD_MEMBER_RELEASE_TAG" ] || [ -n "$FD_PAYMENT_RELEASE_TAG" ] || [ -n "$FD_COMMERCE_RELEASE_TAG" ] || [ -n "$FD_CONTENT_TYPES_RELEASE_TAG" ] || [ -n "$FD_AI_ROUTER_RELEASE_TAG" ] || [ -n "$FD_WEBSOCKET_PUSH_RELEASE_TAG" ] || [ -n "$WPGRAPHQL_JWT_AUTH_RELEASE_TAG" ] || [ -n "$WPGRAPHQL_TAX_QUERY_REF" ]; then
               ENV_FILE=.env \
               FD_THEME_RELEASE_TAG="$FD_THEME_RELEASE_TAG" \
               FD_ADMIN_UI_RELEASE_TAG="$FD_ADMIN_UI_RELEASE_TAG" \
@@ -191,6 +210,7 @@ jobs:
               FD_PAYMENT_RELEASE_TAG="$FD_PAYMENT_RELEASE_TAG" \
               FD_COMMERCE_RELEASE_TAG="$FD_COMMERCE_RELEASE_TAG" \
               FD_CONTENT_TYPES_RELEASE_TAG="$FD_CONTENT_TYPES_RELEASE_TAG" \
+              FD_AI_ROUTER_RELEASE_TAG="$FD_AI_ROUTER_RELEASE_TAG" \
               FD_WEBSOCKET_PUSH_RELEASE_TAG="$FD_WEBSOCKET_PUSH_RELEASE_TAG" \
               WPGRAPHQL_JWT_AUTH_RELEASE_TAG="$WPGRAPHQL_JWT_AUTH_RELEASE_TAG" \
               WPGRAPHQL_TAX_QUERY_REF="$WPGRAPHQL_TAX_QUERY_REF" \

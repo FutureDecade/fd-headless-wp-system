@@ -3,6 +3,12 @@
 .env.local
 .env.production
 .env.staging
+.env.ci
+.env.validate
+.env.asset
+.env.https
+.env.tags
+.env*.backup-*
 *.log
 *.sql
 *.sql.gz
