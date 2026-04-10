@@ -39,6 +39,10 @@ run_root_cmd() {
   run_cmd sudo "$@"
 }
 
+apt_update() {
+  run_root_cmd apt-get -o Acquire::ForceIPv4=true update
+}
+
 write_root_file() {
   local path="$1"
   local content="$2"
@@ -162,7 +166,7 @@ check_conflicting_docker_packages() {
 
 install_base_packages() {
   print_step "Installing base packages"
-  run_root_cmd apt-get update
+  apt_update
   run_root_cmd apt-get install -y \
     ca-certificates \
     curl \
@@ -187,7 +191,7 @@ install_docker() {
     "/etc/apt/sources.list.d/docker.list" \
     "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/${DISTRO_ID} ${DISTRO_CODENAME} ${DOCKER_CHANNEL}"
 
-  run_root_cmd apt-get update
+  apt_update
   run_root_cmd apt-get install -y \
     containerd.io \
     docker-buildx-plugin \
@@ -206,6 +210,12 @@ install_github_cli() {
   print_step "Installing GitHub CLI"
   require_command curl
 
+  if command -v gh >/dev/null 2>&1; then
+    echo "GitHub CLI already installed. Skipping reinstallation."
+    gh --version | head -n 1 || true
+    return 0
+  fi
+
   run_root_cmd install -m 0755 -d /usr/share/keyrings
   download_to_root_file \
     "https://cli.github.com/packages/githubcli-archive-keyring.gpg" \
@@ -216,7 +226,7 @@ install_github_cli() {
     "/etc/apt/sources.list.d/github-cli.list" \
     "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main"
 
-  run_root_cmd apt-get update
+  apt_update
   run_root_cmd apt-get install -y gh
 }
 

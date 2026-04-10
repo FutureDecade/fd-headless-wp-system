@@ -73,15 +73,30 @@ wait_for_wp_config() {
 wait_for_database() {
   local attempts=30
   local delay=3
+  local last_error=""
+  local check_output=""
 
   for ((i = 1; i <= attempts; i++)); do
-    if "${compose_base[@]}" exec -T wordpress php -r '$host = getenv("WORDPRESS_DB_HOST") ?: "db"; $db = getenv("WORDPRESS_DB_NAME"); $user = getenv("WORDPRESS_DB_USER"); $pass = getenv("WORDPRESS_DB_PASSWORD"); [$hostname, $port] = array_pad(explode(":", $host, 2), 2, 3306); $mysqli = @new mysqli($hostname, $user, $pass, $db, (int) $port); if ($mysqli->connect_errno) { fwrite(STDERR, $mysqli->connect_error . PHP_EOL); exit(1); } $mysqli->close();' >/dev/null 2>&1; then
+    check_output="$("${compose_base[@]}" exec -T wordpress php -r '$host = getenv("WORDPRESS_DB_HOST") ?: "db"; $db = getenv("WORDPRESS_DB_NAME"); $user = getenv("WORDPRESS_DB_USER"); $pass = getenv("WORDPRESS_DB_PASSWORD"); [$hostname, $port] = array_pad(explode(":", $host, 2), 2, 3306); mysqli_report(MYSQLI_REPORT_OFF); $mysqli = @new mysqli($hostname, $user, $pass, $db, (int) $port); if ($mysqli->connect_errno) { fwrite(STDERR, $mysqli->connect_error . PHP_EOL); exit(1); } $mysqli->close();' 2>&1)" && {
       return 0
+    }
+    last_error="${check_output}"
+
+    if [[ "${last_error}" == *"Access denied for user"* ]]; then
+      echo "WordPress database credentials do not match the existing MariaDB data volume."
+      echo "Current .env credentials were rejected by MariaDB."
+      echo "If this server is being re-installed from a fresh bootstrap token, clear the existing fd-headless-wp database volumes before retrying."
+      printf 'MariaDB said: %s\n' "${last_error}"
+      exit 1
     fi
+
     sleep "${delay}"
   done
 
   echo "Timed out waiting for WordPress database access"
+  if [[ -n "${last_error}" ]]; then
+    printf 'Last database error: %s\n' "${last_error}"
+  fi
   exit 1
 }
 
