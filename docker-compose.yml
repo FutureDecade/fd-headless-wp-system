@@ -104,6 +104,19 @@ services:
       FD_BOUND_HOST: ${FD_BOUND_HOST:-}
       REVALIDATE_SECRET: ${REVALIDATE_SECRET}
       NEXT_PUBLIC_SENTRY_DSN: ${NEXT_PUBLIC_SENTRY_DSN}
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >
+          if [ -n "$${FD_BOUND_HOST:-}" ] && [ "$${FD_DOMAIN_BINDING_SOURCE:-none}" != "none" ]; then
+            wget --no-verbose --tries=1 --header="Host: $${FD_BOUND_HOST}" --spider http://127.0.0.1:3000/api/health;
+          else
+            wget --no-verbose --tries=1 --spider http://127.0.0.1:3000/api/health;
+          fi
+      interval: 30s
+      timeout: 30s
+      start_period: 5s
+      retries: 3
     networks:
       - edge
 
