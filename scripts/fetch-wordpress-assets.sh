@@ -40,6 +40,7 @@ FD_COMMERCE_RELEASE_TAG="${FD_COMMERCE_RELEASE_TAG:-v1.0.0}"
 FD_CONTENT_TYPES_RELEASE_TAG="${FD_CONTENT_TYPES_RELEASE_TAG:-v0.4.1}"
 FD_AI_ROUTER_RELEASE_TAG="${FD_AI_ROUTER_RELEASE_TAG:-v2.2.1}"
 FD_WEBSOCKET_PUSH_RELEASE_TAG="${FD_WEBSOCKET_PUSH_RELEASE_TAG:-v1.0.1}"
+WPGRAPHQL_RELEASE_TAG="${WPGRAPHQL_RELEASE_TAG:-v2.3.3-fd.1}"
 WPGRAPHQL_JWT_AUTH_RELEASE_TAG="${WPGRAPHQL_JWT_AUTH_RELEASE_TAG:-v0.7.2}"
 WPGRAPHQL_TAX_QUERY_REF="${WPGRAPHQL_TAX_QUERY_REF:-v0.2.0}"
 
@@ -68,6 +69,7 @@ fd-commerce=${FD_COMMERCE_RELEASE_TAG}
 fd-content-types=${FD_CONTENT_TYPES_RELEASE_TAG}
 fd-ai-router=${FD_AI_ROUTER_RELEASE_TAG}
 fd-websocket-push=${FD_WEBSOCKET_PUSH_RELEASE_TAG}
+wp-graphql=${WPGRAPHQL_RELEASE_TAG}
 wp-graphql-jwt-authentication=${WPGRAPHQL_JWT_AUTH_RELEASE_TAG}
 wp-graphql-tax-query-develop=${WPGRAPHQL_TAX_QUERY_REF}
 EOF
@@ -107,6 +109,10 @@ assets_already_match() {
   fi
 
   if [[ ! -f "${PLUGINS_DIR}/fd-websocket-push/fd-websocket-push.php" ]]; then
+    return 1
+  fi
+
+  if [[ ! -f "${PLUGINS_DIR}/wp-graphql/wp-graphql.php" ]]; then
     return 1
   fi
 
@@ -247,6 +253,7 @@ download_release_asset "${WORDPRESS_RELEASE_OWNER}/fd-commerce" "${FD_COMMERCE_R
 download_release_asset "${WORDPRESS_RELEASE_OWNER}/fd-content-types" "${FD_CONTENT_TYPES_RELEASE_TAG}" "fd-content-types.zip" "fd-content-types" "${PLUGINS_DIR}/fd-content-types" "fd-content-types"
 download_release_asset "${WORDPRESS_RELEASE_OWNER}/fd-ai-router" "${FD_AI_ROUTER_RELEASE_TAG}" "fd-ai-router.zip" "fd-ai-router" "${PLUGINS_DIR}/fd-ai-router" "fd-ai-router" "fd-ai-router.php"
 download_release_asset "${WORDPRESS_RELEASE_OWNER}/fd-websocket-push" "${FD_WEBSOCKET_PUSH_RELEASE_TAG}" "fd-websocket-push.zip" "fd-websocket-push" "${PLUGINS_DIR}/fd-websocket-push" "fd-websocket-push"
+download_release_asset "${WORDPRESS_RELEASE_OWNER}/wp-graphql" "${WPGRAPHQL_RELEASE_TAG}" "wp-graphql.zip" "wp-graphql" "${PLUGINS_DIR}/wp-graphql" "wp-graphql" "wp-graphql.php"
 download_release_asset "wp-graphql/wp-graphql-jwt-authentication" "${WPGRAPHQL_JWT_AUTH_RELEASE_TAG}" "wp-graphql-jwt-authentication.zip" "wp-graphql-jwt-authentication" "${PLUGINS_DIR}/wp-graphql-jwt-authentication" "wp-graphql-jwt-authentication" "wp-graphql-jwt-authentication.php"
 download_repo_archive "wp-graphql/wp-graphql-tax-query" "${WPGRAPHQL_TAX_QUERY_REF}" "${PLUGINS_DIR}/wp-graphql-tax-query-develop" "wp-graphql-tax-query-develop"
 

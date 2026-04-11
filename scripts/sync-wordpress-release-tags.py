@@ -27,6 +27,7 @@ TAG_REPOS = {
     "FD_CONTENT_TYPES_RELEASE_TAG": "FutureDecade/fd-content-types",
     "FD_AI_ROUTER_RELEASE_TAG": "FutureDecade/fd-ai-router",
     "FD_WEBSOCKET_PUSH_RELEASE_TAG": "FutureDecade/fd-websocket-push",
+    "WPGRAPHQL_RELEASE_TAG": "FutureDecade/wp-graphql",
     "WPGRAPHQL_JWT_AUTH_RELEASE_TAG": "wp-graphql/wp-graphql-jwt-authentication",
     "WPGRAPHQL_TAX_QUERY_REF": "wp-graphql/wp-graphql-tax-query",
 }
@@ -40,6 +41,7 @@ CONFIGURE_DEFAULTS = {
     "fd_content_types_release_tag_default": "FD_CONTENT_TYPES_RELEASE_TAG",
     "fd_ai_router_release_tag_default": "FD_AI_ROUTER_RELEASE_TAG",
     "fd_websocket_push_release_tag_default": "FD_WEBSOCKET_PUSH_RELEASE_TAG",
+    "wpgraphql_release_tag_default": "WPGRAPHQL_RELEASE_TAG",
     "wpgraphql_jwt_auth_release_tag_default": "WPGRAPHQL_JWT_AUTH_RELEASE_TAG",
     "wpgraphql_tax_query_ref_default": "WPGRAPHQL_TAX_QUERY_REF",
 }
@@ -53,6 +55,7 @@ UPDATE_STACK_KEYS = {
     "fd-content-types": "FD_CONTENT_TYPES_RELEASE_TAG",
     "fd-ai-router": "FD_AI_ROUTER_RELEASE_TAG",
     "fd-websocket-push": "FD_WEBSOCKET_PUSH_RELEASE_TAG",
+    "wp-graphql": "WPGRAPHQL_RELEASE_TAG",
     "wp-graphql-jwt-authentication": "WPGRAPHQL_JWT_AUTH_RELEASE_TAG",
     "wp-graphql-tax-query-develop": "WPGRAPHQL_TAX_QUERY_REF",
 }

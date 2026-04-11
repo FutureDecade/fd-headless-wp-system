@@ -214,6 +214,17 @@
       "group": "release"
     },
     {
+      "key": "WPGRAPHQL_RELEASE_TAG",
+      "label": "WPGraphQL Release Tag",
+      "type": "text",
+      "scope": "preset",
+      "required": true,
+      "editable": true,
+      "advanced": true,
+      "defaultValue": "v2.3.3-fd.1",
+      "group": "release"
+    },
+    {
       "key": "WPGRAPHQL_JWT_AUTH_RELEASE_TAG",
       "label": "WPGraphQL JWT Auth Release Tag",
       "type": "text",

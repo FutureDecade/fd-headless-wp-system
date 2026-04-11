@@ -72,6 +72,7 @@ fd-commerce=${FD_COMMERCE_RELEASE_TAG:-v1.0.0}
 fd-content-types=${FD_CONTENT_TYPES_RELEASE_TAG:-v0.4.1}
 fd-ai-router=${FD_AI_ROUTER_RELEASE_TAG:-v2.2.1}
 fd-websocket-push=${FD_WEBSOCKET_PUSH_RELEASE_TAG:-v1.0.1}
+wp-graphql=${WPGRAPHQL_RELEASE_TAG:-v2.3.3-fd.1}
 wp-graphql-jwt-authentication=${WPGRAPHQL_JWT_AUTH_RELEASE_TAG:-v0.7.2}
 wp-graphql-tax-query-develop=${WPGRAPHQL_TAX_QUERY_REF:-v0.2.0}
 EOF
@@ -117,6 +118,10 @@ need_wordpress_asset_sync() {
   fi
 
   if [[ ! -f "${ROOT_DIR}/runtime/wp-content/plugins/fd-websocket-push/fd-websocket-push.php" ]]; then
+    return 0
+  fi
+
+  if [[ ! -f "${ROOT_DIR}/runtime/wp-content/plugins/wp-graphql/wp-graphql.php" ]]; then
     return 0
   fi
 

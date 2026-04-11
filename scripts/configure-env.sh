@@ -317,6 +317,7 @@ fd_commerce_release_tag_default="${FD_COMMERCE_RELEASE_TAG:-v1.0.0}"
 fd_content_types_release_tag_default="${FD_CONTENT_TYPES_RELEASE_TAG:-v0.4.1}"
 fd_ai_router_release_tag_default="${FD_AI_ROUTER_RELEASE_TAG:-v2.2.1}"
 fd_websocket_push_release_tag_default="${FD_WEBSOCKET_PUSH_RELEASE_TAG:-v1.0.1}"
+wpgraphql_release_tag_default="${WPGRAPHQL_RELEASE_TAG:-v2.3.3-fd.1}"
 wpgraphql_jwt_auth_release_tag_default="${WPGRAPHQL_JWT_AUTH_RELEASE_TAG:-v0.7.2}"
 wpgraphql_tax_query_ref_default="${WPGRAPHQL_TAX_QUERY_REF:-v0.2.0}"
 wordpress_title_default="${WORDPRESS_TITLE:-FD Headless WP}"
@@ -477,6 +478,7 @@ if [[ "${wordpress_fetch_release_assets}" == "true" ]]; then
     fd_content_types_release_tag="${fd_content_types_release_tag_default}"
     fd_ai_router_release_tag="${fd_ai_router_release_tag_default}"
     fd_websocket_push_release_tag="${fd_websocket_push_release_tag_default}"
+    wpgraphql_release_tag="${wpgraphql_release_tag_default}"
     wpgraphql_jwt_auth_release_tag="${wpgraphql_jwt_auth_release_tag_default}"
     wpgraphql_tax_query_ref="${wpgraphql_tax_query_ref_default}"
   else
@@ -489,6 +491,7 @@ if [[ "${wordpress_fetch_release_assets}" == "true" ]]; then
     fd_content_types_release_tag="$(prompt_required_value "fd-content-types release tag" "${fd_content_types_release_tag_default}")"
     fd_ai_router_release_tag="$(prompt_required_value "fd-ai-router release tag" "${fd_ai_router_release_tag_default}")"
     fd_websocket_push_release_tag="$(prompt_required_value "fd-websocket-push release tag" "${fd_websocket_push_release_tag_default}")"
+    wpgraphql_release_tag="$(prompt_required_value "wp-graphql release tag" "${wpgraphql_release_tag_default}")"
     wpgraphql_jwt_auth_release_tag="$(prompt_required_value "wp-graphql-jwt-authentication release tag" "${wpgraphql_jwt_auth_release_tag_default}")"
     wpgraphql_tax_query_ref="$(prompt_required_value "wp-graphql-tax-query ref" "${wpgraphql_tax_query_ref_default}")"
   fi
@@ -502,6 +505,7 @@ if [[ "${wordpress_fetch_release_assets}" == "true" ]]; then
   set_env_value "${ENV_FILE}" "FD_CONTENT_TYPES_RELEASE_TAG" "${fd_content_types_release_tag}"
   set_env_value "${ENV_FILE}" "FD_AI_ROUTER_RELEASE_TAG" "${fd_ai_router_release_tag}"
   set_env_value "${ENV_FILE}" "FD_WEBSOCKET_PUSH_RELEASE_TAG" "${fd_websocket_push_release_tag}"
+  set_env_value "${ENV_FILE}" "WPGRAPHQL_RELEASE_TAG" "${wpgraphql_release_tag}"
   set_env_value "${ENV_FILE}" "WPGRAPHQL_JWT_AUTH_RELEASE_TAG" "${wpgraphql_jwt_auth_release_tag}"
   set_env_value "${ENV_FILE}" "WPGRAPHQL_TAX_QUERY_REF" "${wpgraphql_tax_query_ref}"
 fi

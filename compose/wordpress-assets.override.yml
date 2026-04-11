@@ -9,6 +9,7 @@ services:
       - ./runtime/wp-content/plugins/fd-content-types:/var/www/html/wp-content/plugins/fd-content-types:ro
       - ./runtime/wp-content/plugins/fd-ai-router:/var/www/html/wp-content/plugins/fd-ai-router:ro
       - ./runtime/wp-content/plugins/fd-websocket-push:/var/www/html/wp-content/plugins/fd-websocket-push:ro
+      - ./runtime/wp-content/plugins/wp-graphql:/var/www/html/wp-content/plugins/wp-graphql:ro
       - ./runtime/wp-content/plugins/wp-graphql-jwt-authentication:/var/www/html/wp-content/plugins/wp-graphql-jwt-authentication:ro
       - ./runtime/wp-content/plugins/wp-graphql-tax-query-develop:/var/www/html/wp-content/plugins/wp-graphql-tax-query-develop:ro
   wpcli:
@@ -21,5 +22,6 @@ services:
       - ./runtime/wp-content/plugins/fd-content-types:/var/www/html/wp-content/plugins/fd-content-types:ro
       - ./runtime/wp-content/plugins/fd-ai-router:/var/www/html/wp-content/plugins/fd-ai-router:ro
       - ./runtime/wp-content/plugins/fd-websocket-push:/var/www/html/wp-content/plugins/fd-websocket-push:ro
+      - ./runtime/wp-content/plugins/wp-graphql:/var/www/html/wp-content/plugins/wp-graphql:ro
       - ./runtime/wp-content/plugins/wp-graphql-jwt-authentication:/var/www/html/wp-content/plugins/wp-graphql-jwt-authentication:ro
       - ./runtime/wp-content/plugins/wp-graphql-tax-query-develop:/var/www/html/wp-content/plugins/wp-graphql-tax-query-develop:ro
