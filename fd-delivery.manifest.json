@@ -133,7 +133,7 @@
       "required": true,
       "editable": true,
       "advanced": true,
-      "defaultValue": "v1.0.9",
+      "defaultValue": "v1.0.10",
       "group": "release"
     },
     {
@@ -155,7 +155,7 @@
       "required": true,
       "editable": true,
       "advanced": true,
-      "defaultValue": "v1.0.3",
+      "defaultValue": "v1.0.4",
       "group": "release"
     },
     {
@@ -199,7 +199,7 @@
       "required": true,
       "editable": true,
       "advanced": true,
-      "defaultValue": "v2.2.2",
+      "defaultValue": "v2.2.3",
       "group": "release"
     },
     {
@@ -211,17 +211,6 @@
       "editable": true,
       "advanced": true,
       "defaultValue": "v1.0.2",
-      "group": "release"
-    },
-    {
-      "key": "WPGRAPHQL_RELEASE_TAG",
-      "label": "WPGraphQL Release Tag",
-      "type": "text",
-      "scope": "preset",
-      "required": true,
-      "editable": true,
-      "advanced": true,
-      "defaultValue": "v2.3.3-fd.1",
       "group": "release"
     },
     {
