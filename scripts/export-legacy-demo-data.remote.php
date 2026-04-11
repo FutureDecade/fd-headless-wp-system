@@ -594,6 +594,7 @@ $export = array(
         'template' => get_option('template'),
         'nav_menu_locations' => get_theme_mod('nav_menu_locations'),
     ),
+    'homepage_layout' => get_option('fd_homepage_layout', ''),
     'menus' => array(
         'primary' => array(
             'location' => 'primary-menu',

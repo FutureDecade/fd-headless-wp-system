@@ -713,6 +713,27 @@ function fd_demo_configure_site(array $site, array $state): void
     update_option('page_for_posts', $pageForPosts);
 }
 
+function fd_demo_import_homepage_layout(array $package): void
+{
+    $layoutData = $package['homepage_layout'] ?? null;
+
+    if ($layoutData === null || $layoutData === '' || $layoutData === false) {
+        return;
+    }
+
+    if (is_array($layoutData)) {
+        update_option('fd_homepage_layout', wp_json_encode($layoutData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), false);
+        return;
+    }
+
+    if (is_string($layoutData)) {
+        $decoded = json_decode($layoutData, true);
+        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+            update_option('fd_homepage_layout', $layoutData, false);
+        }
+    }
+}
+
 function fd_demo_menu_item_url(array $item, array $state): string
 {
     $frontendBase = fd_demo_frontend_base_url();
@@ -864,9 +885,27 @@ function fd_demo_configure_frontend_options(array $package): void
     ]);
 }
 
+function fd_demo_recount_terms(array $state): void
+{
+    foreach ((array) ($state['terms'] ?? []) as $taxonomy => $termsBySlug) {
+        if (!taxonomy_exists($taxonomy) || !is_array($termsBySlug)) {
+            continue;
+        }
+
+        $termIds = array_values(array_filter(array_map('intval', array_values($termsBySlug))));
+        if (empty($termIds)) {
+            continue;
+        }
+
+        wp_update_term_count_now($termIds, $taxonomy);
+        clean_term_cache($termIds, $taxonomy);
+    }
+}
+
 [$jsonPath, $forceImport] = fd_demo_parse_args();
 
 $package = fd_demo_load_package($jsonPath);
+$contentPackage = is_array($package['content'] ?? null) ? $package['content'] : $package;
 $signature = fd_demo_package_signature($jsonPath);
 $existingSignature = (string) get_option('fd_demo_data_version', '');
 
@@ -892,16 +931,18 @@ try {
     fd_demo_import_terms((array) ($package['terms'] ?? []), $state);
     fd_demo_import_assets((array) ($package['assets'] ?? []), $state);
 
-    fd_demo_import_content_items((array) ($package['pages'] ?? []), 'pages', 'page', $state, 'fd_demo_map_note_meta');
-    fd_demo_import_content_items((array) ($package['posts'] ?? []), 'posts', 'post', $state, 'fd_demo_map_post_meta');
-    fd_demo_import_content_items((array) ($package['notes'] ?? []), 'notes', 'note', $state, 'fd_demo_map_note_meta');
-    fd_demo_import_content_items((array) ($package['apps'] ?? []), 'apps', 'app', $state, 'fd_demo_map_app_meta');
-    fd_demo_import_content_items((array) ($package['events'] ?? []), 'events', 'event', $state, 'fd_demo_map_event_meta');
-    fd_demo_import_content_items((array) ($package['products'] ?? []), 'products', 'product', $state, 'fd_demo_map_product_meta');
+    fd_demo_import_content_items((array) ($contentPackage['pages'] ?? []), 'pages', 'page', $state, 'fd_demo_map_note_meta');
+    fd_demo_import_content_items((array) ($contentPackage['posts'] ?? []), 'posts', 'post', $state, 'fd_demo_map_post_meta');
+    fd_demo_import_content_items((array) ($contentPackage['notes'] ?? []), 'notes', 'note', $state, 'fd_demo_map_note_meta');
+    fd_demo_import_content_items((array) ($contentPackage['apps'] ?? []), 'apps', 'app', $state, 'fd_demo_map_app_meta');
+    fd_demo_import_content_items((array) ($contentPackage['events'] ?? []), 'events', 'event', $state, 'fd_demo_map_event_meta');
+    fd_demo_import_content_items((array) ($contentPackage['products'] ?? []), 'products', 'product', $state, 'fd_demo_map_product_meta');
 
     fd_demo_configure_frontend_options($package);
     fd_demo_configure_site((array) ($package['site'] ?? []), $state);
+    fd_demo_import_homepage_layout($package);
     fd_demo_import_menus((array) ($package['menus'] ?? []), $state);
+    fd_demo_recount_terms($state);
 
     if (function_exists('fd_rebuild_slug_mapping_table')) {
         fd_rebuild_slug_mapping_table();
