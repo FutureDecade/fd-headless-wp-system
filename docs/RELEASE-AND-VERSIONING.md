@@ -22,12 +22,12 @@
 
 ## 当前推荐默认版本
 
-- `fd-theme`：`v1.0.9`
-- `fd-member`：`v1.0.3`
+- `fd-theme`：`v1.0.11`
+- `fd-member`：`v1.0.5`
 - `fd-payment`：`v1.0.2`
 - `fd-commerce`：`v1.0.0`
-- `fd-content-types`：`v0.4.2`
-- `fd-ai-router`：`v2.2.2`
+- `fd-content-types`：`v0.4.4`
+- `fd-ai-router`：`v2.2.4`
 
 对应 release asset：
 
