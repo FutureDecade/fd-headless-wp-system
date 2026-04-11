@@ -64,14 +64,14 @@ compose_tools=(
 
 desired_assets_lock() {
   cat <<EOF
-fd-theme=${FD_THEME_RELEASE_TAG:-v1.0.8}
+fd-theme=${FD_THEME_RELEASE_TAG:-v1.0.9}
 fd-admin-ui=${FD_ADMIN_UI_RELEASE_TAG:-v1.3.2}
-fd-member=${FD_MEMBER_RELEASE_TAG:-v1.0.2}
-fd-payment=${FD_PAYMENT_RELEASE_TAG:-v1.0.1}
+fd-member=${FD_MEMBER_RELEASE_TAG:-v1.0.3}
+fd-payment=${FD_PAYMENT_RELEASE_TAG:-v1.0.2}
 fd-commerce=${FD_COMMERCE_RELEASE_TAG:-v1.0.0}
-fd-content-types=${FD_CONTENT_TYPES_RELEASE_TAG:-v0.4.1}
-fd-ai-router=${FD_AI_ROUTER_RELEASE_TAG:-v2.2.1}
-fd-websocket-push=${FD_WEBSOCKET_PUSH_RELEASE_TAG:-v1.0.1}
+fd-content-types=${FD_CONTENT_TYPES_RELEASE_TAG:-v0.4.2}
+fd-ai-router=${FD_AI_ROUTER_RELEASE_TAG:-v2.2.2}
+fd-websocket-push=${FD_WEBSOCKET_PUSH_RELEASE_TAG:-v1.0.2}
 wp-graphql=${WPGRAPHQL_RELEASE_TAG:-v2.3.3-fd.1}
 wp-graphql-jwt-authentication=${WPGRAPHQL_JWT_AUTH_RELEASE_TAG:-v0.7.2}
 wp-graphql-tax-query-develop=${WPGRAPHQL_TAX_QUERY_REF:-v0.2.0}
