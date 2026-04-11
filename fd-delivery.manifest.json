@@ -188,7 +188,7 @@
       "required": true,
       "editable": true,
       "advanced": true,
-      "defaultValue": "v0.4.2",
+      "defaultValue": "v0.4.3",
       "group": "release"
     },
     {
