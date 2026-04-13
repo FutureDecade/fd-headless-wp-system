@@ -604,6 +604,165 @@ function fd_demo_map_product_meta(array $item, array &$state): array
     return $meta;
 }
 
+function fd_demo_normalize_spec_snapshot(array $snapshot): array
+{
+    ksort($snapshot);
+
+    return $snapshot;
+}
+
+function fd_demo_reset_product_commerce_data(int $postId): void
+{
+    global $wpdb;
+
+    $specGroupsTable = $wpdb->prefix . 'fd_spec_groups';
+    $specValuesTable = $wpdb->prefix . 'fd_spec_values';
+    $skusTable = $wpdb->prefix . 'fd_product_skus';
+
+    $wpdb->delete($skusTable, ['product_id' => $postId], ['%d']);
+    $wpdb->delete($specValuesTable, ['product_id' => $postId], ['%d']);
+    $wpdb->delete($specGroupsTable, ['product_id' => $postId], ['%d']);
+}
+
+function fd_demo_sync_product_specs_and_skus(int $postId, array $item, array &$state): void
+{
+    if (
+        !class_exists('FD_Commerce_Spec_Group') ||
+        !class_exists('FD_Commerce_Spec_Value') ||
+        !class_exists('FD_Commerce_SKU') ||
+        !class_exists('FD_Commerce_SKU_Generator')
+    ) {
+        return;
+    }
+
+    $commerce = $item['commerce'] ?? [];
+    $specGroups = $commerce['spec_groups'] ?? [];
+    $skuOverrides = $commerce['sku_overrides'] ?? [];
+
+    if (!is_array($specGroups) || empty($specGroups)) {
+        return;
+    }
+
+    fd_demo_reset_product_commerce_data($postId);
+
+    foreach (array_values($specGroups) as $groupIndex => $groupData) {
+        if (!is_array($groupData)) {
+            continue;
+        }
+
+        $groupName = sanitize_text_field((string) ($groupData['name'] ?? ''));
+        if ($groupName === '') {
+            continue;
+        }
+
+        $groupId = FD_Commerce_Spec_Group::create([
+            'product_id' => $postId,
+            'name' => $groupName,
+            'sort_order' => isset($groupData['sort_order']) ? absint($groupData['sort_order']) : $groupIndex,
+        ]);
+
+        $values = $groupData['values'] ?? [];
+        if (!is_array($values)) {
+            continue;
+        }
+
+        foreach (array_values($values) as $valueIndex => $valueData) {
+            if (!is_array($valueData)) {
+                continue;
+            }
+
+            $valueText = sanitize_text_field((string) ($valueData['value'] ?? ''));
+            if ($valueText === '') {
+                continue;
+            }
+
+            $imageId = 0;
+            if (!empty($valueData['image'])) {
+                $imageId = fd_demo_attachment_id_from_ref($valueData['image'], $state);
+            }
+
+            FD_Commerce_Spec_Value::create([
+                'group_id' => $groupId,
+                'product_id' => $postId,
+                'value' => $valueText,
+                'sort_order' => isset($valueData['sort_order']) ? absint($valueData['sort_order']) : $valueIndex,
+                'image_id' => $imageId ?: null,
+            ]);
+        }
+    }
+
+    FD_Commerce_SKU_Generator::regenerate($postId);
+
+    if (!empty($skuOverrides) && is_array($skuOverrides)) {
+        $skus = FD_Commerce_SKU::get_by_product($postId, false);
+
+        foreach ($skus as $sku) {
+            $snapshot = json_decode((string) $sku->spec_snapshot, true);
+            if (!is_array($snapshot)) {
+                continue;
+            }
+
+            $snapshot = fd_demo_normalize_spec_snapshot($snapshot);
+
+            foreach ($skuOverrides as $override) {
+                if (!is_array($override) || empty($override['snapshot']) || !is_array($override['snapshot'])) {
+                    continue;
+                }
+
+                if (fd_demo_normalize_spec_snapshot($override['snapshot']) !== $snapshot) {
+                    continue;
+                }
+
+                $update = [];
+
+                if (!empty($override['sku_code'])) {
+                    $update['sku_code'] = sanitize_text_field((string) $override['sku_code']);
+                }
+                if (array_key_exists('price', $override)) {
+                    $update['price'] = floatval($override['price']);
+                }
+                if (array_key_exists('original_price', $override)) {
+                    $update['original_price'] = $override['original_price'] === null ? null : floatval($override['original_price']);
+                }
+                if (array_key_exists('cost_price', $override)) {
+                    $update['cost_price'] = $override['cost_price'] === null ? null : floatval($override['cost_price']);
+                }
+                if (array_key_exists('member_price', $override)) {
+                    $update['member_price'] = $override['member_price'] === null ? null : floatval($override['member_price']);
+                }
+                if (array_key_exists('stock', $override)) {
+                    $update['stock'] = intval($override['stock']);
+                }
+                if (array_key_exists('barcode', $override)) {
+                    $update['barcode'] = sanitize_text_field((string) $override['barcode']);
+                }
+                if (array_key_exists('is_active', $override)) {
+                    $update['is_active'] = !empty($override['is_active']) ? 1 : 0;
+                }
+                if (array_key_exists('sort_order', $override)) {
+                    $update['sort_order'] = absint($override['sort_order']);
+                }
+                if (array_key_exists('image', $override)) {
+                    $imageId = fd_demo_attachment_id_from_ref($override['image'], $state);
+                    if ($imageId) {
+                        $update['image_id'] = $imageId;
+                    }
+                }
+
+                if (!empty($update)) {
+                    FD_Commerce_SKU::update((int) $sku->id, $update);
+                }
+
+                break;
+            }
+        }
+    }
+
+    if (class_exists('FD_Commerce_Stock_Service')) {
+        FD_Commerce_Stock_Service::sync_spu_stock($postId);
+    }
+}
+
 function fd_demo_import_content_items(
     array $items,
     string $label,
@@ -675,6 +834,10 @@ function fd_demo_import_content_items(
             foreach ($meta as $metaKey => $metaValue) {
                 fd_demo_upsert_meta($postId, (string) $metaKey, $metaValue);
             }
+        }
+
+        if ($postType === 'product') {
+            fd_demo_sync_product_specs_and_skus($postId, $item, $state);
         }
     }
 

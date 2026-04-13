@@ -34,6 +34,7 @@ services:
         define('WP_HOME', '${PUBLIC_SCHEME}://${ADMIN_DOMAIN}');
         define('WP_SITEURL', '${PUBLIC_SCHEME}://${ADMIN_DOMAIN}');
         define('FD_FRONTEND_URL', '${PUBLIC_SCHEME}://${FRONTEND_DOMAIN}');
+        define('GRAPHQL_JWT_AUTH_SECRET_KEY', '${JWT_SECRET}');
         define('FD_WEBSOCKET_PUSH_SECRET', '${PUSH_SECRET}');
         define('REVALIDATE_SECRET', '${REVALIDATE_SECRET}');
         define('WP_REDIS_HOST', 'redis');
@@ -64,6 +65,7 @@ services:
         define('WP_HOME', '${PUBLIC_SCHEME}://${ADMIN_DOMAIN}');
         define('WP_SITEURL', '${PUBLIC_SCHEME}://${ADMIN_DOMAIN}');
         define('FD_FRONTEND_URL', '${PUBLIC_SCHEME}://${FRONTEND_DOMAIN}');
+        define('GRAPHQL_JWT_AUTH_SECRET_KEY', '${JWT_SECRET}');
         define('FD_WEBSOCKET_PUSH_SECRET', '${PUSH_SECRET}');
         define('REVALIDATE_SECRET', '${REVALIDATE_SECRET}');
         define('WP_REDIS_HOST', 'redis');
