@@ -309,7 +309,8 @@ frontend_image_default="${FRONTEND_IMAGE:-}"
 websocket_image_default="${WEBSOCKET_IMAGE:-}"
 letsencrypt_email_default="${LETSENCRYPT_EMAIL:-}"
 wordpress_release_owner_default="${WORDPRESS_RELEASE_OWNER:-FutureDecade}"
-fd_theme_release_tag_default="${FD_THEME_RELEASE_TAG:-v1.0.11}"
+fd_theme_release_tag_default="${FD_THEME_RELEASE_TAG:-v1.1.0}"
+fd_page_composer_release_tag_default="${FD_PAGE_COMPOSER_RELEASE_TAG:-v0.2.0}"
 fd_admin_ui_release_tag_default="${FD_ADMIN_UI_RELEASE_TAG:-v1.3.2}"
 fd_member_release_tag_default="${FD_MEMBER_RELEASE_TAG:-v1.0.5}"
 fd_payment_release_tag_default="${FD_PAYMENT_RELEASE_TAG:-v1.0.2}"
@@ -471,6 +472,7 @@ if [[ "${wordpress_fetch_release_assets}" == "true" ]]; then
   if [[ "${stack_bootstrap_mode}" == "true" ]]; then
     wordpress_release_owner="${wordpress_release_owner_default}"
     fd_theme_release_tag="${fd_theme_release_tag_default}"
+    fd_page_composer_release_tag="${fd_page_composer_release_tag_default}"
     fd_admin_ui_release_tag="${fd_admin_ui_release_tag_default}"
     fd_member_release_tag="${fd_member_release_tag_default}"
     fd_payment_release_tag="${fd_payment_release_tag_default}"
@@ -484,6 +486,7 @@ if [[ "${wordpress_fetch_release_assets}" == "true" ]]; then
   else
     wordpress_release_owner="$(prompt_required_value "GitHub 发布账号或组织" "${wordpress_release_owner_default}")"
     fd_theme_release_tag="$(prompt_required_value "fd-theme release tag" "${fd_theme_release_tag_default}")"
+    fd_page_composer_release_tag="$(prompt_required_value "fd-page-composer release tag" "${fd_page_composer_release_tag_default}")"
     fd_admin_ui_release_tag="$(prompt_required_value "fd-admin-ui release tag" "${fd_admin_ui_release_tag_default}")"
     fd_member_release_tag="$(prompt_required_value "fd-member release tag" "${fd_member_release_tag_default}")"
     fd_payment_release_tag="$(prompt_required_value "fd-payment release tag" "${fd_payment_release_tag_default}")"
@@ -498,6 +501,7 @@ if [[ "${wordpress_fetch_release_assets}" == "true" ]]; then
 
   set_env_value "${ENV_FILE}" "WORDPRESS_RELEASE_OWNER" "${wordpress_release_owner}"
   set_env_value "${ENV_FILE}" "FD_THEME_RELEASE_TAG" "${fd_theme_release_tag}"
+  set_env_value "${ENV_FILE}" "FD_PAGE_COMPOSER_RELEASE_TAG" "${fd_page_composer_release_tag}"
   set_env_value "${ENV_FILE}" "FD_ADMIN_UI_RELEASE_TAG" "${fd_admin_ui_release_tag}"
   set_env_value "${ENV_FILE}" "FD_MEMBER_RELEASE_TAG" "${fd_member_release_tag}"
   set_env_value "${ENV_FILE}" "FD_PAYMENT_RELEASE_TAG" "${fd_payment_release_tag}"

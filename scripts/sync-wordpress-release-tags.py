@@ -20,6 +20,7 @@ UPDATE_STACK_FILE = ROOT_DIR / "scripts" / "update-stack.sh"
 
 TAG_REPOS = {
     "FD_THEME_RELEASE_TAG": "FutureDecade/fd-theme",
+    "FD_PAGE_COMPOSER_RELEASE_TAG": "FutureDecade/fd-page-composer",
     "FD_ADMIN_UI_RELEASE_TAG": "FutureDecade/fd-admin-ui",
     "FD_MEMBER_RELEASE_TAG": "FutureDecade/fd-member",
     "FD_PAYMENT_RELEASE_TAG": "FutureDecade/fd-payment",
@@ -34,6 +35,7 @@ TAG_REPOS = {
 
 CONFIGURE_DEFAULTS = {
     "fd_theme_release_tag_default": "FD_THEME_RELEASE_TAG",
+    "fd_page_composer_release_tag_default": "FD_PAGE_COMPOSER_RELEASE_TAG",
     "fd_admin_ui_release_tag_default": "FD_ADMIN_UI_RELEASE_TAG",
     "fd_member_release_tag_default": "FD_MEMBER_RELEASE_TAG",
     "fd_payment_release_tag_default": "FD_PAYMENT_RELEASE_TAG",
@@ -48,6 +50,7 @@ CONFIGURE_DEFAULTS = {
 
 UPDATE_STACK_KEYS = {
     "fd-theme": "FD_THEME_RELEASE_TAG",
+    "fd-page-composer": "FD_PAGE_COMPOSER_RELEASE_TAG",
     "fd-admin-ui": "FD_ADMIN_UI_RELEASE_TAG",
     "fd-member": "FD_MEMBER_RELEASE_TAG",
     "fd-payment": "FD_PAYMENT_RELEASE_TAG",
@@ -62,6 +65,7 @@ UPDATE_STACK_KEYS = {
 
 DOC_SLUG_KEYS = {
     "fd-theme": "FD_THEME_RELEASE_TAG",
+    "fd-page-composer": "FD_PAGE_COMPOSER_RELEASE_TAG",
     "fd-admin-ui": "FD_ADMIN_UI_RELEASE_TAG",
     "fd-member": "FD_MEMBER_RELEASE_TAG",
     "fd-payment": "FD_PAYMENT_RELEASE_TAG",

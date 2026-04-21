@@ -163,7 +163,8 @@ if [[ -n "${HTTPS_PORT:-}" && ! "${HTTPS_PORT}" =~ ^[0-9]+$ ]]; then
 fi
 
 FORCE_WORDPRESS_ASSET_FETCH="${FORCE_WORDPRESS_ASSET_FETCH:-false}"
-FD_THEME_RELEASE_TAG="${FD_THEME_RELEASE_TAG:-v1.0.11}"
+FD_THEME_RELEASE_TAG="${FD_THEME_RELEASE_TAG:-v1.1.0}"
+FD_PAGE_COMPOSER_RELEASE_TAG="${FD_PAGE_COMPOSER_RELEASE_TAG:-v0.2.0}"
 FD_ADMIN_UI_RELEASE_TAG="${FD_ADMIN_UI_RELEASE_TAG:-v1.3.2}"
 FD_MEMBER_RELEASE_TAG="${FD_MEMBER_RELEASE_TAG:-v1.0.5}"
 FD_PAYMENT_RELEASE_TAG="${FD_PAYMENT_RELEASE_TAG:-v1.0.2}"
@@ -202,6 +203,10 @@ need_wordpress_asset_fetch() {
     return 0
   fi
 
+  if [[ ! -f "${ROOT_DIR}/runtime/wp-content/plugins/fd-page-composer/fd-page-composer.php" ]]; then
+    return 0
+  fi
+
   if [[ ! -f "${ROOT_DIR}/runtime/wp-content/plugins/fd-member/index.php" ]]; then
     return 0
   fi
@@ -237,6 +242,7 @@ need_wordpress_asset_fetch() {
   local expected_lock
   expected_lock="$(cat <<EOF
 fd-theme=${FD_THEME_RELEASE_TAG}
+fd-page-composer=${FD_PAGE_COMPOSER_RELEASE_TAG}
 fd-admin-ui=${FD_ADMIN_UI_RELEASE_TAG}
 fd-member=${FD_MEMBER_RELEASE_TAG}
 fd-payment=${FD_PAYMENT_RELEASE_TAG}

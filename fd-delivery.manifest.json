@@ -133,7 +133,18 @@
       "required": true,
       "editable": true,
       "advanced": true,
-      "defaultValue": "v1.0.11",
+      "defaultValue": "v1.1.0",
+      "group": "release"
+    },
+    {
+      "key": "FD_PAGE_COMPOSER_RELEASE_TAG",
+      "label": "fd-page-composer Release Tag",
+      "type": "text",
+      "scope": "preset",
+      "required": true,
+      "editable": true,
+      "advanced": true,
+      "defaultValue": "v0.2.0",
       "group": "release"
     },
     {

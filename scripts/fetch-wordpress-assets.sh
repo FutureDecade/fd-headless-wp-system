@@ -32,7 +32,8 @@ if [[ "${WORDPRESS_FETCH_RELEASE_ASSETS}" != "true" ]]; then
 fi
 
 WORDPRESS_RELEASE_OWNER="${WORDPRESS_RELEASE_OWNER:-FutureDecade}"
-FD_THEME_RELEASE_TAG="${FD_THEME_RELEASE_TAG:-v1.0.11}"
+FD_THEME_RELEASE_TAG="${FD_THEME_RELEASE_TAG:-v1.1.0}"
+FD_PAGE_COMPOSER_RELEASE_TAG="${FD_PAGE_COMPOSER_RELEASE_TAG:-v0.2.0}"
 FD_ADMIN_UI_RELEASE_TAG="${FD_ADMIN_UI_RELEASE_TAG:-v1.3.2}"
 FD_MEMBER_RELEASE_TAG="${FD_MEMBER_RELEASE_TAG:-v1.0.5}"
 FD_PAYMENT_RELEASE_TAG="${FD_PAYMENT_RELEASE_TAG:-v1.0.2}"
@@ -62,6 +63,7 @@ mkdir -p "${THEMES_DIR}" "${PLUGINS_DIR}"
 desired_assets_lock() {
   cat <<EOF
 fd-theme=${FD_THEME_RELEASE_TAG}
+fd-page-composer=${FD_PAGE_COMPOSER_RELEASE_TAG}
 fd-admin-ui=${FD_ADMIN_UI_RELEASE_TAG}
 fd-member=${FD_MEMBER_RELEASE_TAG}
 fd-payment=${FD_PAYMENT_RELEASE_TAG}
@@ -85,6 +87,10 @@ assets_already_match() {
   fi
 
   if [[ ! -f "${PLUGINS_DIR}/fd-admin-ui/fd-admin-ui.php" ]]; then
+    return 1
+  fi
+
+  if [[ ! -f "${PLUGINS_DIR}/fd-page-composer/fd-page-composer.php" ]]; then
     return 1
   fi
 
@@ -246,6 +252,7 @@ download_repo_archive() {
 }
 
 download_release_asset "${WORDPRESS_RELEASE_OWNER}/fd-theme" "${FD_THEME_RELEASE_TAG}" "fd-theme.zip" "fd-theme" "${THEMES_DIR}/fd-theme" "fd-theme"
+download_release_asset "${WORDPRESS_RELEASE_OWNER}/fd-page-composer" "${FD_PAGE_COMPOSER_RELEASE_TAG}" "fd-page-composer.zip" "fd-page-composer" "${PLUGINS_DIR}/fd-page-composer" "fd-page-composer" "fd-page-composer.php"
 download_release_asset "${WORDPRESS_RELEASE_OWNER}/fd-admin-ui" "${FD_ADMIN_UI_RELEASE_TAG}" "fd-admin-ui.zip" "fd-admin-ui" "${PLUGINS_DIR}/fd-admin-ui" "fd-admin-ui"
 download_release_asset "${WORDPRESS_RELEASE_OWNER}/fd-member" "${FD_MEMBER_RELEASE_TAG}" "fd-member.zip" "fd-member" "${PLUGINS_DIR}/fd-member" "fd-member"
 download_release_asset "${WORDPRESS_RELEASE_OWNER}/fd-payment" "${FD_PAYMENT_RELEASE_TAG}" "fd-payment.zip" "fd-payment" "${PLUGINS_DIR}/fd-payment" "fd-payment"
