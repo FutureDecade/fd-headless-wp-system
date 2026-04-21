@@ -22,7 +22,7 @@
 
 ## 当前推荐默认版本
 
-- `fd-theme`：`v1.0.11`
+- `fd-theme`：`v1.1.0`
 - `fd-member`：`v1.0.5`
 - `fd-payment`：`v1.0.2`
 - `fd-commerce`：`v1.0.0`
