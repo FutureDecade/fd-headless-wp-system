@@ -13,6 +13,8 @@
 - `record-available-runtime-images.sh`
 - `apply-available-runtime-images.sh`
 - `update-runtime-services.sh`
+- `record-available-wordpress-release-tags.sh`
+- `apply-available-wordpress-release-tags.sh`
 - `preflight-check.sh`
 - `fetch-wordpress-assets.sh`
 - `init-wordpress.sh`
@@ -53,6 +55,12 @@
   - 只拉取并重建 `frontend`、`websocket`、`nginx`
   - 不触发 `wordpress`、`db`、`redis` 的受控更新流程
   - 适合前端镜像 tag 的独立更新
+- `record-available-wordpress-release-tags.sh`
+  - 把新的主题/插件/GraphQL release tag 记录成 `AVAILABLE_*_RELEASE_TAG`
+  - 适合手动确认后再更新的部署
+- `apply-available-wordpress-release-tags.sh`
+  - 把 `AVAILABLE_*_RELEASE_TAG` 提升为当前 release tag
+  - 提升后仍需要再执行一次 `update-stack.sh` 才会真正拉取资产并更新容器
 
 目前 `quick-install.sh` 负责再往前收一层：
 

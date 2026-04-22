@@ -17,6 +17,9 @@ on:
       fd_theme_release_tag:
         description: fd-theme release tag, blank means keep current value
         required: false
+      fd_page_composer_release_tag:
+        description: fd-page-composer release tag, blank means keep current value
+        required: false
       fd_admin_ui_release_tag:
         description: fd-admin-ui release tag, blank means keep current value
         required: false
@@ -37,6 +40,9 @@ on:
         required: false
       fd_websocket_push_release_tag:
         description: fd-websocket-push release tag, blank means keep current value
+        required: false
+      wpgraphql_release_tag:
+        description: wp-graphql release tag, blank means keep current value
         required: false
       wpgraphql_jwt_auth_release_tag:
         description: wp-graphql-jwt-authentication release tag, blank means keep current value
@@ -88,6 +94,7 @@ jobs:
       FORCE_WORDPRESS_ASSET_FETCH: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.force_wordpress_asset_fetch || inputs.force_wordpress_asset_fetch || 'false' }}
       SKIP_IMAGE_PULL: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.skip_image_pull || inputs.skip_image_pull || 'false' }}
       FD_THEME_RELEASE_TAG: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.fd_theme_release_tag || inputs.fd_theme_release_tag || '' }}
+      FD_PAGE_COMPOSER_RELEASE_TAG: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.fd_page_composer_release_tag || inputs.fd_page_composer_release_tag || '' }}
       FD_ADMIN_UI_RELEASE_TAG: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.fd_admin_ui_release_tag || inputs.fd_admin_ui_release_tag || '' }}
       FD_MEMBER_RELEASE_TAG: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.fd_member_release_tag || inputs.fd_member_release_tag || '' }}
       FD_PAYMENT_RELEASE_TAG: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.fd_payment_release_tag || inputs.fd_payment_release_tag || '' }}
@@ -95,6 +102,7 @@ jobs:
       FD_CONTENT_TYPES_RELEASE_TAG: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.fd_content_types_release_tag || inputs.fd_content_types_release_tag || '' }}
       FD_AI_ROUTER_RELEASE_TAG: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.fd_ai_router_release_tag || inputs.fd_ai_router_release_tag || '' }}
       FD_WEBSOCKET_PUSH_RELEASE_TAG: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.fd_websocket_push_release_tag || inputs.fd_websocket_push_release_tag || '' }}
+      WPGRAPHQL_RELEASE_TAG: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.wpgraphql_release_tag || inputs.wpgraphql_release_tag || '' }}
       WPGRAPHQL_JWT_AUTH_RELEASE_TAG: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.wpgraphql_jwt_auth_release_tag || inputs.wpgraphql_jwt_auth_release_tag || '' }}
       WPGRAPHQL_TAX_QUERY_REF: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.wpgraphql_tax_query_ref || inputs.wpgraphql_tax_query_ref || '' }}
       FRONTEND_IMAGE: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.frontend_image || inputs.frontend_image || '' }}
@@ -146,6 +154,7 @@ jobs:
           }
 
           validate_release fd-theme "$FD_THEME_RELEASE_TAG"
+          validate_release fd-page-composer "$FD_PAGE_COMPOSER_RELEASE_TAG"
           validate_release fd-admin-ui "$FD_ADMIN_UI_RELEASE_TAG"
           validate_release fd-member "$FD_MEMBER_RELEASE_TAG"
           validate_release fd-payment "$FD_PAYMENT_RELEASE_TAG"
@@ -153,6 +162,10 @@ jobs:
           validate_release fd-content-types "$FD_CONTENT_TYPES_RELEASE_TAG"
           validate_release fd-ai-router "$FD_AI_ROUTER_RELEASE_TAG"
           validate_release fd-websocket-push "$FD_WEBSOCKET_PUSH_RELEASE_TAG"
+          if [ -n "$WPGRAPHQL_RELEASE_TAG" ]; then
+            echo "Checking FutureDecade/wp-graphql $WPGRAPHQL_RELEASE_TAG"
+            gh release view "$WPGRAPHQL_RELEASE_TAG" -R "FutureDecade/wp-graphql" >/dev/null
+          fi
           if [ -n "$WPGRAPHQL_JWT_AUTH_RELEASE_TAG" ]; then
             echo "Checking wp-graphql/wp-graphql-jwt-authentication $WPGRAPHQL_JWT_AUTH_RELEASE_TAG"
             gh release view "$WPGRAPHQL_JWT_AUTH_RELEASE_TAG" -R "wp-graphql/wp-graphql-jwt-authentication" >/dev/null
@@ -168,7 +181,7 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
-          envs: ACR_USERNAME,ACR_PASSWORD,GH_TOKEN,FORCE_WORDPRESS_ASSET_FETCH,SKIP_IMAGE_PULL,FD_THEME_RELEASE_TAG,FD_ADMIN_UI_RELEASE_TAG,FD_MEMBER_RELEASE_TAG,FD_PAYMENT_RELEASE_TAG,FD_COMMERCE_RELEASE_TAG,FD_CONTENT_TYPES_RELEASE_TAG,FD_AI_ROUTER_RELEASE_TAG,FD_WEBSOCKET_PUSH_RELEASE_TAG,WPGRAPHQL_JWT_AUTH_RELEASE_TAG,WPGRAPHQL_TAX_QUERY_REF,FRONTEND_IMAGE,WEBSOCKET_IMAGE,FRONTEND_DOMAIN,ADMIN_DOMAIN,WS_DOMAIN,PUBLIC_SCHEME,WEBSOCKET_PUBLIC_SCHEME,LETSENCRYPT_EMAIL,LETSENCRYPT_STAGING,RUN_HTTPS_SETUP
+          envs: ACR_USERNAME,ACR_PASSWORD,GH_TOKEN,FORCE_WORDPRESS_ASSET_FETCH,SKIP_IMAGE_PULL,FD_THEME_RELEASE_TAG,FD_PAGE_COMPOSER_RELEASE_TAG,FD_ADMIN_UI_RELEASE_TAG,FD_MEMBER_RELEASE_TAG,FD_PAYMENT_RELEASE_TAG,FD_COMMERCE_RELEASE_TAG,FD_CONTENT_TYPES_RELEASE_TAG,FD_AI_ROUTER_RELEASE_TAG,FD_WEBSOCKET_PUSH_RELEASE_TAG,WPGRAPHQL_RELEASE_TAG,WPGRAPHQL_JWT_AUTH_RELEASE_TAG,WPGRAPHQL_TAX_QUERY_REF,FRONTEND_IMAGE,WEBSOCKET_IMAGE,FRONTEND_DOMAIN,ADMIN_DOMAIN,WS_DOMAIN,PUBLIC_SCHEME,WEBSOCKET_PUBLIC_SCHEME,LETSENCRYPT_EMAIL,LETSENCRYPT_STAGING,RUN_HTTPS_SETUP
           command_timeout: 40m
           script: |
             set -e
@@ -189,6 +202,11 @@ jobs:
             HAS_NON_IMAGE_CHANGES=false
             if [ -n "$FRONTEND_DOMAIN" ] || [ -n "$ADMIN_DOMAIN" ] || [ -n "$WS_DOMAIN" ] || [ -n "$PUBLIC_SCHEME" ] || [ -n "$WEBSOCKET_PUBLIC_SCHEME" ] || [ -n "$LETSENCRYPT_EMAIL" ] || [ -n "$LETSENCRYPT_STAGING" ] || [ "$RUN_HTTPS_SETUP" = "true" ] || [ "$FORCE_WORDPRESS_ASSET_FETCH" = "true" ] || [ -n "$FD_THEME_RELEASE_TAG" ] || [ -n "$FD_ADMIN_UI_RELEASE_TAG" ] || [ -n "$FD_MEMBER_RELEASE_TAG" ] || [ -n "$FD_PAYMENT_RELEASE_TAG" ] || [ -n "$FD_COMMERCE_RELEASE_TAG" ] || [ -n "$FD_CONTENT_TYPES_RELEASE_TAG" ] || [ -n "$FD_AI_ROUTER_RELEASE_TAG" ] || [ -n "$FD_WEBSOCKET_PUSH_RELEASE_TAG" ] || [ -n "$WPGRAPHQL_JWT_AUTH_RELEASE_TAG" ] || [ -n "$WPGRAPHQL_TAX_QUERY_REF" ]; then
               HAS_NON_IMAGE_CHANGES=true
+            fi
+
+            HAS_WORDPRESS_ASSET_REQUEST=false
+            if [ -n "$FD_THEME_RELEASE_TAG" ] || [ -n "$FD_ADMIN_UI_RELEASE_TAG" ] || [ -n "$FD_MEMBER_RELEASE_TAG" ] || [ -n "$FD_PAYMENT_RELEASE_TAG" ] || [ -n "$FD_COMMERCE_RELEASE_TAG" ] || [ -n "$FD_CONTENT_TYPES_RELEASE_TAG" ] || [ -n "$FD_AI_ROUTER_RELEASE_TAG" ] || [ -n "$FD_WEBSOCKET_PUSH_RELEASE_TAG" ] || [ -n "$WPGRAPHQL_JWT_AUTH_RELEASE_TAG" ] || [ -n "$WPGRAPHQL_TAX_QUERY_REF" ]; then
+              HAS_WORDPRESS_ASSET_REQUEST=true
             fi
 
             echo "Runtime image update policy: ${FD_RUNTIME_IMAGE_UPDATE_POLICY}"
@@ -244,8 +262,29 @@ jobs:
             fi
 
             if [ -n "$FD_THEME_RELEASE_TAG" ] || [ -n "$FD_ADMIN_UI_RELEASE_TAG" ] || [ -n "$FD_MEMBER_RELEASE_TAG" ] || [ -n "$FD_PAYMENT_RELEASE_TAG" ] || [ -n "$FD_COMMERCE_RELEASE_TAG" ] || [ -n "$FD_CONTENT_TYPES_RELEASE_TAG" ] || [ -n "$FD_AI_ROUTER_RELEASE_TAG" ] || [ -n "$FD_WEBSOCKET_PUSH_RELEASE_TAG" ] || [ -n "$WPGRAPHQL_JWT_AUTH_RELEASE_TAG" ] || [ -n "$WPGRAPHQL_TAX_QUERY_REF" ]; then
+              if [ "${FD_RUNTIME_IMAGE_UPDATE_POLICY}" = "manual" ] && [ "$HAS_RUNTIME_IMAGE_REQUEST" != "true" ] && [ -z "$FRONTEND_DOMAIN" ] && [ -z "$ADMIN_DOMAIN" ] && [ -z "$WS_DOMAIN" ] && [ -z "$PUBLIC_SCHEME" ] && [ -z "$WEBSOCKET_PUBLIC_SCHEME" ] && [ -z "$LETSENCRYPT_EMAIL" ] && [ -z "$LETSENCRYPT_STAGING" ] && [ "$RUN_HTTPS_SETUP" != "true" ] && [ "$FORCE_WORDPRESS_ASSET_FETCH" != "true" ]; then
+                ENV_FILE=.env \
+                FD_THEME_RELEASE_TAG="$FD_THEME_RELEASE_TAG" \
+                FD_PAGE_COMPOSER_RELEASE_TAG="$FD_PAGE_COMPOSER_RELEASE_TAG" \
+                FD_ADMIN_UI_RELEASE_TAG="$FD_ADMIN_UI_RELEASE_TAG" \
+                FD_MEMBER_RELEASE_TAG="$FD_MEMBER_RELEASE_TAG" \
+                FD_PAYMENT_RELEASE_TAG="$FD_PAYMENT_RELEASE_TAG" \
+                FD_COMMERCE_RELEASE_TAG="$FD_COMMERCE_RELEASE_TAG" \
+                FD_CONTENT_TYPES_RELEASE_TAG="$FD_CONTENT_TYPES_RELEASE_TAG" \
+                FD_AI_ROUTER_RELEASE_TAG="$FD_AI_ROUTER_RELEASE_TAG" \
+                FD_WEBSOCKET_PUSH_RELEASE_TAG="$FD_WEBSOCKET_PUSH_RELEASE_TAG" \
+                WPGRAPHQL_RELEASE_TAG="$WPGRAPHQL_RELEASE_TAG" \
+                WPGRAPHQL_JWT_AUTH_RELEASE_TAG="$WPGRAPHQL_JWT_AUTH_RELEASE_TAG" \
+                WPGRAPHQL_TAX_QUERY_REF="$WPGRAPHQL_TAX_QUERY_REF" \
+                bash scripts/record-available-wordpress-release-tags.sh
+
+                echo "Runtime image update policy is manual. Recorded available WordPress asset release tags and skipped stack update."
+                exit 0
+              fi
+
               ENV_FILE=.env \
               FD_THEME_RELEASE_TAG="$FD_THEME_RELEASE_TAG" \
+              FD_PAGE_COMPOSER_RELEASE_TAG="$FD_PAGE_COMPOSER_RELEASE_TAG" \
               FD_ADMIN_UI_RELEASE_TAG="$FD_ADMIN_UI_RELEASE_TAG" \
               FD_MEMBER_RELEASE_TAG="$FD_MEMBER_RELEASE_TAG" \
               FD_PAYMENT_RELEASE_TAG="$FD_PAYMENT_RELEASE_TAG" \
@@ -253,6 +292,7 @@ jobs:
               FD_CONTENT_TYPES_RELEASE_TAG="$FD_CONTENT_TYPES_RELEASE_TAG" \
               FD_AI_ROUTER_RELEASE_TAG="$FD_AI_ROUTER_RELEASE_TAG" \
               FD_WEBSOCKET_PUSH_RELEASE_TAG="$FD_WEBSOCKET_PUSH_RELEASE_TAG" \
+              WPGRAPHQL_RELEASE_TAG="$WPGRAPHQL_RELEASE_TAG" \
               WPGRAPHQL_JWT_AUTH_RELEASE_TAG="$WPGRAPHQL_JWT_AUTH_RELEASE_TAG" \
               WPGRAPHQL_TAX_QUERY_REF="$WPGRAPHQL_TAX_QUERY_REF" \
               bash scripts/update-wordpress-release-tags.sh
