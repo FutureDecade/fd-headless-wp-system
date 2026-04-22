@@ -16,6 +16,7 @@
 - `record-available-wordpress-release-tags.sh`
 - `apply-available-wordpress-release-tags.sh`
 - `report-deployment-status.sh`
+- `run-pending-deployment-action.sh`
 - `preflight-check.sh`
 - `fetch-wordpress-assets.sh`
 - `init-wordpress.sh`
@@ -65,6 +66,10 @@
 - `report-deployment-status.sh`
   - 把当前/可用 runtime image 与 WordPress release 状态回报给 `fd-core-stack`
   - 依赖 bootstrap 下发的 `FD_STACK_DEPLOYMENT_ID`、`FD_STACK_STATUS_REPORT_URL`、`FD_STACK_STATUS_REPORT_TOKEN`
+- `run-pending-deployment-action.sh`
+  - 从 `fd-core-stack` 拉取待执行的 deployment 更新动作
+  - 命中后自动执行“应用前端更新”或“应用 WP 资产更新”
+  - 执行完会回报动作完成状态
 
 目前 `quick-install.sh` 负责再往前收一层：
 
