@@ -12,6 +12,7 @@
 - `update-stack.sh`
 - `record-available-runtime-images.sh`
 - `apply-available-runtime-images.sh`
+- `update-runtime-services.sh`
 - `preflight-check.sh`
 - `fetch-wordpress-assets.sh`
 - `init-wordpress.sh`
@@ -48,6 +49,10 @@
 - `apply-available-runtime-images.sh`
   - 把 `AVAILABLE_*` 提升为当前 `FRONTEND_IMAGE` / `WEBSOCKET_IMAGE`
   - 提升后仍需要再执行一次 `update-stack.sh` 才会真正拉镜像并重建容器
+- `update-runtime-services.sh`
+  - 只拉取并重建 `frontend`、`websocket`、`nginx`
+  - 不触发 `wordpress`、`db`、`redis` 的受控更新流程
+  - 适合前端镜像 tag 的独立更新
 
 目前 `quick-install.sh` 负责再往前收一层：
 

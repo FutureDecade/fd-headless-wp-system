@@ -232,6 +232,15 @@ jobs:
               FRONTEND_IMAGE="$FRONTEND_IMAGE" \
               WEBSOCKET_IMAGE="$WEBSOCKET_IMAGE" \
               bash scripts/update-runtime-images.sh
+
+              if [ "$HAS_NON_IMAGE_CHANGES" != "true" ]; then
+                ACR_USERNAME="$ACR_USERNAME" \
+                ACR_PASSWORD="$ACR_PASSWORD" \
+                SKIP_IMAGE_PULL="$SKIP_IMAGE_PULL" \
+                ENV_FILE=.env \
+                bash scripts/update-runtime-services.sh
+                exit 0
+              fi
             fi
 
             if [ -n "$FD_THEME_RELEASE_TAG" ] || [ -n "$FD_ADMIN_UI_RELEASE_TAG" ] || [ -n "$FD_MEMBER_RELEASE_TAG" ] || [ -n "$FD_PAYMENT_RELEASE_TAG" ] || [ -n "$FD_COMMERCE_RELEASE_TAG" ] || [ -n "$FD_CONTENT_TYPES_RELEASE_TAG" ] || [ -n "$FD_AI_ROUTER_RELEASE_TAG" ] || [ -n "$FD_WEBSOCKET_PUSH_RELEASE_TAG" ] || [ -n "$WPGRAPHQL_JWT_AUTH_RELEASE_TAG" ] || [ -n "$WPGRAPHQL_TAX_QUERY_REF" ]; then
