@@ -105,7 +105,6 @@ services:
       FD_DOMAIN_BINDING_SOURCE: ${FD_DOMAIN_BINDING_SOURCE:-primaryDomain}
       FD_BOUND_HOST: ${FD_BOUND_HOST:-}
       REVALIDATE_SECRET: ${REVALIDATE_SECRET}
-      NEXT_PUBLIC_SENTRY_DSN: ${NEXT_PUBLIC_SENTRY_DSN}
     healthcheck:
       test:
         - CMD-SHELL
