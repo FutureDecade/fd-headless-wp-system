@@ -97,6 +97,40 @@ SVG,
     ];
 }
 
+function demo_json_encode($value): string
+{
+    $json = json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+    return false === $json ? '[]' : $json;
+}
+
+function demo_page_composer_meta(string $pageType, array $layout, array $seo = []): array
+{
+    return [
+        '_fdpc_builder_enabled' => '1',
+        '_fdpc_page_type' => $pageType,
+        '_fdpc_layout_json' => demo_json_encode($layout),
+        '_fdpc_seo_json' => empty($seo) ? '' : demo_json_encode($seo),
+        '_fdpc_visibility_rules' => '',
+    ];
+}
+
+function demo_page_composer_post_ref(string $slug, string $postType = 'post'): array
+{
+    return [
+        'post_type' => $postType,
+        'slug' => $slug,
+    ];
+}
+
+function demo_page_composer_term_ref(string $taxonomy, string $slug): array
+{
+    return [
+        'taxonomy' => $taxonomy,
+        'slug' => $slug,
+    ];
+}
+
 $assets = [
     demo_svg_asset('note-ai-workflow-cover', 'AI 工作流', '上线前三层检查', 1200, 630, ['#0D3B66', '#1E6091', '#8ECAE6', '#F1FAEE']),
     demo_svg_asset('note-interview-cards-cover', '访谈卡片', '把原始记录变成知识资产', 1200, 630, ['#3A5A40', '#588157', '#A3B18A', '#F4F1DE']),
@@ -181,9 +215,1308 @@ $terms = [
     ['taxonomy' => 'post_tag', 'name' => '研究方法', 'slug' => 'research-methods', 'description' => '', 'parent_slug' => null],
     ['taxonomy' => 'post_tag', 'name' => '团队协作', 'slug' => 'team-collaboration', 'description' => '', 'parent_slug' => null],
     ['taxonomy' => 'post_tag', 'name' => '数字工具', 'slug' => 'digital-tools', 'description' => '', 'parent_slug' => null],
+
+    ['taxonomy' => 'series', 'name' => '内容系统', 'slug' => 'content-systems', 'description' => '围绕编辑系统、知识路由与内容结构的连续专题。', 'parent_slug' => null],
+    ['taxonomy' => 'series', 'name' => '未来方法', 'slug' => 'future-methods', 'description' => '围绕会员关系、团队方法与新型工作流的连续专题。', 'parent_slug' => null],
+];
+
+$customTaxonomies = [
+    [
+        'slug' => 'series',
+        'singular_label' => '系列',
+        'plural_label' => '系列',
+        'description' => '用于组织文章专题与连续内容的自定义分类法。',
+        'object_types' => ['post'],
+        'hierarchical' => true,
+        'rewrite_slug' => 'series',
+        'graphql_single_name' => 'series',
+        'graphql_plural_name' => 'seriesItems',
+    ],
+];
+
+$samplePageComposerLayout = [
+    'version' => '1.0',
+    'sections' => [
+        [
+            'title' => 'Page Composer 模块展厅',
+            'settings' => [
+                'theme' => 'accent',
+                'container' => 'wide',
+                'spacing' => 'comfortable',
+                'anchor' => 'hero',
+            ],
+            'rows' => [
+                [
+                    'columns' => [
+                        [
+                            'span' => 12,
+                            'modules' => [
+                                [
+                                    'type' => 'hero',
+                                    'props' => [
+                                        'eyebrow' => 'FD Page Composer',
+                                        'title' => '在一个页面里查看全部通用模块的前台效果。',
+                                        'description' => '这个演示页会把当前页面编辑器里的模块全部排出来，方便你在真实前台环境里检查视觉、数据源和交互细节。',
+                                        'primary_cta_label' => '查看内容流模块',
+                                        'primary_cta_url' => '#data-blocks',
+                                        'secondary_cta_label' => '跳到表单模块',
+                                        'secondary_cta_url' => '#forms',
+                                        'media_url' => '',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ],
+        [
+            'title' => '基础内容与营销模块',
+            'settings' => [
+                'theme' => 'default',
+                'container' => 'contained',
+                'spacing' => 'comfortable',
+                'anchor' => 'core-modules',
+            ],
+            'rows' => [
+                [
+                    'columns' => [
+                        [
+                            'span' => 7,
+                            'modules' => [
+                                [
+                                    'type' => 'rich-text',
+                                    'props' => [
+                                        'title' => 'Rich Text',
+                                        'content' => '<p>这里是 <strong>Rich Text</strong> 模块，用于测试长文本、标题层级、列表、链接和强调文本的前台效果。</p><p>在实际项目里，它通常承担页面说明、品牌叙事、专题导语或活动详情简介。</p><ul><li>支持正文段落</li><li>支持列表与强调内容</li><li>适合承接需要上下文的模块组</li></ul>',
+                                    ],
+                                ],
+                            ],
+                        ],
+                        [
+                            'span' => 5,
+                            'modules' => [
+                                [
+                                    'type' => 'cta-band',
+                                    'props' => [
+                                        'title' => 'CTA Band',
+                                        'description' => '一个紧凑的行动号召模块，适合放在模块组之间引导用户进入下一步。',
+                                        'button_label' => '联系团队',
+                                        'button_url' => '/page/contact-us',
+                                        'style' => 'brand',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                [
+                    'columns' => [
+                        [
+                            'span' => 12,
+                            'modules' => [
+                                [
+                                    'type' => 'feature-grid',
+                                    'props' => [
+                                        'title' => 'Feature Grid',
+                                        'columns' => 3,
+                                        'items_json' => demo_json_encode([
+                                            ['icon' => '01', 'title' => '统一编排', 'description' => '用一套模块语言覆盖品牌页、专题页和内容页。'],
+                                            ['icon' => '02', 'title' => '强约束输出', 'description' => '比自由拖拽轻得多，但足够支撑常见业务页面。'],
+                                            ['icon' => '03', 'title' => 'AI 友好', 'description' => '未来可以让 AI 直接输出合法的 layout JSON。'],
+                                        ]),
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                [
+                    'columns' => [
+                        [
+                            'span' => 6,
+                            'modules' => [
+                                [
+                                    'type' => 'logo-cloud',
+                                    'props' => [
+                                        'title' => 'Logo Cloud',
+                                        'logos_json' => demo_json_encode([
+                                            ['name' => 'FutureDecade'],
+                                            ['name' => 'Signal Works'],
+                                            ['name' => 'Atlas Capture'],
+                                            ['name' => 'Open Build'],
+                                            ['name' => 'City Lab'],
+                                        ]),
+                                    ],
+                                ],
+                            ],
+                        ],
+                        [
+                            'span' => 6,
+                            'modules' => [
+                                [
+                                    'type' => 'stats',
+                                    'props' => [
+                                        'title' => 'Stats',
+                                        'items_json' => demo_json_encode([
+                                            ['value' => '28', 'label' => '当前模块总数', 'description' => '通用模块和 editorial 模块都已经接入前台。'],
+                                            ['value' => '4', 'label' => '演示页面', 'description' => 'Landing、Content Hub、Commerce、Editorial Showcase。'],
+                                            ['value' => '1', 'label' => '页面语法', 'description' => '统一的 section / row / module 结构。'],
+                                            ['value' => '∞', 'label' => '后续扩展空间', 'description' => '继续加模块，而不是引入重型 page builder。'],
+                                        ]),
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ],
+        [
+            'title' => '转化与信任模块',
+            'settings' => [
+                'theme' => 'light',
+                'container' => 'contained',
+                'spacing' => 'comfortable',
+                'anchor' => 'conversion',
+            ],
+            'rows' => [
+                [
+                    'columns' => [
+                        [
+                            'span' => 6,
+                            'modules' => [
+                                [
+                                    'type' => 'pricing',
+                                    'props' => [
+                                        'title' => 'Pricing',
+                                        'plans_json' => demo_json_encode([
+                                            ['name' => 'Starter', 'price' => '¥99', 'period' => '/月', 'description' => '适合单人验证工作流。', 'features' => ['基础模块', '前台渲染', '基础表单'], 'ctaLabel' => '开始体验', 'ctaUrl' => '/page/contact-us'],
+                                            ['name' => 'Team', 'price' => '¥299', 'period' => '/月', 'description' => '适合小团队协同与专题运营。', 'features' => ['更多模块', '内容与活动联动', '更高扩展性'], 'ctaLabel' => '预约演示', 'ctaUrl' => '/page/contact-us', 'highlight' => true, 'badge' => '推荐'],
+                                            ['name' => 'Scale', 'price' => '定制', 'period' => '', 'description' => '适合需要编排、AI 和会员联动的复杂站点。', 'features' => ['页面系统', '表单系统', '后续 AI 接入'], 'ctaLabel' => '联系销售', 'ctaUrl' => '/page/contact-us'],
+                                        ]),
+                                    ],
+                                ],
+                            ],
+                        ],
+                        [
+                            'span' => 6,
+                            'modules' => [
+                                [
+                                    'type' => 'faq',
+                                    'props' => [
+                                        'title' => 'FAQ',
+                                        'items_json' => demo_json_encode([
+                                            ['question' => '为什么不直接上专业 page builder？', 'answer' => '因为你们要的是可控的页面编排，而不是任意自由画布。'],
+                                            ['question' => '这套系统适合哪些页面？', 'answer' => '企业官网、内容主页、专题页、活动页、产品页都适合。'],
+                                            ['question' => '后面能不能接 AI 生成页面？', 'answer' => '可以，AI 输出 layout JSON 会比输出 HTML 更稳定。'],
+                                        ]),
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                [
+                    'columns' => [
+                        [
+                            'span' => 12,
+                            'modules' => [
+                                [
+                                    'type' => 'testimonials',
+                                    'props' => [
+                                        'title' => 'Testimonials',
+                                        'items_json' => demo_json_encode([
+                                            ['quote' => '可视化编辑器和受约束模块的组合，比重型 page builder 更适合长期维护。', 'name' => '产品负责人', 'title' => '内容团队'],
+                                            ['quote' => '现在可以更快地做落地页、专题页和产品页，不需要每次都重新拼页面结构。', 'name' => '运营负责人', 'title' => '增长团队'],
+                                        ]),
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ],
+        [
+            'title' => '工具模块',
+            'settings' => [
+                'theme' => 'default',
+                'container' => 'contained',
+                'spacing' => 'comfortable',
+                'anchor' => 'forms',
+            ],
+            'rows' => [
+                [
+                    'columns' => [
+                        [
+                            'span' => 6,
+                            'modules' => [
+                                [
+                                    'type' => 'form-embed',
+                                    'props' => [
+                                        'form_key' => 'demo_contact_form',
+                                        'title' => 'Form Embed',
+                                        'description' => '这里接的是一条 demo contact form，用于测试 page composer 和 fd-forms 的联动。',
+                                    ],
+                                ],
+                            ],
+                        ],
+                        [
+                            'span' => 6,
+                            'modules' => [
+                                [
+                                    'type' => 'embed',
+                                    'props' => [
+                                        'title' => 'Embed',
+                                        'embed_html' => '<div style="padding:24px;border:1px solid #dbe5f0;background:#f8fafc;border-radius:16px;"><strong>Trusted Embed Slot</strong><p style="margin:12px 0 0;">这个模块用于承接 iframe、视频、第三方卡片或可信 HTML 片段。</p></div>',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ],
+        [
+            'title' => '数据模块',
+            'settings' => [
+                'theme' => 'light',
+                'container' => 'wide',
+                'spacing' => 'comfortable',
+                'anchor' => 'data-blocks',
+            ],
+            'rows' => [
+                [
+                    'columns' => [
+                        [
+                            'span' => 12,
+                            'modules' => [
+                                [
+                                    'type' => 'post-feed',
+                                    'props' => [
+                                        'title' => 'Post Feed',
+                                        'source' => 'latest',
+                                        'count' => 3,
+                                        'layout' => 'list',
+                                        'category_id' => '',
+                                        'tag_id' => '',
+                                        'post_ids' => '',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                [
+                    'columns' => [
+                        [
+                            'span' => 12,
+                            'modules' => [
+                                [
+                                    'type' => 'event-list',
+                                    'props' => [
+                                        'title' => 'Event List',
+                                        'source' => 'upcoming',
+                                        'event_ids' => '',
+                                        'category_slug' => '',
+                                        'count' => 3,
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                [
+                    'columns' => [
+                        [
+                            'span' => 12,
+                            'modules' => [
+                                [
+                                    'type' => 'app-grid',
+                                    'props' => [
+                                        'title' => 'App Grid',
+                                        'source' => 'latest',
+                                        'app_ids' => '',
+                                        'taxonomy_name' => '',
+                                        'taxonomy_term_slug' => '',
+                                        'count' => 3,
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                [
+                    'columns' => [
+                        [
+                            'span' => 12,
+                            'modules' => [
+                                [
+                                    'type' => 'product-shelf',
+                                    'props' => [
+                                        'title' => 'Product Shelf',
+                                        'source' => 'latest',
+                                        'product_ids' => '',
+                                        'category_slug' => '',
+                                        'count' => 3,
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ],
+    ],
+];
+
+$editorialShowcaseComposerLayout = [
+    'version' => '1.0',
+    'sections' => [
+        [
+            'title' => 'Editorial Hero',
+            'settings' => [
+                'theme' => 'accent',
+                'container' => 'wide',
+                'spacing' => 'comfortable',
+                'anchor' => 'hero',
+            ],
+            'rows' => [
+                [
+                    'columns' => [
+                        [
+                            'span' => 12,
+                            'modules' => [
+                                [
+                                    'type' => 'hero-carousel',
+                                    'props' => [
+                                        'data_source' => 'latest',
+                                        'count' => 5,
+                                        'layout_style' => 'slider',
+                                        'autoplay' => true,
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ],
+        [
+            'title' => 'Editorial Grid',
+            'settings' => [
+                'theme' => 'default',
+                'container' => 'wide',
+                'spacing' => 'comfortable',
+                'anchor' => 'grid',
+            ],
+            'rows' => [
+                [
+                    'columns' => [
+                        [
+                            'span' => 9,
+                            'modules' => [
+                                [
+                                    'type' => 'post-list',
+                                    'props' => [
+                                        'query_type' => 'taxonomy',
+                                        'taxonomy_name' => 'series',
+                                        'taxonomy_ref' => demo_page_composer_term_ref('series', 'content-systems'),
+                                        'count' => 3,
+                                        'layout' => 'grid-3',
+                                        'enable_infinite_scroll' => false,
+                                        'exclude_ids' => '',
+                                    ],
+                                ],
+                            ],
+                        ],
+                        [
+                            'span' => 3,
+                            'modules' => [
+                                [
+                                    'type' => 'category-column',
+                                    'props' => [
+                                        'category_ref' => demo_page_composer_term_ref('category', 'team-methods'),
+                                        'show_featured' => true,
+                                        'featured_count' => 1,
+                                        'list_count' => 1,
+                                        'show_more_link' => true,
+                                        'show_count' => false,
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                [
+                    'columns' => [
+                        [
+                            'span' => 12,
+                            'modules' => [
+                                [
+                                    'type' => 'tabbed-posts',
+                                    'props' => [
+                                        'selected_category_refs' => [
+                                            demo_page_composer_term_ref('category', 'content-strategy'),
+                                            demo_page_composer_term_ref('category', 'ai-insights'),
+                                            demo_page_composer_term_ref('category', 'team-methods'),
+                                        ],
+                                        'layout_style' => 'mixed',
+                                        'posts_count_mixed' => 4,
+                                        'posts_count_grid' => 6,
+                                        'grid_columns' => 3,
+                                        'posts_count_list' => 6,
+                                        'enable_infinite_scroll_grid' => false,
+                                        'enable_infinite_scroll_list' => false,
+                                        'show_featured_image' => true,
+                                        'show_excerpt' => true,
+                                        'show_meta' => true,
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ],
+        [
+            'title' => 'Editorial Rails',
+            'settings' => [
+                'theme' => 'light',
+                'container' => 'wide',
+                'spacing' => 'comfortable',
+                'anchor' => 'rails',
+            ],
+            'rows' => [
+                [
+                    'columns' => [
+                        [
+                            'span' => 3,
+                            'modules' => [
+                                [
+                                    'type' => 'top-stories',
+                                    'props' => [
+                                        'title' => 'Top Stories',
+                                        'data_source' => 'manual',
+                                        'post_refs' => [
+                                            demo_page_composer_post_ref('knowledge-routing-needs-traceable-paths'),
+                                            demo_page_composer_post_ref('small-teams-often-ignore-sync-cost'),
+                                            demo_page_composer_post_ref('which-metrics-creative-teams-should-track'),
+                                            demo_page_composer_post_ref('membership-products-need-relational-loops'),
+                                            demo_page_composer_post_ref('content-distribution-needs-routing-not-volume'),
+                                        ],
+                                        'count' => 5,
+                                        'show_thumbnail' => true,
+                                        'show_author' => true,
+                                        'show_date' => true,
+                                        'show_comments' => true,
+                                        'show_ranking' => true,
+                                    ],
+                                ],
+                            ],
+                        ],
+                        [
+                            'span' => 9,
+                            'modules' => [
+                                [
+                                    'type' => 'horizontal-scroll',
+                                    'props' => [
+                                        'title' => 'Horizontal Scroll',
+                                        'query_type' => 'latest',
+                                        'count' => 6,
+                                        'show_image' => true,
+                                        'show_excerpt' => true,
+                                        'show_category' => true,
+                                        'show_date' => true,
+                                        'card_style' => 'bordered',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                [
+                    'columns' => [
+                        [
+                            'span' => 3,
+                            'modules' => [
+                                [
+                                    'type' => 'image-text-list',
+                                    'props' => [
+                                        'data_source' => 'taxonomy',
+                                        'taxonomy_name' => 'series',
+                                        'taxonomy_ref' => demo_page_composer_term_ref('series', 'content-systems'),
+                                        'count' => 3,
+                                    ],
+                                ],
+                            ],
+                        ],
+                        [
+                            'span' => 3,
+                            'modules' => [
+                                [
+                                    'type' => 'thumbnail-list',
+                                    'props' => [
+                                        'title' => '观点',
+                                        'data_source' => 'manual',
+                                        'post_refs' => [
+                                            demo_page_composer_post_ref('why-editorial-systems-still-matter-in-ai-era'),
+                                            demo_page_composer_post_ref('content-distribution-needs-routing-not-volume'),
+                                            demo_page_composer_post_ref('which-metrics-creative-teams-should-track'),
+                                            demo_page_composer_post_ref('knowledge-routing-needs-traceable-paths'),
+                                        ],
+                                        'count' => 4,
+                                        'show_more_link' => true,
+                                    ],
+                                ],
+                            ],
+                        ],
+                        [
+                            'span' => 6,
+                            'modules' => [
+                                [
+                                    'type' => 'featured-article',
+                                    'props' => [
+                                        'data_source' => 'manual',
+                                        'post_ref' => demo_page_composer_post_ref('membership-products-need-relational-loops'),
+                                        'show_excerpt' => true,
+                                        'show_author' => true,
+                                        'show_comments' => true,
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ],
+        [
+            'title' => 'Editorial Features',
+            'settings' => [
+                'theme' => 'default',
+                'container' => 'wide',
+                'spacing' => 'comfortable',
+                'anchor' => 'features',
+            ],
+            'rows' => [
+                [
+                    'columns' => [
+                        [
+                            'span' => 12,
+                            'modules' => [
+                                [
+                                    'type' => 'slider-carousel',
+                                    'props' => [
+                                        'data_source' => 'manual',
+                                        'post_refs' => [
+                                            demo_page_composer_post_ref('why-editorial-systems-still-matter-in-ai-era'),
+                                            demo_page_composer_post_ref('content-distribution-needs-routing-not-volume'),
+                                            demo_page_composer_post_ref('knowledge-routing-needs-traceable-paths'),
+                                        ],
+                                        'count' => 3,
+                                        'autoplay' => true,
+                                        'autoplay_interval' => 5,
+                                        'show_dots' => true,
+                                        'show_arrows' => true,
+                                        'show_title' => true,
+                                        'show_excerpt' => true,
+                                        'show_category' => true,
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                [
+                    'columns' => [
+                        [
+                            'span' => 12,
+                            'modules' => [
+                                [
+                                    'type' => 'insider',
+                                    'props' => [
+                                        'section_title' => 'THE INSIDER',
+                                        'data_source' => 'manual',
+                                        'post_ref' => demo_page_composer_post_ref('knowledge-routing-needs-traceable-paths'),
+                                        'show_excerpt' => true,
+                                        'show_date' => true,
+                                        'show_reading_time' => true,
+                                        'background_color' => 'dark',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                [
+                    'columns' => [
+                        [
+                            'span' => 12,
+                            'modules' => [
+                                [
+                                    'type' => 'opinion',
+                                    'props' => [
+                                        'section_title' => 'Opinion',
+                                        'data_source' => 'manual',
+                                        'post_refs' => [
+                                            demo_page_composer_post_ref('membership-products-need-relational-loops'),
+                                            demo_page_composer_post_ref('small-teams-often-ignore-sync-cost'),
+                                            demo_page_composer_post_ref('which-metrics-creative-teams-should-track'),
+                                            demo_page_composer_post_ref('knowledge-routing-needs-traceable-paths'),
+                                        ],
+                                        'main_count' => 1,
+                                        'list_count' => 3,
+                                        'show_author_title' => true,
+                                        'background_color' => 'light',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                [
+                    'columns' => [
+                        [
+                            'span' => 12,
+                            'modules' => [
+                                [
+                                    'type' => 'featured-story',
+                                    'props' => [
+                                        'section_title' => 'THE BIG STORY',
+                                        'data_source' => 'manual',
+                                        'post_refs' => [
+                                            demo_page_composer_post_ref('why-editorial-systems-still-matter-in-ai-era'),
+                                            demo_page_composer_post_ref('content-distribution-needs-routing-not-volume'),
+                                            demo_page_composer_post_ref('membership-products-need-relational-loops'),
+                                            demo_page_composer_post_ref('small-teams-often-ignore-sync-cost'),
+                                            demo_page_composer_post_ref('knowledge-routing-needs-traceable-paths'),
+                                        ],
+                                        'list_count' => 4,
+                                        'show_category' => true,
+                                        'show_excerpt' => true,
+                                        'show_author' => true,
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ],
+    ],
+];
+
+$landingPageComposerLayout = [
+    'version' => '1.0',
+    'sections' => [
+        [
+            'title' => 'Landing Hero',
+            'settings' => [
+                'theme' => 'accent',
+                'container' => 'wide',
+                'spacing' => 'comfortable',
+                'anchor' => 'hero',
+            ],
+            'rows' => [
+                [
+                    'columns' => [
+                        [
+                            'span' => 12,
+                            'modules' => [
+                                [
+                                    'type' => 'hero',
+                                    'props' => [
+                                        'eyebrow' => 'FutureDecade Demo',
+                                        'title' => '把内容、产品、活动和页面编排放进同一个系统。',
+                                        'description' => '这是一个用于演示 headless WordPress + fd-frontend + fd-page-composer 的 landing page。它适合企业官网首页，也适合作为产品能力总览页。',
+                                        'primary_cta_label' => '查看模块展厅',
+                                        'primary_cta_url' => '/page/sample-page',
+                                        'secondary_cta_label' => '进入内容主页',
+                                        'secondary_cta_url' => '/page/content-home-demo',
+                                        'media_url' => '',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ],
+        [
+            'title' => '为什么这套系统更适合你们',
+            'settings' => [
+                'theme' => 'default',
+                'container' => 'contained',
+                'spacing' => 'comfortable',
+                'anchor' => 'why',
+            ],
+            'rows' => [
+                [
+                    'columns' => [
+                        [
+                            'span' => 12,
+                            'modules' => [
+                                [
+                                    'type' => 'feature-grid',
+                                    'props' => [
+                                        'title' => '不是 page builder，而是页面编排系统',
+                                        'columns' => 3,
+                                        'items_json' => demo_json_encode([
+                                            ['icon' => '01', 'title' => '更可控', 'description' => '模块有限但足够真实业务使用。'],
+                                            ['icon' => '02', 'title' => '更轻量', 'description' => '不引入巨量第三方 builder 复杂性。'],
+                                            ['icon' => '03', 'title' => '更可复用', 'description' => '模块和 schema 可以在不同页面重复使用。'],
+                                        ]),
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                [
+                    'columns' => [
+                        [
+                            'span' => 12,
+                            'modules' => [
+                                [
+                                    'type' => 'stats',
+                                    'props' => [
+                                        'title' => '站点能力总览',
+                                        'items_json' => demo_json_encode([
+                                            ['value' => '6+', 'label' => '内容类型', 'description' => '文章、页面、笔记、应用、活动、商品。'],
+                                            ['value' => '15', 'label' => '通用模块', 'description' => '营销、内容、数据与工具模块并存。'],
+                                            ['value' => '2', 'label' => '新插件', 'description' => 'fd-page-composer 与 fd-forms 已接入前端。'],
+                                            ['value' => '1', 'label' => '统一前台', 'description' => '所有内容最后都在 fd-frontend 渲染。'],
+                                        ]),
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ],
+        [
+            'title' => '信任与转化',
+            'settings' => [
+                'theme' => 'light',
+                'container' => 'contained',
+                'spacing' => 'comfortable',
+                'anchor' => 'trust',
+            ],
+            'rows' => [
+                [
+                    'columns' => [
+                        [
+                            'span' => 7,
+                            'modules' => [
+                                [
+                                    'type' => 'testimonials',
+                                    'props' => [
+                                        'title' => '团队反馈',
+                                        'items_json' => demo_json_encode([
+                                            ['quote' => '受约束模块比完全自由拖拽更适合多人长期协作。', 'name' => '站点管理员', 'title' => 'FutureDecade Demo'],
+                                            ['quote' => '我们现在可以更快验证页面想法，而不是每次重新开发整页。', 'name' => '运营同学', 'title' => '内容增长团队'],
+                                        ]),
+                                    ],
+                                ],
+                            ],
+                        ],
+                        [
+                            'span' => 5,
+                            'modules' => [
+                                [
+                                    'type' => 'cta-band',
+                                    'props' => [
+                                        'title' => '开始测试整站体验',
+                                        'description' => '从内容主页、模块展厅、商品与活动页开始逐个验证前后端联动。',
+                                        'button_label' => '查看内容主页',
+                                        'button_url' => '/page/content-home-demo',
+                                        'style' => 'brand',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ],
+    ],
+];
+
+$contentHomeComposerLayout = [
+    'version' => '1.0',
+    'sections' => [
+        [
+            'title' => 'Editorial Front Door',
+            'settings' => [
+                'theme' => 'accent',
+                'container' => 'wide',
+                'spacing' => 'comfortable',
+                'anchor' => 'hero',
+            ],
+            'rows' => [
+                [
+                    'columns' => [
+                        [
+                            'span' => 12,
+                            'modules' => [
+                                [
+                                    'type' => 'hero',
+                                    'props' => [
+                                        'eyebrow' => 'Content Hub',
+                                        'title' => '把文章、活动和工具更新集中在一个内容主页里。',
+                                        'description' => '这个页面用来演示内容主页 / 内容中枢场景，适合做编辑部前台、专题聚合页或知识首页。',
+                                        'primary_cta_label' => '浏览最新文章',
+                                        'primary_cta_url' => '#latest',
+                                        'secondary_cta_label' => '查看即将开始的活动',
+                                        'secondary_cta_url' => '#events',
+                                        'media_url' => '',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ],
+        [
+            'title' => 'Latest Coverage',
+            'settings' => [
+                'theme' => 'default',
+                'container' => 'contained',
+                'spacing' => 'comfortable',
+                'anchor' => 'latest',
+            ],
+            'rows' => [
+                [
+                    'columns' => [
+                        [
+                            'span' => 12,
+                            'modules' => [
+                                [
+                                    'type' => 'post-feed',
+                                    'props' => [
+                                        'title' => '最新文章',
+                                        'source' => 'latest',
+                                        'count' => 6,
+                                        'layout' => 'grid',
+                                        'category_id' => '',
+                                        'tag_id' => '',
+                                        'post_ids' => '',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ],
+        [
+            'title' => 'Why Follow This Hub',
+            'settings' => [
+                'theme' => 'light',
+                'container' => 'contained',
+                'spacing' => 'comfortable',
+                'anchor' => 'why',
+            ],
+            'rows' => [
+                [
+                    'columns' => [
+                        [
+                            'span' => 6,
+                            'modules' => [
+                                [
+                                    'type' => 'rich-text',
+                                    'props' => [
+                                        'title' => '内容主页不只是文章列表',
+                                        'content' => '<p>一个真正可用的内容主页，除了展示最新内容，还应该说明编辑视角、组织方式和为什么值得持续关注。</p><p>这类页面适合作为站点内容中心、专题前门和品牌内容入口。</p>',
+                                    ],
+                                ],
+                            ],
+                        ],
+                        [
+                            'span' => 6,
+                            'modules' => [
+                                [
+                                    'type' => 'feature-grid',
+                                    'props' => [
+                                        'title' => '读者在这里得到什么',
+                                        'columns' => 2,
+                                        'items_json' => demo_json_encode([
+                                            ['icon' => 'A', 'title' => '更清晰的主题路由', 'description' => '内容、活动和产品不再分散。'],
+                                            ['icon' => 'B', 'title' => '更稳定的内容节奏', 'description' => '适合持续更新而不是一次性页面。'],
+                                            ['icon' => 'C', 'title' => '更强的后续动作', 'description' => '内容消费后可以继续进入活动或表单。'],
+                                            ['icon' => 'D', 'title' => '更容易专题化', 'description' => '可以继续扩成 series / taxonomy / page composer 专题页。'],
+                                        ]),
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ],
+        [
+            'title' => 'Events',
+            'settings' => [
+                'theme' => 'default',
+                'container' => 'wide',
+                'spacing' => 'comfortable',
+                'anchor' => 'events',
+            ],
+            'rows' => [
+                [
+                    'columns' => [
+                        [
+                            'span' => 12,
+                            'modules' => [
+                                [
+                                    'type' => 'event-list',
+                                    'props' => [
+                                        'title' => '近期活动',
+                                        'source' => 'upcoming',
+                                        'event_ids' => '',
+                                        'category_slug' => '',
+                                        'count' => 3,
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ],
+        [
+            'title' => 'Stay Connected',
+            'settings' => [
+                'theme' => 'dark',
+                'container' => 'contained',
+                'spacing' => 'comfortable',
+                'anchor' => 'cta',
+            ],
+            'rows' => [
+                [
+                    'columns' => [
+                        [
+                            'span' => 12,
+                            'modules' => [
+                                [
+                                    'type' => 'cta-band',
+                                    'props' => [
+                                        'title' => '把偶发访问变成持续关注。',
+                                        'description' => '这里可以继续接 newsletter、member、form 或活动报名流。',
+                                        'button_label' => '进入模块展厅',
+                                        'button_url' => '/page/sample-page',
+                                        'style' => 'brand',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ],
+    ],
+];
+
+$commerceLaunchComposerLayout = [
+    'version' => '1.0',
+    'sections' => [
+        [
+            'title' => 'Commerce Launch',
+            'settings' => [
+                'theme' => 'accent',
+                'container' => 'wide',
+                'spacing' => 'comfortable',
+                'anchor' => 'hero',
+            ],
+            'rows' => [
+                [
+                    'columns' => [
+                        [
+                            'span' => 12,
+                            'modules' => [
+                                [
+                                    'type' => 'hero',
+                                    'props' => [
+                                        'eyebrow' => 'Commerce Demo',
+                                        'title' => '用 page composer 组织商品发布页与商业化页面。',
+                                        'description' => '这个页面用来演示产品集合、FAQ、说明文本和 CTA 如何一起构成一个更完整的商业页面。',
+                                        'primary_cta_label' => '查看商品',
+                                        'primary_cta_url' => '#products',
+                                        'secondary_cta_label' => '了解详情',
+                                        'secondary_cta_url' => '#details',
+                                        'media_url' => '',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ],
+        [
+            'title' => 'Featured Products',
+            'settings' => [
+                'theme' => 'default',
+                'container' => 'contained',
+                'spacing' => 'comfortable',
+                'anchor' => 'products',
+            ],
+            'rows' => [
+                [
+                    'columns' => [
+                        [
+                            'span' => 12,
+                            'modules' => [
+                                [
+                                    'type' => 'product-shelf',
+                                    'props' => [
+                                        'title' => '演示商品',
+                                        'source' => 'latest',
+                                        'product_ids' => '',
+                                        'category_slug' => '',
+                                        'count' => 3,
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ],
+        [
+            'title' => 'Details',
+            'settings' => [
+                'theme' => 'light',
+                'container' => 'contained',
+                'spacing' => 'comfortable',
+                'anchor' => 'details',
+            ],
+            'rows' => [
+                [
+                    'columns' => [
+                        [
+                            'span' => 6,
+                            'modules' => [
+                                [
+                                    'type' => 'feature-grid',
+                                    'props' => [
+                                        'title' => '为什么这个商业页结构更稳定',
+                                        'columns' => 2,
+                                        'items_json' => demo_json_encode([
+                                            ['icon' => '01', 'title' => '商品集合', 'description' => '用 Product Shelf 承接真实商品。'],
+                                            ['icon' => '02', 'title' => '上下文说明', 'description' => '用 Rich Text 解释定位和购买理由。'],
+                                            ['icon' => '03', 'title' => '疑问处理', 'description' => '用 FAQ 降低购买犹豫。'],
+                                            ['icon' => '04', 'title' => '最后收口', 'description' => '用 CTA Band 明确下一步动作。'],
+                                        ]),
+                                    ],
+                                ],
+                            ],
+                        ],
+                        [
+                            'span' => 6,
+                            'modules' => [
+                                [
+                                    'type' => 'rich-text',
+                                    'props' => [
+                                        'title' => '商业页面说明',
+                                        'content' => '<p>相比只摆商品卡片，一个更完整的商业页面应该同时覆盖产品集合、价值说明、购买 FAQ 和转化引导。</p><p>这套组合也适合课程页、活动售卖页和数字产品发布页。</p>',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ],
+        [
+            'title' => 'Decision Support',
+            'settings' => [
+                'theme' => 'default',
+                'container' => 'contained',
+                'spacing' => 'comfortable',
+                'anchor' => 'faq',
+            ],
+            'rows' => [
+                [
+                    'columns' => [
+                        [
+                            'span' => 8,
+                            'modules' => [
+                                [
+                                    'type' => 'faq',
+                                    'props' => [
+                                        'title' => '购买 FAQ',
+                                        'items_json' => demo_json_encode([
+                                            ['question' => '这里适合放什么商品？', 'answer' => '实体周边、数字资源、订阅产品都可以。'],
+                                            ['question' => 'page composer 和商品系统能否一起工作？', 'answer' => '可以，Product Shelf 会直接读取 product 数据。'],
+                                            ['question' => '后面能否接会员和表单？', 'answer' => '可以，后续还可以接 fd-forms 和 member level 逻辑。'],
+                                        ]),
+                                    ],
+                                ],
+                            ],
+                        ],
+                        [
+                            'span' => 4,
+                            'modules' => [
+                                [
+                                    'type' => 'cta-band',
+                                    'props' => [
+                                        'title' => '查看模块展厅',
+                                        'description' => '继续检查其它模块和页面类型的前台效果。',
+                                        'button_label' => '前往 Sample Page',
+                                        'button_url' => '/page/sample-page',
+                                        'style' => 'neutral',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ],
+    ],
+];
+
+$forms = [
+    [
+        'title' => 'Demo Contact Form',
+        'slug' => 'demo-contact-form',
+        'status' => 'publish',
+        'date' => '2026-04-01T10:00:00+08:00',
+        'excerpt' => '用于 page composer 和表单前台演示的联系表单。',
+        'content' => '',
+        'featured_media' => null,
+        'taxonomies' => [],
+        'meta' => [
+            '_fdf_form_key' => 'demo_contact_form',
+            '_fdf_form_description' => '用于演示 page composer 与 fd-forms 的前台联动。',
+            '_fdf_submit_label' => '发送请求',
+            '_fdf_success_message' => '感谢提交，我们已经收到你的演示请求。',
+            '_fdf_schema_json' => demo_json_encode([
+                'version' => '1.0',
+                'fields' => [
+                    [
+                        'name' => 'full_name',
+                        'type' => 'text',
+                        'label' => 'Full Name',
+                        'required' => true,
+                        'placeholder' => 'Your name',
+                        'description' => '',
+                    ],
+                    [
+                        'name' => 'email',
+                        'type' => 'email',
+                        'label' => 'Email',
+                        'required' => true,
+                        'placeholder' => 'name@example.com',
+                        'description' => '',
+                    ],
+                    [
+                        'name' => 'company',
+                        'type' => 'text',
+                        'label' => 'Company',
+                        'required' => false,
+                        'placeholder' => 'Team or company',
+                        'description' => '',
+                    ],
+                    [
+                        'name' => 'interest_area',
+                        'type' => 'select',
+                        'label' => 'Interest Area',
+                        'required' => true,
+                        'placeholder' => 'Please select',
+                        'description' => '',
+                        'options' => [
+                            ['label' => 'Page Composer', 'value' => 'page-composer'],
+                            ['label' => 'FD Forms', 'value' => 'fd-forms'],
+                            ['label' => 'Headless Demo Stack', 'value' => 'headless-stack'],
+                        ],
+                    ],
+                    [
+                        'name' => 'message',
+                        'type' => 'textarea',
+                        'label' => 'Message',
+                        'required' => true,
+                        'placeholder' => 'Tell us what you want to test',
+                        'description' => '',
+                    ],
+                ],
+            ]),
+            '_fdf_email_notifications_enabled' => '',
+            '_fdf_notification_email_to' => '',
+            '_fdf_notification_email_subject' => '',
+            '_fdf_notification_reply_to_field' => 'email',
+            '_fdf_webhook_enabled' => '',
+            '_fdf_webhook_url' => '',
+            '_fdf_webhook_secret' => '',
+        ],
+    ],
 ];
 
 $pages = [
+    [
+        'title' => 'Sample Page',
+        'slug' => 'sample-page',
+        'status' => 'publish',
+        'date' => '2026-04-01T07:30:00+08:00',
+        'excerpt' => '用于集中展示 FD Page Composer 全部模块的演示页面。',
+        'content' => '<p>This page is powered by FD Page Composer and is intended to showcase every currently registered page module.</p>',
+        'featured_media' => null,
+        'taxonomies' => [],
+        'template' => 'default',
+        'meta' => demo_page_composer_meta('generic', $samplePageComposerLayout),
+    ],
+    [
+        'title' => 'Landing Page Demo',
+        'slug' => 'landing-page-demo',
+        'status' => 'publish',
+        'date' => '2026-04-01T07:40:00+08:00',
+        'excerpt' => '用于演示企业官网 / landing page 结构的页面。',
+        'content' => '<p>This landing page demo should render through FD Page Composer.</p>',
+        'featured_media' => null,
+        'taxonomies' => [],
+        'template' => 'default',
+        'meta' => demo_page_composer_meta('landing', $landingPageComposerLayout),
+    ],
+    [
+        'title' => 'Content Home Demo',
+        'slug' => 'content-home-demo',
+        'status' => 'publish',
+        'date' => '2026-04-01T07:50:00+08:00',
+        'excerpt' => '用于演示内容主页 / 内容中枢结构的页面。',
+        'content' => '<p>This content hub demo should render through FD Page Composer.</p>',
+        'featured_media' => null,
+        'taxonomies' => [],
+        'template' => 'default',
+        'meta' => demo_page_composer_meta('content-hub', $contentHomeComposerLayout),
+    ],
+    [
+        'title' => 'Commerce Launch Demo',
+        'slug' => 'commerce-launch-demo',
+        'status' => 'publish',
+        'date' => '2026-04-01T08:00:00+08:00',
+        'excerpt' => '用于演示商业发布页 / 商品发布页结构的页面。',
+        'content' => '<p>This commerce launch demo should render through FD Page Composer.</p>',
+        'featured_media' => null,
+        'taxonomies' => [],
+        'template' => 'default',
+        'meta' => demo_page_composer_meta('commerce', $commerceLaunchComposerLayout),
+    ],
+    [
+        'title' => 'Editorial Showcase Demo',
+        'slug' => 'editorial-showcase-demo',
+        'status' => 'publish',
+        'date' => '2026-04-01T08:05:00+08:00',
+        'excerpt' => '用于演示 page composer editorial 模块组的页面。',
+        'content' => '<p>This editorial showcase demo should render through FD Page Composer.</p>',
+        'featured_media' => null,
+        'taxonomies' => [],
+        'template' => 'default',
+        'meta' => demo_page_composer_meta('editorial', $editorialShowcaseComposerLayout),
+    ],
     [
         'title' => '关于我们',
         'slug' => 'about-us',
@@ -308,6 +1641,9 @@ HTML,
                 ['name' => 'AI效率', 'slug' => 'ai-productivity'],
                 ['name' => '研究方法', 'slug' => 'research-methods'],
             ],
+            'series' => [
+                ['name' => '内容系统', 'slug' => 'content-systems'],
+            ],
         ],
         'meta' => [
             'template_type' => 'standard',
@@ -337,6 +1673,9 @@ HTML,
             'post_tag' => [
                 ['name' => '数字工具', 'slug' => 'digital-tools'],
                 ['name' => '团队协作', 'slug' => 'team-collaboration'],
+            ],
+            'series' => [
+                ['name' => '内容系统', 'slug' => 'content-systems'],
             ],
         ],
         'meta' => [
@@ -373,6 +1712,9 @@ HTML,
                 ['name' => '团队协作', 'slug' => 'team-collaboration'],
                 ['name' => '数字工具', 'slug' => 'digital-tools'],
             ],
+            'series' => [
+                ['name' => '未来方法', 'slug' => 'future-methods'],
+            ],
         ],
         'meta' => [
             'template_type' => 'standard',
@@ -408,6 +1750,9 @@ HTML,
                 ['name' => 'AI效率', 'slug' => 'ai-productivity'],
                 ['name' => '团队协作', 'slug' => 'team-collaboration'],
             ],
+            'series' => [
+                ['name' => '未来方法', 'slug' => 'future-methods'],
+            ],
         ],
         'meta' => [
             'template_type' => 'standard',
@@ -438,6 +1783,9 @@ HTML,
                 ['name' => '团队协作', 'slug' => 'team-collaboration'],
                 ['name' => '研究方法', 'slug' => 'research-methods'],
             ],
+            'series' => [
+                ['name' => '未来方法', 'slug' => 'future-methods'],
+            ],
         ],
         'meta' => [
             'template_type' => 'standard',
@@ -467,6 +1815,9 @@ HTML,
             'post_tag' => [
                 ['name' => '研究方法', 'slug' => 'research-methods'],
                 ['name' => '数字工具', 'slug' => 'digital-tools'],
+            ],
+            'series' => [
+                ['name' => '内容系统', 'slug' => 'content-systems'],
             ],
         ],
         'meta' => [
@@ -1445,6 +2796,170 @@ HTML,
     ],
 ];
 
+$memberLevels = [
+    'default_level_id' => 1,
+    'levels' => [
+        [
+            'id' => 1,
+            'name' => '体验会员',
+            'description' => '用于演示新用户默认等级、基础内容访问和表单流程。',
+            'priority' => 10,
+            'price' => 0,
+            'duration' => 0,
+            'duration_unit' => 'days',
+        ],
+        [
+            'id' => 2,
+            'name' => '专业会员',
+            'description' => '适合长期查看深度文章、参加线上活动和下载数字资源的个人用户。',
+            'priority' => 20,
+            'price' => 199,
+            'duration' => 30,
+            'duration_unit' => 'days',
+        ],
+        [
+            'id' => 3,
+            'name' => '团队会员',
+            'description' => '适合小团队协作使用，强调多人共享、模板复用和活动权益。',
+            'priority' => 30,
+            'price' => 699,
+            'duration' => 30,
+            'duration_unit' => 'days',
+        ],
+        [
+            'id' => 4,
+            'name' => '年度会员',
+            'description' => '适合把内容系统、活动参与和产品资源长期纳入工作流的稳定用户。',
+            'priority' => 40,
+            'price' => 1999,
+            'duration' => 12,
+            'duration_unit' => 'months',
+        ],
+    ],
+];
+
+$comments = [
+    [
+        'key' => 'post-editorial-1',
+        'post_type' => 'post',
+        'post_slug' => 'why-editorial-systems-still-matter-in-ai-era',
+        'author_name' => '陈岚',
+        'author_email' => 'chenlan@example.com',
+        'author_url' => 'https://example.com/chen-lan',
+        'content' => '这篇把“模型提效”和“编辑系统”之间的关系讲清楚了。很多团队的问题不是不会写，而是没有统一的判断与复盘结构。',
+        'date' => '2026-04-07T10:15:00+08:00',
+        'status' => 'approve',
+        'parent_key' => null,
+        'meta' => [],
+    ],
+    [
+        'key' => 'post-editorial-1-reply',
+        'post_type' => 'post',
+        'post_slug' => 'why-editorial-systems-still-matter-in-ai-era',
+        'author_name' => 'FutureDecade 编辑部',
+        'author_email' => 'editorial@futuredecade.local',
+        'author_url' => '',
+        'content' => '是的，这也是我们把选题标准、资料路径和分发节奏一起做成系统的原因。',
+        'date' => '2026-04-07T11:05:00+08:00',
+        'status' => 'approve',
+        'parent_key' => 'post-editorial-1',
+        'meta' => [],
+    ],
+    [
+        'key' => 'post-editorial-pending',
+        'post_type' => 'post',
+        'post_slug' => 'why-editorial-systems-still-matter-in-ai-era',
+        'author_name' => '测试用户',
+        'author_email' => 'pending-review@example.com',
+        'author_url' => '',
+        'content' => '这条评论保留为待审核状态，用来测试后台评论审核流程。',
+        'date' => '2026-04-07T13:20:00+08:00',
+        'status' => 'hold',
+        'parent_key' => null,
+        'meta' => [],
+    ],
+    [
+        'key' => 'page-about-1',
+        'post_type' => 'page',
+        'post_slug' => 'about-us',
+        'author_name' => '李想',
+        'author_email' => 'lixiang@example.com',
+        'author_url' => '',
+        'content' => '这个 About 页面内容够完整，适合用来测试 page 模板、评论列表和静态页面渲染。',
+        'date' => '2026-04-08T09:40:00+08:00',
+        'status' => 'approve',
+        'parent_key' => null,
+        'meta' => [],
+    ],
+    [
+        'key' => 'note-ai-workflow-1',
+        'post_type' => 'note',
+        'post_slug' => 'ai-workflow-three-layer-check',
+        'author_name' => '王映',
+        'author_email' => 'wangying@example.com',
+        'author_url' => '',
+        'content' => '“输入稳定、判断可解释、回退温和” 这三个检查点很适合作为上线前 checklist。',
+        'date' => '2026-04-08T14:10:00+08:00',
+        'status' => 'approve',
+        'parent_key' => null,
+        'meta' => [],
+    ],
+    [
+        'key' => 'app-signal-desk-1',
+        'post_type' => 'app',
+        'post_slug' => 'signal-desk',
+        'author_name' => '赵衡',
+        'author_email' => 'zhaoheng@example.com',
+        'author_url' => '',
+        'content' => '适合做研究资料库，尤其是“观点回到证据”这件事做得很顺。这里顺便保留一条带评分的评论，用于测试 app 评分统计。',
+        'date' => '2026-04-09T10:00:00+08:00',
+        'status' => 'approve',
+        'parent_key' => null,
+        'meta' => [
+            'rating' => 5,
+        ],
+    ],
+    [
+        'key' => 'app-signal-desk-1-reply',
+        'post_type' => 'app',
+        'post_slug' => 'signal-desk',
+        'author_name' => '产品支持',
+        'author_email' => 'support@futuredecade.local',
+        'author_url' => '',
+        'content' => '谢谢反馈。演示环境里保留了评分和回复结构，方便前后端一起测试评论与统计字段。',
+        'date' => '2026-04-09T11:15:00+08:00',
+        'status' => 'approve',
+        'parent_key' => 'app-signal-desk-1',
+        'meta' => [],
+    ],
+    [
+        'key' => 'event-open-class-1',
+        'post_type' => 'event',
+        'post_slug' => 'ai-product-strategy-open-class',
+        'author_name' => '苏航',
+        'author_email' => 'suhang@example.com',
+        'author_url' => '',
+        'content' => '这类活动页有评论数据后，更容易测试活动详情里的互动区和 GraphQL 评论连接。',
+        'date' => '2026-04-09T16:00:00+08:00',
+        'status' => 'approve',
+        'parent_key' => null,
+        'meta' => [],
+    ],
+    [
+        'key' => 'product-trend-brief-1',
+        'post_type' => 'product',
+        'post_slug' => 'trend-brief-annual-subscription',
+        'author_name' => '顾禾',
+        'author_email' => 'guhe@example.com',
+        'author_url' => '',
+        'content' => '商品页如果有一两条评论，前端在测试富媒体、电商信息和评论混排时会更接近真实场景。',
+        'date' => '2026-04-10T09:30:00+08:00',
+        'status' => 'approve',
+        'parent_key' => null,
+        'meta' => [],
+    ],
+];
+
 $document = [
     'manifest' => [
         'schema_version' => 1,
@@ -1459,10 +2974,11 @@ $document = [
             'media_strategy' => 'Inline SVG assets keep the demo package self-contained and importable without legacy media.',
         ],
     ],
+    'custom_taxonomies' => $customTaxonomies,
     'site' => [
-        'show_on_front' => 'posts',
-        'page_on_front' => 0,
-        'page_for_posts' => 0,
+        'show_on_front' => 'page',
+        'page_on_front' => 'landing-page-demo',
+        'page_for_posts' => 'content-home-demo',
         'stylesheet' => 'fd-theme',
         'template' => 'fd-theme',
     ],
@@ -1472,42 +2988,59 @@ $document = [
             'label' => '主菜单',
             'items' => [
                 ['title' => '首页', 'kind' => 'custom_path', 'path' => '/', 'parent' => null, 'order' => 1],
-                ['title' => '文章', 'kind' => 'custom_path', 'path' => '/', 'parent' => null, 'order' => 2],
-                ['title' => '笔记', 'kind' => 'custom_path', 'path' => '/note', 'parent' => null, 'order' => 3],
-                ['title' => '应用', 'kind' => 'custom_path', 'path' => '/app', 'parent' => null, 'order' => 4],
-                ['title' => '活动', 'kind' => 'custom_path', 'path' => '/event', 'parent' => null, 'order' => 5],
-                ['title' => '商品', 'kind' => 'custom_path', 'path' => '/product', 'parent' => null, 'order' => 6],
-                ['title' => '关于我们', 'kind' => 'page_ref', 'page_slug' => 'about-us', 'parent' => null, 'order' => 7],
+                ['title' => 'Landing Demo', 'kind' => 'page_ref', 'page_slug' => 'landing-page-demo', 'parent' => null, 'order' => 2],
+                ['title' => 'Content Hub Demo', 'kind' => 'page_ref', 'page_slug' => 'content-home-demo', 'parent' => null, 'order' => 3],
+                ['title' => 'Module Showcase', 'kind' => 'page_ref', 'page_slug' => 'sample-page', 'parent' => null, 'order' => 4],
+                ['title' => 'Commerce Demo', 'kind' => 'page_ref', 'page_slug' => 'commerce-launch-demo', 'parent' => null, 'order' => 5],
+                ['title' => 'Editorial Demo', 'kind' => 'page_ref', 'page_slug' => 'editorial-showcase-demo', 'parent' => null, 'order' => 6],
+                ['title' => '文章', 'kind' => 'custom_path', 'path' => '/', 'parent' => null, 'order' => 7],
+                ['title' => '笔记', 'kind' => 'custom_path', 'path' => '/note', 'parent' => null, 'order' => 8],
+                ['title' => '应用', 'kind' => 'custom_path', 'path' => '/app', 'parent' => null, 'order' => 9],
+                ['title' => '活动', 'kind' => 'custom_path', 'path' => '/event', 'parent' => null, 'order' => 10],
+                ['title' => '商品', 'kind' => 'custom_path', 'path' => '/product', 'parent' => null, 'order' => 11],
+                ['title' => '关于我们', 'kind' => 'page_ref', 'page_slug' => 'about-us', 'parent' => null, 'order' => 12],
             ],
         ],
         'footer' => [
             'location' => 'footer-menu',
             'label' => '底部菜单',
             'items' => [
-                ['title' => '关于我们', 'kind' => 'page_ref', 'page_slug' => 'about-us', 'parent' => null, 'order' => 1],
-                ['title' => '联系我们', 'kind' => 'page_ref', 'page_slug' => 'contact-us', 'parent' => null, 'order' => 2],
-                ['title' => '隐私条款', 'kind' => 'page_ref', 'page_slug' => 'privacy', 'parent' => null, 'order' => 3],
-                ['title' => '版权声明', 'kind' => 'page_ref', 'page_slug' => 'copyright-claim', 'parent' => null, 'order' => 4],
+                ['title' => 'Sample Page', 'kind' => 'page_ref', 'page_slug' => 'sample-page', 'parent' => null, 'order' => 1],
+                ['title' => 'Landing Demo', 'kind' => 'page_ref', 'page_slug' => 'landing-page-demo', 'parent' => null, 'order' => 2],
+                ['title' => 'Content Hub Demo', 'kind' => 'page_ref', 'page_slug' => 'content-home-demo', 'parent' => null, 'order' => 3],
+                ['title' => 'Commerce Demo', 'kind' => 'page_ref', 'page_slug' => 'commerce-launch-demo', 'parent' => null, 'order' => 4],
+                ['title' => 'Editorial Demo', 'kind' => 'page_ref', 'page_slug' => 'editorial-showcase-demo', 'parent' => null, 'order' => 5],
+                ['title' => '关于我们', 'kind' => 'page_ref', 'page_slug' => 'about-us', 'parent' => null, 'order' => 6],
+                ['title' => '联系我们', 'kind' => 'page_ref', 'page_slug' => 'contact-us', 'parent' => null, 'order' => 7],
+                ['title' => '隐私条款', 'kind' => 'page_ref', 'page_slug' => 'privacy', 'parent' => null, 'order' => 8],
+                ['title' => '版权声明', 'kind' => 'page_ref', 'page_slug' => 'copyright-claim', 'parent' => null, 'order' => 9],
             ],
         ],
     ],
     'assets' => $assets,
     'terms' => $terms,
+    'forms' => $forms,
     'pages' => $pages,
     'posts' => $posts,
     'notes' => $notes,
     'apps' => $apps,
     'events' => $events,
     'products' => $products,
+    'comments' => $comments,
+    'member_levels' => $memberLevels,
     'counts' => [
         'assets' => count($assets),
+        'custom_taxonomies' => count($customTaxonomies),
         'terms' => count($terms),
+        'forms' => count($forms),
         'pages' => count($pages),
         'posts' => count($posts),
         'notes' => count($notes),
         'apps' => count($apps),
         'events' => count($events),
         'products' => count($products),
+        'comments' => count($comments),
+        'member_levels' => count((array) ($memberLevels['levels'] ?? [])),
     ],
 ];
 

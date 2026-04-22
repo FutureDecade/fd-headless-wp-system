@@ -203,6 +203,546 @@ function fd_demo_find_post_id(string $postType, string $slug): int
     return isset($posts[0]) ? (int) $posts[0] : 0;
 }
 
+function fd_demo_find_term_id_by_slug(string $taxonomy, string $slug, array &$state): int
+{
+    $taxonomy = sanitize_key($taxonomy);
+    $slug = sanitize_title($slug);
+
+    if ($taxonomy === '' || $slug === '') {
+        return 0;
+    }
+
+    $termId = (int) ($state['terms'][$taxonomy][$slug] ?? 0);
+
+    if ($termId > 0) {
+        return $termId;
+    }
+
+    $existing = term_exists($slug, $taxonomy);
+    $termId = fd_demo_term_id($existing);
+
+    if ($termId > 0) {
+        $state['terms'][$taxonomy][$slug] = $termId;
+    }
+
+    return $termId;
+}
+
+function fd_demo_resolve_page_composer_post_ref($ref): int
+{
+    if (!is_array($ref)) {
+        return 0;
+    }
+
+    $postType = sanitize_key((string) ($ref['post_type'] ?? 'post'));
+    $slug = sanitize_title((string) ($ref['slug'] ?? ''));
+
+    if ($postType === '' || $slug === '') {
+        return 0;
+    }
+
+    return fd_demo_find_post_id($postType, $slug);
+}
+
+function fd_demo_resolve_page_composer_props(array $props, array &$state): array
+{
+    if (isset($props['category_ref']) && is_array($props['category_ref'])) {
+        $taxonomy = (string) ($props['category_ref']['taxonomy'] ?? 'category');
+        $slug = (string) ($props['category_ref']['slug'] ?? '');
+        $termId = fd_demo_find_term_id_by_slug($taxonomy, $slug, $state);
+
+        if ($termId > 0) {
+            $props['category_id'] = (string) $termId;
+        }
+
+        unset($props['category_ref']);
+    }
+
+    if (isset($props['tag_ref']) && is_array($props['tag_ref'])) {
+        $taxonomy = (string) ($props['tag_ref']['taxonomy'] ?? 'post_tag');
+        $slug = (string) ($props['tag_ref']['slug'] ?? '');
+        $termId = fd_demo_find_term_id_by_slug($taxonomy, $slug, $state);
+
+        if ($termId > 0) {
+            $props['tag_id'] = (string) $termId;
+        }
+
+        unset($props['tag_ref']);
+    }
+
+    if (isset($props['taxonomy_ref']) && is_array($props['taxonomy_ref'])) {
+        $taxonomy = sanitize_key((string) ($props['taxonomy_ref']['taxonomy'] ?? $props['taxonomy_name'] ?? ''));
+        $slug = sanitize_title((string) ($props['taxonomy_ref']['slug'] ?? $props['taxonomy_term_slug'] ?? ''));
+
+        if ($taxonomy !== '') {
+            $props['taxonomy_name'] = $taxonomy;
+        }
+
+        if ($slug !== '') {
+            $props['taxonomy_term_slug'] = $slug;
+        }
+
+        $termId = fd_demo_find_term_id_by_slug($taxonomy, $slug, $state);
+
+        if ($termId > 0) {
+            $props['taxonomy_term_id'] = (string) $termId;
+        }
+
+        unset($props['taxonomy_ref']);
+    }
+
+    if (isset($props['selected_category_refs']) && is_array($props['selected_category_refs'])) {
+        $selectedCategories = [];
+
+        foreach ($props['selected_category_refs'] as $ref) {
+            if (!is_array($ref)) {
+                continue;
+            }
+
+            $taxonomy = (string) ($ref['taxonomy'] ?? 'category');
+            $slug = (string) ($ref['slug'] ?? '');
+            $termId = fd_demo_find_term_id_by_slug($taxonomy, $slug, $state);
+
+            if ($termId > 0) {
+                $selectedCategories[] = (string) $termId;
+            }
+        }
+
+        if (!empty($selectedCategories)) {
+            $props['selected_categories'] = $selectedCategories;
+        }
+
+        unset($props['selected_category_refs']);
+    }
+
+    if (isset($props['post_ref']) && is_array($props['post_ref'])) {
+        $postId = fd_demo_resolve_page_composer_post_ref($props['post_ref']);
+
+        if ($postId > 0) {
+            $props['post_id'] = (string) $postId;
+        }
+
+        unset($props['post_ref']);
+    }
+
+    if (isset($props['post_refs']) && is_array($props['post_refs'])) {
+        $postIds = [];
+
+        foreach ($props['post_refs'] as $ref) {
+            $postId = fd_demo_resolve_page_composer_post_ref($ref);
+
+            if ($postId > 0) {
+                $postIds[] = (string) $postId;
+            }
+        }
+
+        if (!empty($postIds)) {
+            $props['post_ids'] = $postIds;
+        }
+
+        unset($props['post_refs']);
+    }
+
+    return $props;
+}
+
+function fd_demo_resolve_page_composer_layout_value($value, array &$state)
+{
+    if (!is_array($value)) {
+        return $value;
+    }
+
+    if (isset($value['props']) && is_array($value['props'])) {
+        $value['props'] = fd_demo_resolve_page_composer_props($value['props'], $state);
+    }
+
+    foreach ($value as $key => $child) {
+        if ($key === 'props') {
+            continue;
+        }
+
+        $value[$key] = fd_demo_resolve_page_composer_layout_value($child, $state);
+    }
+
+    return $value;
+}
+
+function fd_demo_resolve_page_composer_layout_json(string $json, array &$state): string
+{
+    $layout = json_decode($json, true);
+
+    if (!is_array($layout)) {
+        return $json;
+    }
+
+    $resolved = fd_demo_resolve_page_composer_layout_value($layout, $state);
+    $encoded = wp_json_encode($resolved, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+    return is_string($encoded) && $encoded !== '' ? $encoded : $json;
+}
+
+function fd_demo_import_custom_taxonomies(array $definitions): int
+{
+    if (empty($definitions)) {
+        return 0;
+    }
+
+    if (!class_exists('FD_Content_Types_Custom_Taxonomy_Registry')) {
+        fd_demo_out('Skipping custom taxonomy import because FD_Content_Types_Custom_Taxonomy_Registry is unavailable.');
+        return 0;
+    }
+
+    $imported = 0;
+
+    foreach ($definitions as $definition) {
+        if (!is_array($definition)) {
+            continue;
+        }
+
+        $definition = fd_demo_replace_demo_urls($definition);
+        $slug = sanitize_key((string) ($definition['slug'] ?? ''));
+
+        if ($slug === '') {
+            continue;
+        }
+
+        $existing = FD_Content_Types_Custom_Taxonomy_Registry::get_definition($slug);
+        $result = FD_Content_Types_Custom_Taxonomy_Registry::save_definition($definition, $existing ? $slug : '');
+
+        if (is_wp_error($result)) {
+            fd_demo_fail(sprintf('Failed to import custom taxonomy "%s": %s', $slug, $result->get_error_message()));
+        }
+
+        $imported++;
+    }
+
+    if ($imported > 0) {
+        FD_Content_Types_Custom_Taxonomy_Registry::register();
+        flush_rewrite_rules(false);
+    }
+
+    return $imported;
+}
+
+function fd_demo_import_member_levels(array $package): int
+{
+    $levels = $package['levels'] ?? [];
+
+    if (!is_array($levels) || empty($levels)) {
+        return 0;
+    }
+
+    $clean = [];
+    $usedIds = [];
+
+    foreach ($levels as $index => $level) {
+        if (!is_array($level)) {
+            continue;
+        }
+
+        $name = sanitize_text_field((string) ($level['name'] ?? ''));
+
+        if ($name === '') {
+            continue;
+        }
+
+        $id = absint($level['id'] ?? ($index + 1));
+
+        if ($id < 1 || isset($usedIds[$id])) {
+            $id = $index + 1;
+            while (isset($usedIds[$id])) {
+                $id++;
+            }
+        }
+
+        $usedIds[$id] = true;
+
+        $clean[] = [
+            'id' => $id,
+            'name' => $name,
+            'description' => sanitize_textarea_field((string) ($level['description'] ?? '')),
+            'priority' => intval($level['priority'] ?? 0),
+            'price' => floatval($level['price'] ?? 0),
+            'duration' => max(0, intval($level['duration'] ?? 0)),
+            'duration_unit' => sanitize_key((string) ($level['duration_unit'] ?? 'days')) ?: 'days',
+        ];
+    }
+
+    if (empty($clean)) {
+        return 0;
+    }
+
+    update_option('fd_member_levels', $clean, false);
+
+    $defaultLevelId = absint($package['default_level_id'] ?? 0);
+    $validLevelIds = array_map(static function (array $level): int {
+        return (int) $level['id'];
+    }, $clean);
+
+    if ($defaultLevelId < 1 || !in_array($defaultLevelId, $validLevelIds, true)) {
+        $defaultLevelId = (int) ($clean[0]['id'] ?? 0);
+    }
+
+    if (function_exists('fd_member_set_default_member_level')) {
+        fd_member_set_default_member_level($defaultLevelId);
+    } elseif ($defaultLevelId > 0) {
+        update_option('fd_member_default_level', $defaultLevelId, false);
+    }
+
+    return count($clean);
+}
+
+function fd_demo_find_comment_id_by_key(string $key): int
+{
+    if ($key === '') {
+        return 0;
+    }
+
+    $comments = get_comments([
+        'number' => 1,
+        'status' => 'all',
+        'fields' => 'ids',
+        'meta_key' => '_fd_demo_comment_key',
+        'meta_value' => $key,
+    ]);
+
+    return isset($comments[0]) ? (int) $comments[0] : 0;
+}
+
+function fd_demo_delete_existing_comments(array $comments): void
+{
+    $existingIds = [];
+
+    foreach ($comments as $comment) {
+        if (!is_array($comment)) {
+            continue;
+        }
+
+        $key = (string) ($comment['key'] ?? '');
+
+        if ($key === '') {
+            continue;
+        }
+
+        $commentId = fd_demo_find_comment_id_by_key($key);
+
+        if ($commentId > 0) {
+            $existingIds[] = $commentId;
+        }
+    }
+
+    rsort($existingIds);
+
+    foreach (array_values(array_unique($existingIds)) as $commentId) {
+        wp_delete_comment((int) $commentId, true);
+    }
+}
+
+function fd_demo_resolve_comment_post_id(array $comment): int
+{
+    $postType = sanitize_key((string) ($comment['post_type'] ?? 'post'));
+    $postSlug = sanitize_title((string) ($comment['post_slug'] ?? ''));
+
+    if ($postType === '' || $postSlug === '') {
+        return 0;
+    }
+
+    return fd_demo_find_post_id($postType, $postSlug);
+}
+
+function fd_demo_enable_comments_for_post(int $postId): void
+{
+    if ($postId < 1) {
+        return;
+    }
+
+    wp_update_post([
+        'ID' => $postId,
+        'comment_status' => 'open',
+        'ping_status' => 'closed',
+    ]);
+}
+
+function fd_demo_comment_approved_value(string $status)
+{
+    $status = strtolower(trim($status));
+
+    switch ($status) {
+        case 'hold':
+        case 'pending':
+            return '0';
+        case 'spam':
+            return 'spam';
+        case 'trash':
+            return 'trash';
+        case 'approve':
+        case 'approved':
+        default:
+            return '1';
+    }
+}
+
+function fd_demo_upsert_comment_meta(int $commentId, string $key, $value): void
+{
+    if ($value === null || $value === '' || (is_array($value) && $value === [])) {
+        delete_comment_meta($commentId, $key);
+        return;
+    }
+
+    if (is_bool($value)) {
+        update_comment_meta($commentId, $key, $value ? '1' : '0');
+        return;
+    }
+
+    update_comment_meta($commentId, $key, $value);
+}
+
+function fd_demo_recount_comment_karma(array $postIds): void
+{
+    global $wpdb;
+
+    $postIds = array_values(array_filter(array_map('intval', $postIds)));
+
+    if (empty($postIds)) {
+        return;
+    }
+
+    foreach ($postIds as $postId) {
+        $comments = get_comments([
+            'post_id' => $postId,
+            'status' => 'approve',
+            'type' => 'comment',
+            'orderby' => 'comment_date_gmt',
+            'order' => 'ASC',
+            'number' => 0,
+        ]);
+
+        $childCounts = [];
+
+        foreach ($comments as $comment) {
+            $parentId = (int) $comment->comment_parent;
+
+            if ($parentId > 0) {
+                $childCounts[$parentId] = (int) ($childCounts[$parentId] ?? 0) + 1;
+            }
+        }
+
+        foreach ($comments as $comment) {
+            $commentId = (int) $comment->comment_ID;
+            $karma = (int) ($childCounts[$commentId] ?? 0);
+
+            $wpdb->update(
+                $wpdb->comments,
+                ['comment_karma' => $karma],
+                ['comment_ID' => $commentId],
+                ['%d'],
+                ['%d']
+            );
+
+            if (function_exists('clean_comment_cache')) {
+                clean_comment_cache($commentId);
+            } else {
+                wp_cache_delete($commentId, 'comment');
+            }
+        }
+    }
+}
+
+function fd_demo_import_comments(array $comments, array &$state): int
+{
+    if (empty($comments)) {
+        return 0;
+    }
+
+    fd_demo_delete_existing_comments($comments);
+
+    $imported = 0;
+    $touchedPostIds = [];
+    $touchedAppIds = [];
+
+    foreach ($comments as $comment) {
+        if (!is_array($comment)) {
+            continue;
+        }
+
+        $key = (string) ($comment['key'] ?? '');
+
+        if ($key === '') {
+            continue;
+        }
+
+        $postId = fd_demo_resolve_comment_post_id($comment);
+
+        if ($postId < 1) {
+            fd_demo_out(sprintf(
+                'Skipping comment "%s" because target content was not found: %s/%s',
+                $key,
+                (string) ($comment['post_type'] ?? ''),
+                (string) ($comment['post_slug'] ?? '')
+            ));
+            continue;
+        }
+
+        fd_demo_enable_comments_for_post($postId);
+
+        $parentId = 0;
+        $parentKey = (string) ($comment['parent_key'] ?? '');
+
+        if ($parentKey !== '') {
+            $parentId = (int) ($state['comments'][$parentKey] ?? 0);
+        }
+
+        $dates = fd_demo_normalize_post_dates((string) ($comment['date'] ?? ''));
+        $commentData = [
+            'comment_post_ID' => $postId,
+            'comment_author' => sanitize_text_field((string) ($comment['author_name'] ?? 'Demo User')),
+            'comment_author_email' => sanitize_email((string) ($comment['author_email'] ?? 'demo@example.com')),
+            'comment_author_url' => esc_url_raw((string) ($comment['author_url'] ?? '')),
+            'comment_author_IP' => sanitize_text_field((string) ($comment['author_ip'] ?? '127.0.0.1')),
+            'comment_agent' => 'fd-demo-import',
+            'comment_content' => (string) fd_demo_replace_demo_urls($comment['content'] ?? ''),
+            'comment_type' => 'comment',
+            'comment_parent' => $parentId,
+            'user_id' => 0,
+            'comment_approved' => fd_demo_comment_approved_value((string) ($comment['status'] ?? 'approve')),
+            'comment_date' => $dates['post_date'],
+            'comment_date_gmt' => $dates['post_date_gmt'],
+        ];
+
+        $commentId = wp_insert_comment(wp_slash($commentData));
+
+        if (!is_numeric($commentId) || (int) $commentId < 1) {
+            fd_demo_fail(sprintf('Failed to insert demo comment "%s".', $key));
+        }
+
+        $commentId = (int) $commentId;
+        update_comment_meta($commentId, '_fd_demo_comment_key', $key);
+
+        foreach ((array) ($comment['meta'] ?? []) as $metaKey => $metaValue) {
+            fd_demo_upsert_comment_meta($commentId, (string) $metaKey, $metaValue);
+        }
+
+        $state['comments'][$key] = $commentId;
+        $touchedPostIds[$postId] = $postId;
+
+        if (get_post_type($postId) === 'app') {
+            $touchedAppIds[$postId] = $postId;
+        }
+
+        $imported++;
+    }
+
+    fd_demo_recount_comment_karma(array_values($touchedPostIds));
+
+    if (function_exists('fd_update_app_rating_stats')) {
+        foreach (array_values($touchedAppIds) as $appId) {
+            fd_update_app_rating_stats((int) $appId);
+        }
+    }
+
+    return $imported;
+}
+
 function fd_demo_term_id($term)
 {
     if (is_array($term)) {
@@ -448,7 +988,53 @@ function fd_demo_upsert_meta(int $postId, string $key, $value): void
         return;
     }
 
+    if (is_string($value) && fd_demo_is_json_string($value)) {
+        $prepared_value = fd_demo_meta_requires_double_slash($key)
+            ? wp_slash(wp_slash($value))
+            : wp_slash($value);
+        update_post_meta($postId, $key, $prepared_value);
+        return;
+    }
+
     update_post_meta($postId, $key, $value);
+}
+
+function fd_demo_meta_requires_double_slash(string $key): bool
+{
+    return in_array(
+        $key,
+        [
+            '_fdpc_layout_json',
+            '_fdpc_seo_json',
+            '_fdpc_visibility_rules',
+            '_fdf_schema_json',
+        ],
+        true
+    );
+}
+
+function fd_demo_is_json_string($value): bool
+{
+    if (!is_string($value)) {
+        return false;
+    }
+
+    $trimmed = trim($value);
+
+    if ('' === $trimmed) {
+        return false;
+    }
+
+    $first = substr($trimmed, 0, 1);
+    $last = substr($trimmed, -1);
+
+    if (!(('{' === $first && '}' === $last) || ('[' === $first && ']' === $last))) {
+        return false;
+    }
+
+    json_decode($trimmed, true);
+
+    return JSON_ERROR_NONE === json_last_error();
 }
 
 function fd_demo_set_featured_media(int $postId, $ref, array &$state): void
@@ -522,6 +1108,10 @@ function fd_demo_map_post_meta(array $item, array &$state): array
 function fd_demo_map_note_meta(array $item, array &$state): array
 {
     $meta = fd_demo_replace_demo_urls($item['meta'] ?? []);
+
+    if (is_array($meta) && isset($meta['_fdpc_layout_json']) && is_string($meta['_fdpc_layout_json'])) {
+        $meta['_fdpc_layout_json'] = fd_demo_resolve_page_composer_layout_json($meta['_fdpc_layout_json'], $state);
+    }
 
     return is_array($meta) ? $meta : [];
 }
@@ -1082,6 +1672,7 @@ $state = [
     'terms' => [],
     'attachments' => [],
     'pages' => [],
+    'comments' => [],
     'summary' => [],
 ];
 
@@ -1091,15 +1682,19 @@ $oldDeferCommentCounting = wp_defer_comment_counting(true);
 try {
     fd_demo_out(sprintf('Importing demo data package: %s', basename($jsonPath)));
 
+    $state['summary']['custom_taxonomies'] = fd_demo_import_custom_taxonomies((array) ($package['custom_taxonomies'] ?? []));
     fd_demo_import_terms((array) ($package['terms'] ?? []), $state);
     fd_demo_import_assets((array) ($package['assets'] ?? []), $state);
 
-    fd_demo_import_content_items((array) ($contentPackage['pages'] ?? []), 'pages', 'page', $state, 'fd_demo_map_note_meta');
+    fd_demo_import_content_items((array) ($contentPackage['forms'] ?? []), 'forms', 'fd_form', $state, 'fd_demo_map_note_meta');
     fd_demo_import_content_items((array) ($contentPackage['posts'] ?? []), 'posts', 'post', $state, 'fd_demo_map_post_meta');
     fd_demo_import_content_items((array) ($contentPackage['notes'] ?? []), 'notes', 'note', $state, 'fd_demo_map_note_meta');
     fd_demo_import_content_items((array) ($contentPackage['apps'] ?? []), 'apps', 'app', $state, 'fd_demo_map_app_meta');
     fd_demo_import_content_items((array) ($contentPackage['events'] ?? []), 'events', 'event', $state, 'fd_demo_map_event_meta');
     fd_demo_import_content_items((array) ($contentPackage['products'] ?? []), 'products', 'product', $state, 'fd_demo_map_product_meta');
+    fd_demo_import_content_items((array) ($contentPackage['pages'] ?? []), 'pages', 'page', $state, 'fd_demo_map_note_meta');
+    $state['summary']['member_levels'] = fd_demo_import_member_levels((array) ($package['member_levels'] ?? []));
+    $state['summary']['comments'] = fd_demo_import_comments((array) ($package['comments'] ?? []), $state);
 
     fd_demo_configure_frontend_options($package);
     fd_demo_configure_site((array) ($package['site'] ?? []), $state);
