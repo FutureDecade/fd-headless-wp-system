@@ -15,6 +15,7 @@
 - `update-runtime-services.sh`
 - `record-available-wordpress-release-tags.sh`
 - `apply-available-wordpress-release-tags.sh`
+- `report-deployment-status.sh`
 - `preflight-check.sh`
 - `fetch-wordpress-assets.sh`
 - `init-wordpress.sh`
@@ -61,6 +62,9 @@
 - `apply-available-wordpress-release-tags.sh`
   - 把 `AVAILABLE_*_RELEASE_TAG` 提升为当前 release tag
   - 提升后仍需要再执行一次 `update-stack.sh` 才会真正拉取资产并更新容器
+- `report-deployment-status.sh`
+  - 把当前/可用 runtime image 与 WordPress release 状态回报给 `fd-core-stack`
+  - 依赖 bootstrap 下发的 `FD_STACK_DEPLOYMENT_ID`、`FD_STACK_STATUS_REPORT_URL`、`FD_STACK_STATUS_REPORT_TOKEN`
 
 目前 `quick-install.sh` 负责再往前收一层：
 

@@ -46,3 +46,5 @@ set_env_value "${ENV_FILE}" "LAST_RUNTIME_IMAGE_APPLIED_AT" "$(date -u +%Y-%m-%d
 echo "Updated runtime images."
 echo "Backup: ${backup_file}"
 grep -E '^(FRONTEND_IMAGE|WEBSOCKET_IMAGE|AVAILABLE_FRONTEND_IMAGE|AVAILABLE_WEBSOCKET_IMAGE|LAST_RUNTIME_IMAGE_APPLIED_AT)=' "${ENV_FILE}" || true
+
+ENV_FILE="${ENV_FILE}" bash "${ROOT_DIR}/scripts/report-deployment-status.sh" || true

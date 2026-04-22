@@ -219,6 +219,7 @@ bash scripts/configure-env.sh
 - 当策略是 `auto` 且这次只涉及 `FRONTEND_IMAGE` / `WEBSOCKET_IMAGE` 时，测试服会走 `scripts/update-runtime-services.sh`，只重建 `frontend`、`websocket`、`nginx`，不会联动重建 `wordpress`
 - WordPress 主题/插件 release 现在也支持 `available/current` 两套状态：当策略是 `manual` 时，新的 release tag 会先记录到 `AVAILABLE_*_RELEASE_TAG`，由你决定何时应用
 - 应用可用的 WordPress release tag 时，可以先运行 `bash scripts/apply-available-wordpress-release-tags.sh`，再执行 `bash scripts/update-stack.sh`
+- 如果这台服务器来自 `fd-core-stack` 的一键部署，运行时镜像和 WordPress 资产状态会通过 `FD_STACK_STATUS_REPORT_URL` / `FD_STACK_STATUS_REPORT_TOKEN` 自动回报给控制台
 - 服务器上不要直接手写裸 `docker compose up/run` 来操作 WordPress 相关容器，应该统一走仓库脚本；否则可能遗漏 `wordpress-assets` 挂载
 - `scripts/install.sh` 现在会先做预检查，再直接复用 `scripts/update-stack.sh` 的安全更新流程，避免维护两套部署逻辑
 - `scripts/quick-install.sh` 会把“配置 + 收集凭据 + 首次安装”收成一个入口
