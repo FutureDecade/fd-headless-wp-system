@@ -67,6 +67,16 @@ elif [[ "${action_kind}" == "apply_wordpress_assets" ]]; then
     status="failed"
     message="Failed to apply WordPress asset update"
   fi
+elif [[ "${action_kind}" == "ignore_runtime_images" ]]; then
+  if ! ENV_FILE="${ENV_FILE}" bash "${ROOT_DIR}/scripts/clear-available-runtime-images.sh"; then
+    status="failed"
+    message="Failed to ignore runtime image update"
+  fi
+elif [[ "${action_kind}" == "ignore_wordpress_assets" ]]; then
+  if ! ENV_FILE="${ENV_FILE}" bash "${ROOT_DIR}/scripts/clear-available-wordpress-release-tags.sh"; then
+    status="failed"
+    message="Failed to ignore WordPress asset update"
+  fi
 else
   status="failed"
   message="Unknown deployment action kind: ${action_kind}"

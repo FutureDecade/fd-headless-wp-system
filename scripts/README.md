@@ -17,6 +17,8 @@
 - `apply-available-wordpress-release-tags.sh`
 - `report-deployment-status.sh`
 - `run-pending-deployment-action.sh`
+- `clear-available-runtime-images.sh`
+- `clear-available-wordpress-release-tags.sh`
 - `preflight-check.sh`
 - `fetch-wordpress-assets.sh`
 - `init-wordpress.sh`
@@ -70,6 +72,10 @@
   - 从 `fd-core-stack` 拉取待执行的 deployment 更新动作
   - 命中后自动执行“应用前端更新”或“应用 WP 资产更新”
   - 执行完会回报动作完成状态
+- `clear-available-runtime-images.sh`
+  - 清理待应用的 runtime image 更新
+- `clear-available-wordpress-release-tags.sh`
+  - 清理待应用的 WordPress release tag 更新
 
 目前 `quick-install.sh` 负责再往前收一层：
 
