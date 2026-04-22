@@ -25,12 +25,24 @@ cp "${ENV_FILE}" "${backup_file}"
 
 if [[ -n "${NEW_FRONTEND_IMAGE}" ]]; then
   set_env_value "${ENV_FILE}" "FRONTEND_IMAGE" "${NEW_FRONTEND_IMAGE}"
+
+  load_env_file "${ENV_FILE}"
+  if [[ "${AVAILABLE_FRONTEND_IMAGE:-}" == "${NEW_FRONTEND_IMAGE}" ]]; then
+    unset_env_value "${ENV_FILE}" "AVAILABLE_FRONTEND_IMAGE"
+  fi
 fi
 
 if [[ -n "${NEW_WEBSOCKET_IMAGE}" ]]; then
   set_env_value "${ENV_FILE}" "WEBSOCKET_IMAGE" "${NEW_WEBSOCKET_IMAGE}"
+
+  load_env_file "${ENV_FILE}"
+  if [[ "${AVAILABLE_WEBSOCKET_IMAGE:-}" == "${NEW_WEBSOCKET_IMAGE}" ]]; then
+    unset_env_value "${ENV_FILE}" "AVAILABLE_WEBSOCKET_IMAGE"
+  fi
 fi
+
+set_env_value "${ENV_FILE}" "LAST_RUNTIME_IMAGE_APPLIED_AT" "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 
 echo "Updated runtime images."
 echo "Backup: ${backup_file}"
-grep -E '^(FRONTEND_IMAGE|WEBSOCKET_IMAGE)=' "${ENV_FILE}"
+grep -E '^(FRONTEND_IMAGE|WEBSOCKET_IMAGE|AVAILABLE_FRONTEND_IMAGE|AVAILABLE_WEBSOCKET_IMAGE|LAST_RUNTIME_IMAGE_APPLIED_AT)=' "${ENV_FILE}" || true

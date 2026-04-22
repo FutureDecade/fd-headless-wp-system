@@ -69,6 +69,7 @@ WEBSOCKET_PUBLIC_SCHEME="${WEBSOCKET_PUBLIC_SCHEME:-ws}"
 HTTPS_ENABLED="${HTTPS_ENABLED:-false}"
 WORDPRESS_FETCH_RELEASE_ASSETS="${WORDPRESS_FETCH_RELEASE_ASSETS:-false}"
 WORDPRESS_RUN_INIT="${WORDPRESS_RUN_INIT:-false}"
+FD_RUNTIME_IMAGE_UPDATE_POLICY="${FD_RUNTIME_IMAGE_UPDATE_POLICY:-manual}"
 
 config_errors=()
 
@@ -149,6 +150,7 @@ check_allowed_value "WEBSOCKET_PUBLIC_SCHEME" "ws" "wss"
 check_allowed_value "HTTPS_ENABLED" "true" "false"
 check_allowed_value "WORDPRESS_FETCH_RELEASE_ASSETS" "true" "false"
 check_allowed_value "WORDPRESS_RUN_INIT" "true" "false"
+check_allowed_value "FD_RUNTIME_IMAGE_UPDATE_POLICY" "manual" "auto"
 
 if [[ "${FRONTEND_DOMAIN:-}" == "${ADMIN_DOMAIN:-}" || "${FRONTEND_DOMAIN:-}" == "${WS_DOMAIN:-}" || "${ADMIN_DOMAIN:-}" == "${WS_DOMAIN:-}" ]]; then
   add_config_error "FRONTEND_DOMAIN、ADMIN_DOMAIN、WS_DOMAIN 不能重复"

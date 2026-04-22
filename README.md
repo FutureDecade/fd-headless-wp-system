@@ -213,6 +213,8 @@ bash scripts/configure-env.sh
 - 如果要在测试服务器拉取私有 WordPress release 资产，需要把 `WORDPRESS_FETCH_RELEASE_ASSETS=true`
 - 如果 WordPress 资产版本没有变化，`scripts/update-stack.sh` 会自动跳过重复下载；只有需要强制重拉时，才把 `FORCE_WORDPRESS_ASSET_FETCH=true`
 - 测试服务器更新建议直接运行 `bash scripts/update-stack.sh`
+- `FD_RUNTIME_IMAGE_UPDATE_POLICY` 用来控制收到新运行时镜像后的行为：`manual` 只记录 `AVAILABLE_FRONTEND_IMAGE` / `AVAILABLE_WEBSOCKET_IMAGE`，`auto` 才会直接切换当前镜像
+- 当策略是 `manual` 时，可以先查看 `.env` 里记录的 `AVAILABLE_*`，再运行 `bash scripts/apply-available-runtime-images.sh`，最后执行 `bash scripts/update-stack.sh`
 - 服务器上不要直接手写裸 `docker compose up/run` 来操作 WordPress 相关容器，应该统一走仓库脚本；否则可能遗漏 `wordpress-assets` 挂载
 - `scripts/install.sh` 现在会先做预检查，再直接复用 `scripts/update-stack.sh` 的安全更新流程，避免维护两套部署逻辑
 - `scripts/quick-install.sh` 会把“配置 + 收集凭据 + 首次安装”收成一个入口
@@ -225,7 +227,7 @@ bash scripts/configure-env.sh
 - 后续证书续期可以运行 `ACR_USERNAME=你的账号 ACR_PASSWORD=你的密码 bash scripts/renew-https.sh`
 - 如果只想更新 WordPress 交付资产版本，可以运行 `FD_THEME_RELEASE_TAG=v1.1.0 FD_CONTENT_TYPES_RELEASE_TAG=v0.4.4 FD_AI_ROUTER_RELEASE_TAG=v2.2.4 FD_WEBSOCKET_PUSH_RELEASE_TAG=v1.0.2 WPGRAPHQL_JWT_AUTH_RELEASE_TAG=v0.7.2 WPGRAPHQL_TAX_QUERY_REF=v0.2.0 bash scripts/update-wordpress-release-tags.sh`
 - GitHub Actions 里的 `Sync WordPress Release Tags` 现在会每 6 小时自动检查一次 latest release；必要时也可以手动触发，自动回写 manifest 与默认脚本版本
-- GitHub Actions 里的 `Deploy Test Server` 现在既支持手动填写 release tag，也支持被 `repository_dispatch` 传入新的 `FRONTEND_IMAGE` / `WEBSOCKET_IMAGE`；服务器会先改 `.env`，再自动重拉并更新
+- GitHub Actions 里的 `Deploy Test Server` 现在既支持手动填写 release tag，也支持被 `repository_dispatch` 传入新的 `FRONTEND_IMAGE` / `WEBSOCKET_IMAGE`；是否立即更新由服务器 `.env` 里的 `FD_RUNTIME_IMAGE_UPDATE_POLICY` 决定
 - 截至 `2026-03-28`，测试机 `144.48.8.218` 已经完成 `www.futuredecade.com`、`admin.futuredecade.com`、`ws.futuredecade.com` 的正式 HTTPS 验证
 - 这版仓库的目标是先固定系统边界，不是立即完成生产可用的一键部署
 

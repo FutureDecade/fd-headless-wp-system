@@ -10,6 +10,8 @@
 - `configure-env.sh`
 - `prepare-server.sh`
 - `update-stack.sh`
+- `record-available-runtime-images.sh`
+- `apply-available-runtime-images.sh`
 - `preflight-check.sh`
 - `fetch-wordpress-assets.sh`
 - `init-wordpress.sh`
@@ -37,6 +39,15 @@
 - 如果 `.env` 不存在，会先自动生成
 - 然后提醒你修改关键配置
 - 真正执行安装时，会直接复用 `update-stack.sh`
+
+目前运行时镜像更新还新增了两条辅助脚本：
+
+- `record-available-runtime-images.sh`
+  - 把新的 `FRONTEND_IMAGE` / `WEBSOCKET_IMAGE` 记录成 `AVAILABLE_*`
+  - 适合 `FD_RUNTIME_IMAGE_UPDATE_POLICY=manual` 的部署
+- `apply-available-runtime-images.sh`
+  - 把 `AVAILABLE_*` 提升为当前 `FRONTEND_IMAGE` / `WEBSOCKET_IMAGE`
+  - 提升后仍需要再执行一次 `update-stack.sh` 才会真正拉镜像并重建容器
 
 目前 `quick-install.sh` 负责再往前收一层：
 

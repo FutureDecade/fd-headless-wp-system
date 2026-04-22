@@ -176,6 +176,38 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
 
+            # shellcheck source=/dev/null
+            source scripts/common.sh
+            load_env_file .env
+            FD_RUNTIME_IMAGE_UPDATE_POLICY="${FD_RUNTIME_IMAGE_UPDATE_POLICY:-manual}"
+
+            HAS_RUNTIME_IMAGE_REQUEST=false
+            if [ -n "$FRONTEND_IMAGE" ] || [ -n "$WEBSOCKET_IMAGE" ]; then
+              HAS_RUNTIME_IMAGE_REQUEST=true
+            fi
+
+            HAS_NON_IMAGE_CHANGES=false
+            if [ -n "$FRONTEND_DOMAIN" ] || [ -n "$ADMIN_DOMAIN" ] || [ -n "$WS_DOMAIN" ] || [ -n "$PUBLIC_SCHEME" ] || [ -n "$WEBSOCKET_PUBLIC_SCHEME" ] || [ -n "$LETSENCRYPT_EMAIL" ] || [ -n "$LETSENCRYPT_STAGING" ] || [ "$RUN_HTTPS_SETUP" = "true" ] || [ "$FORCE_WORDPRESS_ASSET_FETCH" = "true" ] || [ -n "$FD_THEME_RELEASE_TAG" ] || [ -n "$FD_ADMIN_UI_RELEASE_TAG" ] || [ -n "$FD_MEMBER_RELEASE_TAG" ] || [ -n "$FD_PAYMENT_RELEASE_TAG" ] || [ -n "$FD_COMMERCE_RELEASE_TAG" ] || [ -n "$FD_CONTENT_TYPES_RELEASE_TAG" ] || [ -n "$FD_AI_ROUTER_RELEASE_TAG" ] || [ -n "$FD_WEBSOCKET_PUSH_RELEASE_TAG" ] || [ -n "$WPGRAPHQL_JWT_AUTH_RELEASE_TAG" ] || [ -n "$WPGRAPHQL_TAX_QUERY_REF" ]; then
+              HAS_NON_IMAGE_CHANGES=true
+            fi
+
+            echo "Runtime image update policy: ${FD_RUNTIME_IMAGE_UPDATE_POLICY}"
+
+            if [ "$HAS_RUNTIME_IMAGE_REQUEST" = "true" ] && [ "${FD_RUNTIME_IMAGE_UPDATE_POLICY}" = "manual" ]; then
+              ENV_FILE=.env \
+              FRONTEND_IMAGE="$FRONTEND_IMAGE" \
+              WEBSOCKET_IMAGE="$WEBSOCKET_IMAGE" \
+              bash scripts/record-available-runtime-images.sh
+
+              FRONTEND_IMAGE=""
+              WEBSOCKET_IMAGE=""
+
+              if [ "$HAS_NON_IMAGE_CHANGES" != "true" ]; then
+                echo "Runtime image update policy is manual. Recorded available runtime images and skipped stack update."
+                exit 0
+              fi
+            fi
+
             ENV_FILE=.env bash scripts/migrate-base-images-to-acr.sh
 
             if [ -n "$FRONTEND_DOMAIN" ] || [ -n "$ADMIN_DOMAIN" ] || [ -n "$WS_DOMAIN" ] || [ -n "$PUBLIC_SCHEME" ] || [ -n "$WEBSOCKET_PUBLIC_SCHEME" ]; then
