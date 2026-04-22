@@ -197,6 +197,9 @@ wait_for_service websocket 40 3
 wait_for_service nginx 20 2
 validate_runtime_endpoints
 
+echo "Warming frontend cache..."
+ENV_FILE="${ENV_FILE}" bash "${ROOT_DIR}/scripts/warm-frontend-cache.sh"
+
 show_summary
 echo
 echo "Runtime-only service update finished."

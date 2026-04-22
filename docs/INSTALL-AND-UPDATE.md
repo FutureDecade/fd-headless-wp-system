@@ -46,6 +46,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/FutureDecade/fd-headless-wp-
 - `fd-ai-router` 已接入交付链
 - `/graphql` 路由可正常返回 `slugMappingTable`
 - 前台首页和示例页面可正常访问
+- 部署完成后会自动对前端关键页面做一轮缓存预热
 - 前端主要旧域名硬编码已经去掉，页面源码里不再残留 `sslip.io`、`http://admin.futuredecade.com`、`ws://ws.futuredecade.com`
 - 基础镜像已经切到你自己的 ACR，不再依赖 Docker Hub 拉 `nginx` 和 `wordpress`
 - `GraphQL generalSettings.url` 现在已经是 `https://admin.futuredecade.com`
@@ -218,6 +219,7 @@ bash scripts/configure-env.sh
 - `WEBSOCKET_PUBLIC_SCHEME`
 - `FRONTEND_IMAGE`
 - `WEBSOCKET_IMAGE`
+- `FRONTEND_WARMUP_ENABLED`
 - `MYSQL_PASSWORD`
 - `MYSQL_ROOT_PASSWORD`
 - `JWT_SECRET`
@@ -233,6 +235,14 @@ bash scripts/configure-env.sh
 - `WEBSOCKET_PUBLIC_SCHEME=ws`
 - `HTTPS_ENABLED=false`
 - `HTTPS_PORT=443`
+
+如果你想调整部署后的前端缓存预热强度，可以额外修改这些可选项：
+
+- `FRONTEND_WARMUP_ENABLED=true`
+- `FRONTEND_WARMUP_MAX_POSTS=8`
+- `FRONTEND_WARMUP_MAX_PAGES=8`
+- `FRONTEND_WARMUP_MAX_TERMS=8`
+- `FRONTEND_WARMUP_TIMEOUT_SECONDS=10`
 
 原因很简单：
 
