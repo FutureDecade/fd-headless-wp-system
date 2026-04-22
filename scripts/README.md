@@ -19,6 +19,7 @@
 - `run-pending-deployment-action.sh`
 - `clear-available-runtime-images.sh`
 - `clear-available-wordpress-release-tags.sh`
+- `install-deployment-action-timer.sh`
 - `preflight-check.sh`
 - `fetch-wordpress-assets.sh`
 - `init-wordpress.sh`
@@ -76,6 +77,9 @@
   - 清理待应用的 runtime image 更新
 - `clear-available-wordpress-release-tags.sh`
   - 清理待应用的 WordPress release tag 更新
+- `install-deployment-action-timer.sh`
+  - 把 `run-pending-deployment-action.sh` 安装成 systemd timer
+  - 让服务器自动轮询控制台里的待执行更新动作
 
 目前 `quick-install.sh` 负责再往前收一层：
 

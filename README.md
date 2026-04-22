@@ -222,6 +222,7 @@ bash scripts/configure-env.sh
 - 如果这台服务器来自 `fd-core-stack` 的一键部署，运行时镜像和 WordPress 资产状态会通过 `FD_STACK_STATUS_REPORT_URL` / `FD_STACK_STATUS_REPORT_TOKEN` 自动回报给控制台
 - 如果你要让服务器主动执行控制台里已批准的更新动作，可以运行 `bash scripts/run-pending-deployment-action.sh`
 - 如果你决定暂时不跟进某次更新，也可以让服务器执行忽略动作，它会清理对应的 `AVAILABLE_*` 状态并回报给控制台
+- 如果你希望服务器自动轮询并执行控制台里的待更新动作，可以运行 `bash scripts/install-deployment-action-timer.sh`
 - 服务器上不要直接手写裸 `docker compose up/run` 来操作 WordPress 相关容器，应该统一走仓库脚本；否则可能遗漏 `wordpress-assets` 挂载
 - `scripts/install.sh` 现在会先做预检查，再直接复用 `scripts/update-stack.sh` 的安全更新流程，避免维护两套部署逻辑
 - `scripts/quick-install.sh` 会把“配置 + 收集凭据 + 首次安装”收成一个入口
