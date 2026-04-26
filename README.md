@@ -233,7 +233,7 @@ bash scripts/configure-env.sh
 - 如果前端或推送服务镜像在阿里云 ACR 私有仓库，第一次更新时可这样运行：`ACR_USERNAME=你的账号 ACR_PASSWORD=你的密码 bash scripts/update-stack.sh`
 - 如果已经换成正式域名并准备启用 HTTPS，可以运行 `ACR_USERNAME=你的账号 ACR_PASSWORD=你的密码 bash scripts/setup-https.sh`
 - 后续证书续期可以运行 `ACR_USERNAME=你的账号 ACR_PASSWORD=你的密码 bash scripts/renew-https.sh`
-- 如果只想更新 WordPress 交付资产版本，可以运行 `FD_THEME_RELEASE_TAG=v1.1.0 FD_CONTENT_TYPES_RELEASE_TAG=v0.4.4 FD_AI_ROUTER_RELEASE_TAG=v2.2.4 FD_WEBSOCKET_PUSH_RELEASE_TAG=v1.0.2 WPGRAPHQL_JWT_AUTH_RELEASE_TAG=v0.7.2 WPGRAPHQL_TAX_QUERY_REF=v0.2.0 bash scripts/update-wordpress-release-tags.sh`
+- 如果只想更新 WordPress 交付资产版本，可以运行 `FD_THEME_RELEASE_TAG=v1.1.0 FD_CONTENT_TYPES_RELEASE_TAG=v0.4.4 FD_FORMS_RELEASE_TAG=v0.1.0 FD_AI_ROUTER_RELEASE_TAG=v2.2.4 FD_WEBSOCKET_PUSH_RELEASE_TAG=v1.0.3 WPGRAPHQL_JWT_AUTH_RELEASE_TAG=v0.7.2 WPGRAPHQL_TAX_QUERY_REF=v0.2.0 bash scripts/update-wordpress-release-tags.sh`
 - GitHub Actions 里的 `Sync WordPress Release Tags` 现在会每 6 小时自动检查一次 latest release；必要时也可以手动触发，自动回写 manifest 与默认脚本版本
 - GitHub Actions 里的 `Deploy Test Server` 现在既支持手动填写 release tag，也支持被 `repository_dispatch` 传入新的 `FRONTEND_IMAGE` / `WEBSOCKET_IMAGE` 和 WordPress release tag；是否立即更新由服务器 `.env` 里的策略决定
 - 截至 `2026-03-28`，测试机 `144.48.8.218` 已经完成 `www.futuredecade.com`、`admin.futuredecade.com`、`ws.futuredecade.com` 的正式 HTTPS 验证

@@ -39,8 +39,9 @@ FD_MEMBER_RELEASE_TAG="${FD_MEMBER_RELEASE_TAG:-v1.0.5}"
 FD_PAYMENT_RELEASE_TAG="${FD_PAYMENT_RELEASE_TAG:-v1.0.2}"
 FD_COMMERCE_RELEASE_TAG="${FD_COMMERCE_RELEASE_TAG:-v1.0.0}"
 FD_CONTENT_TYPES_RELEASE_TAG="${FD_CONTENT_TYPES_RELEASE_TAG:-v0.4.4}"
+FD_FORMS_RELEASE_TAG="${FD_FORMS_RELEASE_TAG:-v0.1.0}"
 FD_AI_ROUTER_RELEASE_TAG="${FD_AI_ROUTER_RELEASE_TAG:-v2.2.4}"
-FD_WEBSOCKET_PUSH_RELEASE_TAG="${FD_WEBSOCKET_PUSH_RELEASE_TAG:-v1.0.2}"
+FD_WEBSOCKET_PUSH_RELEASE_TAG="${FD_WEBSOCKET_PUSH_RELEASE_TAG:-v1.0.3}"
 WPGRAPHQL_RELEASE_TAG="${WPGRAPHQL_RELEASE_TAG:-v2.3.3-fd.1}"
 WPGRAPHQL_JWT_AUTH_RELEASE_TAG="${WPGRAPHQL_JWT_AUTH_RELEASE_TAG:-v0.7.2}"
 WPGRAPHQL_TAX_QUERY_REF="${WPGRAPHQL_TAX_QUERY_REF:-v0.2.0}"
@@ -69,6 +70,7 @@ fd-member=${FD_MEMBER_RELEASE_TAG}
 fd-payment=${FD_PAYMENT_RELEASE_TAG}
 fd-commerce=${FD_COMMERCE_RELEASE_TAG}
 fd-content-types=${FD_CONTENT_TYPES_RELEASE_TAG}
+fd-forms=${FD_FORMS_RELEASE_TAG}
 fd-ai-router=${FD_AI_ROUTER_RELEASE_TAG}
 fd-websocket-push=${FD_WEBSOCKET_PUSH_RELEASE_TAG}
 wp-graphql=${WPGRAPHQL_RELEASE_TAG}
@@ -107,6 +109,10 @@ assets_already_match() {
   fi
 
   if [[ ! -f "${PLUGINS_DIR}/fd-content-types/fd-content-types.php" ]]; then
+    return 1
+  fi
+
+  if [[ ! -f "${PLUGINS_DIR}/fd-forms/fd-forms.php" ]]; then
     return 1
   fi
 
@@ -258,6 +264,7 @@ download_release_asset "${WORDPRESS_RELEASE_OWNER}/fd-member" "${FD_MEMBER_RELEA
 download_release_asset "${WORDPRESS_RELEASE_OWNER}/fd-payment" "${FD_PAYMENT_RELEASE_TAG}" "fd-payment.zip" "fd-payment" "${PLUGINS_DIR}/fd-payment" "fd-payment"
 download_release_asset "${WORDPRESS_RELEASE_OWNER}/fd-commerce" "${FD_COMMERCE_RELEASE_TAG}" "fd-commerce.zip" "fd-commerce" "${PLUGINS_DIR}/fd-commerce" "fd-commerce"
 download_release_asset "${WORDPRESS_RELEASE_OWNER}/fd-content-types" "${FD_CONTENT_TYPES_RELEASE_TAG}" "fd-content-types.zip" "fd-content-types" "${PLUGINS_DIR}/fd-content-types" "fd-content-types"
+download_release_asset "${WORDPRESS_RELEASE_OWNER}/fd-forms" "${FD_FORMS_RELEASE_TAG}" "fd-forms.zip" "fd-forms" "${PLUGINS_DIR}/fd-forms" "fd-forms" "fd-forms.php"
 download_release_asset "${WORDPRESS_RELEASE_OWNER}/fd-ai-router" "${FD_AI_ROUTER_RELEASE_TAG}" "fd-ai-router.zip" "fd-ai-router" "${PLUGINS_DIR}/fd-ai-router" "fd-ai-router" "fd-ai-router.php"
 download_release_asset "${WORDPRESS_RELEASE_OWNER}/fd-websocket-push" "${FD_WEBSOCKET_PUSH_RELEASE_TAG}" "fd-websocket-push.zip" "fd-websocket-push" "${PLUGINS_DIR}/fd-websocket-push" "fd-websocket-push"
 download_release_asset "${WORDPRESS_RELEASE_OWNER}/wp-graphql" "${WPGRAPHQL_RELEASE_TAG}" "wp-graphql.zip" "wp-graphql" "${PLUGINS_DIR}/wp-graphql" "wp-graphql" "wp-graphql.php"

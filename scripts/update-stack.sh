@@ -71,8 +71,9 @@ fd-member=${FD_MEMBER_RELEASE_TAG:-v1.0.5}
 fd-payment=${FD_PAYMENT_RELEASE_TAG:-v1.0.2}
 fd-commerce=${FD_COMMERCE_RELEASE_TAG:-v1.0.0}
 fd-content-types=${FD_CONTENT_TYPES_RELEASE_TAG:-v0.4.4}
+fd-forms=${FD_FORMS_RELEASE_TAG:-v0.1.0}
 fd-ai-router=${FD_AI_ROUTER_RELEASE_TAG:-v2.2.4}
-fd-websocket-push=${FD_WEBSOCKET_PUSH_RELEASE_TAG:-v1.0.2}
+fd-websocket-push=${FD_WEBSOCKET_PUSH_RELEASE_TAG:-v1.0.3}
 wp-graphql=${WPGRAPHQL_RELEASE_TAG:-v2.3.3-fd.1}
 wp-graphql-jwt-authentication=${WPGRAPHQL_JWT_AUTH_RELEASE_TAG:-v0.7.2}
 wp-graphql-tax-query-develop=${WPGRAPHQL_TAX_QUERY_REF:-v0.2.0}
@@ -98,6 +99,10 @@ need_wordpress_asset_sync() {
     return 0
   fi
 
+  if [[ ! -f "${ROOT_DIR}/runtime/wp-content/plugins/fd-page-composer/fd-page-composer.php" ]]; then
+    return 0
+  fi
+
   if [[ ! -f "${ROOT_DIR}/runtime/wp-content/plugins/fd-member/index.php" ]]; then
     return 0
   fi
@@ -111,6 +116,10 @@ need_wordpress_asset_sync() {
   fi
 
   if [[ ! -f "${ROOT_DIR}/runtime/wp-content/plugins/fd-content-types/fd-content-types.php" ]]; then
+    return 0
+  fi
+
+  if [[ ! -f "${ROOT_DIR}/runtime/wp-content/plugins/fd-forms/fd-forms.php" ]]; then
     return 0
   fi
 
@@ -261,6 +270,8 @@ verify_wordpress_assets_mounts() {
     test -f /var/www/html/wp-content/plugins/fd-payment/index.php &&
     test -f /var/www/html/wp-content/plugins/fd-commerce/fd-commerce.php &&
     test -f /var/www/html/wp-content/plugins/fd-content-types/fd-content-types.php &&
+    test -f /var/www/html/wp-content/plugins/fd-page-composer/fd-page-composer.php &&
+    test -f /var/www/html/wp-content/plugins/fd-forms/fd-forms.php &&
     test -f /var/www/html/wp-content/plugins/fd-ai-router/fd-ai-router.php &&
     test -f /var/www/html/wp-content/plugins/fd-websocket-push/fd-websocket-push.php &&
     test -f /var/www/html/wp-content/plugins/wp-graphql-jwt-authentication/wp-graphql-jwt-authentication.php &&

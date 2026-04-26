@@ -27,7 +27,9 @@
 - `fd-payment`：`v1.0.2`
 - `fd-commerce`：`v1.0.0`
 - `fd-content-types`：`v0.4.4`
+- `fd-forms`：`v0.1.0`
 - `fd-ai-router`：`v2.2.4`
+- `fd-websocket-push`：`v1.0.3`
 
 对应 release asset：
 
@@ -36,7 +38,9 @@
 - `fd-payment.zip`
 - `fd-commerce.zip`
 - `fd-content-types.zip`
+- `fd-forms.zip`
 - `fd-ai-router.zip`
+- `fd-websocket-push.zip`
 
 ## 推荐发布顺序
 

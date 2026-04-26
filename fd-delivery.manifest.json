@@ -203,6 +203,17 @@
       "group": "release"
     },
     {
+      "key": "FD_FORMS_RELEASE_TAG",
+      "label": "fd-forms Release Tag",
+      "type": "text",
+      "scope": "preset",
+      "required": true,
+      "editable": true,
+      "advanced": true,
+      "defaultValue": "v0.1.0",
+      "group": "release"
+    },
+    {
       "key": "FD_AI_ROUTER_RELEASE_TAG",
       "label": "fd-ai-router Release Tag",
       "type": "text",
@@ -221,7 +232,7 @@
       "required": true,
       "editable": true,
       "advanced": true,
-      "defaultValue": "v1.0.2",
+      "defaultValue": "v1.0.3",
       "group": "release"
     },
     {

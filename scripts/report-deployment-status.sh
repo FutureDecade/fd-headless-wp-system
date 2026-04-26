@@ -46,6 +46,7 @@ payload="$(
     --arg fdPayment "${FD_PAYMENT_RELEASE_TAG:-}" \
     --arg fdCommerce "${FD_COMMERCE_RELEASE_TAG:-}" \
     --arg fdContentTypes "${FD_CONTENT_TYPES_RELEASE_TAG:-}" \
+    --arg fdForms "${FD_FORMS_RELEASE_TAG:-}" \
     --arg fdAiRouter "${FD_AI_ROUTER_RELEASE_TAG:-}" \
     --arg fdWebsocketPush "${FD_WEBSOCKET_PUSH_RELEASE_TAG:-}" \
     --arg wpgraphql "${WPGRAPHQL_RELEASE_TAG:-}" \
@@ -58,6 +59,7 @@ payload="$(
     --arg availableFdPayment "${AVAILABLE_FD_PAYMENT_RELEASE_TAG:-}" \
     --arg availableFdCommerce "${AVAILABLE_FD_COMMERCE_RELEASE_TAG:-}" \
     --arg availableFdContentTypes "${AVAILABLE_FD_CONTENT_TYPES_RELEASE_TAG:-}" \
+    --arg availableFdForms "${AVAILABLE_FD_FORMS_RELEASE_TAG:-}" \
     --arg availableFdAiRouter "${AVAILABLE_FD_AI_ROUTER_RELEASE_TAG:-}" \
     --arg availableFdWebsocketPush "${AVAILABLE_FD_WEBSOCKET_PUSH_RELEASE_TAG:-}" \
     --arg availableWpgraphql "${AVAILABLE_WPGRAPHQL_RELEASE_TAG:-}" \
@@ -86,6 +88,7 @@ payload="$(
           FD_PAYMENT_RELEASE_TAG: ($fdPayment | select(length > 0)),
           FD_COMMERCE_RELEASE_TAG: ($fdCommerce | select(length > 0)),
           FD_CONTENT_TYPES_RELEASE_TAG: ($fdContentTypes | select(length > 0)),
+          FD_FORMS_RELEASE_TAG: ($fdForms | select(length > 0)),
           FD_AI_ROUTER_RELEASE_TAG: ($fdAiRouter | select(length > 0)),
           FD_WEBSOCKET_PUSH_RELEASE_TAG: ($fdWebsocketPush | select(length > 0)),
           WPGRAPHQL_RELEASE_TAG: ($wpgraphql | select(length > 0)),
@@ -100,6 +103,7 @@ payload="$(
           AVAILABLE_FD_PAYMENT_RELEASE_TAG: ($availableFdPayment | select(length > 0)),
           AVAILABLE_FD_COMMERCE_RELEASE_TAG: ($availableFdCommerce | select(length > 0)),
           AVAILABLE_FD_CONTENT_TYPES_RELEASE_TAG: ($availableFdContentTypes | select(length > 0)),
+          AVAILABLE_FD_FORMS_RELEASE_TAG: ($availableFdForms | select(length > 0)),
           AVAILABLE_FD_AI_ROUTER_RELEASE_TAG: ($availableFdAiRouter | select(length > 0)),
           AVAILABLE_FD_WEBSOCKET_PUSH_RELEASE_TAG: ($availableFdWebsocketPush | select(length > 0)),
           AVAILABLE_WPGRAPHQL_RELEASE_TAG: ($availableWpgraphql | select(length > 0)),

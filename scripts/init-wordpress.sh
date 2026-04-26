@@ -402,11 +402,13 @@ if [[ "${WORDPRESS_INSTALL_CLASSIC_EDITOR}" == "true" ]]; then
 fi
 
 if [[ "${WORDPRESS_ACTIVATE_CORE_PLUGINS}" == "true" ]]; then
+  activate_plugin_if_present "fd-page-composer"
   activate_plugin_if_present "fd-admin-ui"
   activate_plugin_if_present "fd-member"
   activate_plugin_if_present "fd-payment"
   activate_plugin_if_present "fd-commerce"
   activate_plugin_if_present "fd-content-types"
+  activate_plugin_if_present "fd-forms"
   activate_plugin_if_present "fd-ai-router"
   activate_plugin_if_present "fd-websocket-push"
   activate_plugin_if_present "wp-graphql-jwt-authentication"
