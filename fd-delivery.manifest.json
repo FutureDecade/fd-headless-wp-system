@@ -1,5 +1,5 @@
 {
-  "version": "1",
+  "version": "2",
   "installer": {
     "repoUrl": "https://github.com/FutureDecade/fd-headless-wp-system.git",
     "repoBranch": "main",
