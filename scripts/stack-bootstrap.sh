@@ -50,9 +50,7 @@ apply_stack_bootstrap_defaults() {
       continue
     fi
 
-    if [[ -z "${!key:-}" ]]; then
-      export "${key}=${value}"
-    fi
+    export "${key}=${value}"
   done < <(printf '%s' "${bootstrap_json}" | jq -r '.bootstrap.envDefaults // {} | to_entries[] | [.key, (.value | tostring)] | @tsv')
 }
 

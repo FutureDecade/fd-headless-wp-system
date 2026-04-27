@@ -261,7 +261,7 @@ if [[ ! -f "${ENV_FILE}" ]]; then
 fi
 
 load_env_file "${ENV_FILE}"
-prime_env_from_stack_bootstrap "${env_file_created}"
+prime_env_from_stack_bootstrap "${stack_bootstrap_mode}"
 load_env_file "${ENV_FILE}"
 
 if is_placeholder_domain "${FRONTEND_DOMAIN:-}" && \
