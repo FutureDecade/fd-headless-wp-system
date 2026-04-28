@@ -68,50 +68,53 @@ payload="$(
     --arg wordpressOfferedAt "${LAST_WORDPRESS_ASSET_UPDATE_OFFERED_AT:-}" \
     --arg wordpressAppliedAt "${LAST_WORDPRESS_ASSET_UPDATE_APPLIED_AT:-}" \
     '
+    def optional($value):
+      if ($value | length) > 0 then $value else null end;
+
     {
       deploymentId: $deploymentId,
       token: $token,
       runtimeImages: {
-        currentFrontendImage: ($currentFrontendImage | select(length > 0)),
-        currentWebsocketImage: ($currentWebsocketImage | select(length > 0)),
-        availableFrontendImage: ($availableFrontendImage | select(length > 0)),
-        availableWebsocketImage: ($availableWebsocketImage | select(length > 0)),
-        offeredAt: ($runtimeOfferedAt | select(length > 0)),
-        appliedAt: ($runtimeAppliedAt | select(length > 0))
+        currentFrontendImage: optional($currentFrontendImage),
+        currentWebsocketImage: optional($currentWebsocketImage),
+        availableFrontendImage: optional($availableFrontendImage),
+        availableWebsocketImage: optional($availableWebsocketImage),
+        offeredAt: optional($runtimeOfferedAt),
+        appliedAt: optional($runtimeAppliedAt)
       },
       wordpressAssets: {
         current: {
-          FD_THEME_RELEASE_TAG: ($fdTheme | select(length > 0)),
-          FD_PAGE_COMPOSER_RELEASE_TAG: ($fdPageComposer | select(length > 0)),
-          FD_ADMIN_UI_RELEASE_TAG: ($fdAdminUi | select(length > 0)),
-          FD_MEMBER_RELEASE_TAG: ($fdMember | select(length > 0)),
-          FD_PAYMENT_RELEASE_TAG: ($fdPayment | select(length > 0)),
-          FD_COMMERCE_RELEASE_TAG: ($fdCommerce | select(length > 0)),
-          FD_CONTENT_TYPES_RELEASE_TAG: ($fdContentTypes | select(length > 0)),
-          FD_FORMS_RELEASE_TAG: ($fdForms | select(length > 0)),
-          FD_AI_ROUTER_RELEASE_TAG: ($fdAiRouter | select(length > 0)),
-          FD_WEBSOCKET_PUSH_RELEASE_TAG: ($fdWebsocketPush | select(length > 0)),
-          WPGRAPHQL_RELEASE_TAG: ($wpgraphql | select(length > 0)),
-          WPGRAPHQL_JWT_AUTH_RELEASE_TAG: ($wpgraphqlJwt | select(length > 0)),
-          WPGRAPHQL_TAX_QUERY_REF: ($wpgraphqlTax | select(length > 0))
+          FD_THEME_RELEASE_TAG: optional($fdTheme),
+          FD_PAGE_COMPOSER_RELEASE_TAG: optional($fdPageComposer),
+          FD_ADMIN_UI_RELEASE_TAG: optional($fdAdminUi),
+          FD_MEMBER_RELEASE_TAG: optional($fdMember),
+          FD_PAYMENT_RELEASE_TAG: optional($fdPayment),
+          FD_COMMERCE_RELEASE_TAG: optional($fdCommerce),
+          FD_CONTENT_TYPES_RELEASE_TAG: optional($fdContentTypes),
+          FD_FORMS_RELEASE_TAG: optional($fdForms),
+          FD_AI_ROUTER_RELEASE_TAG: optional($fdAiRouter),
+          FD_WEBSOCKET_PUSH_RELEASE_TAG: optional($fdWebsocketPush),
+          WPGRAPHQL_RELEASE_TAG: optional($wpgraphql),
+          WPGRAPHQL_JWT_AUTH_RELEASE_TAG: optional($wpgraphqlJwt),
+          WPGRAPHQL_TAX_QUERY_REF: optional($wpgraphqlTax)
         },
         available: {
-          AVAILABLE_FD_THEME_RELEASE_TAG: ($availableFdTheme | select(length > 0)),
-          AVAILABLE_FD_PAGE_COMPOSER_RELEASE_TAG: ($availableFdPageComposer | select(length > 0)),
-          AVAILABLE_FD_ADMIN_UI_RELEASE_TAG: ($availableFdAdminUi | select(length > 0)),
-          AVAILABLE_FD_MEMBER_RELEASE_TAG: ($availableFdMember | select(length > 0)),
-          AVAILABLE_FD_PAYMENT_RELEASE_TAG: ($availableFdPayment | select(length > 0)),
-          AVAILABLE_FD_COMMERCE_RELEASE_TAG: ($availableFdCommerce | select(length > 0)),
-          AVAILABLE_FD_CONTENT_TYPES_RELEASE_TAG: ($availableFdContentTypes | select(length > 0)),
-          AVAILABLE_FD_FORMS_RELEASE_TAG: ($availableFdForms | select(length > 0)),
-          AVAILABLE_FD_AI_ROUTER_RELEASE_TAG: ($availableFdAiRouter | select(length > 0)),
-          AVAILABLE_FD_WEBSOCKET_PUSH_RELEASE_TAG: ($availableFdWebsocketPush | select(length > 0)),
-          AVAILABLE_WPGRAPHQL_RELEASE_TAG: ($availableWpgraphql | select(length > 0)),
-          AVAILABLE_WPGRAPHQL_JWT_AUTH_RELEASE_TAG: ($availableWpgraphqlJwt | select(length > 0)),
-          AVAILABLE_WPGRAPHQL_TAX_QUERY_REF: ($availableWpgraphqlTax | select(length > 0))
+          AVAILABLE_FD_THEME_RELEASE_TAG: optional($availableFdTheme),
+          AVAILABLE_FD_PAGE_COMPOSER_RELEASE_TAG: optional($availableFdPageComposer),
+          AVAILABLE_FD_ADMIN_UI_RELEASE_TAG: optional($availableFdAdminUi),
+          AVAILABLE_FD_MEMBER_RELEASE_TAG: optional($availableFdMember),
+          AVAILABLE_FD_PAYMENT_RELEASE_TAG: optional($availableFdPayment),
+          AVAILABLE_FD_COMMERCE_RELEASE_TAG: optional($availableFdCommerce),
+          AVAILABLE_FD_CONTENT_TYPES_RELEASE_TAG: optional($availableFdContentTypes),
+          AVAILABLE_FD_FORMS_RELEASE_TAG: optional($availableFdForms),
+          AVAILABLE_FD_AI_ROUTER_RELEASE_TAG: optional($availableFdAiRouter),
+          AVAILABLE_FD_WEBSOCKET_PUSH_RELEASE_TAG: optional($availableFdWebsocketPush),
+          AVAILABLE_WPGRAPHQL_RELEASE_TAG: optional($availableWpgraphql),
+          AVAILABLE_WPGRAPHQL_JWT_AUTH_RELEASE_TAG: optional($availableWpgraphqlJwt),
+          AVAILABLE_WPGRAPHQL_TAX_QUERY_REF: optional($availableWpgraphqlTax)
         },
-        offeredAt: ($wordpressOfferedAt | select(length > 0)),
-        appliedAt: ($wordpressAppliedAt | select(length > 0))
+        offeredAt: optional($wordpressOfferedAt),
+        appliedAt: optional($wordpressAppliedAt)
       }
     }
     '
