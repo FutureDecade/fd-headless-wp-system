@@ -232,7 +232,7 @@
       "required": true,
       "editable": true,
       "advanced": true,
-      "defaultValue": "v1.0.3",
+      "defaultValue": "v1.0.4",
       "group": "release"
     },
     {
