@@ -1515,17 +1515,27 @@ function fd_demo_menu_item_url(array $item, array $state): string
 
 function fd_demo_reset_menu_items(int $menuId): void
 {
-    $items = wp_get_nav_menu_items($menuId, [
-        'post_status' => 'any',
-    ]);
+    $itemIds = get_objects_in_term($menuId, 'nav_menu');
 
-    if (!is_array($items)) {
-        return;
+    if (is_wp_error($itemIds)) {
+        fd_demo_fail(sprintf('Failed to load nav menu items for menu ID %d: %s', $menuId, $itemIds->get_error_message()));
     }
 
-    foreach ($items as $item) {
-        wp_delete_post((int) $item->ID, true);
+    foreach ((array) $itemIds as $itemId) {
+        $itemId = (int) $itemId;
+
+        if ($itemId > 0 && get_post_type($itemId) === 'nav_menu_item') {
+            wp_delete_post($itemId, true);
+        }
     }
+
+    fd_demo_refresh_nav_menu_count($menuId);
+}
+
+function fd_demo_refresh_nav_menu_count(int $menuId): void
+{
+    wp_update_term_count_now([$menuId], 'nav_menu');
+    clean_term_cache([$menuId], 'nav_menu');
 }
 
 function fd_demo_import_menus(array $menus, array $state): void
@@ -1598,6 +1608,8 @@ function fd_demo_import_menus(array $menus, array $state): void
 
             $createdItems[$title] = (int) $menuItemId;
         }
+
+        fd_demo_refresh_nav_menu_count($menuId);
 
         $location = (string) ($menuDefinition['location'] ?? '');
 
