@@ -133,7 +133,7 @@
       "required": true,
       "editable": true,
       "advanced": true,
-      "defaultValue": "v1.1.0",
+      "defaultValue": "v1.1.1",
       "group": "release"
     },
     {
@@ -166,7 +166,7 @@
       "required": true,
       "editable": true,
       "advanced": true,
-      "defaultValue": "v1.0.5",
+      "defaultValue": "v1.0.6",
       "group": "release"
     },
     {
@@ -177,7 +177,7 @@
       "required": true,
       "editable": true,
       "advanced": true,
-      "defaultValue": "v1.0.2",
+      "defaultValue": "v1.0.3",
       "group": "release"
     },
     {
@@ -199,7 +199,7 @@
       "required": true,
       "editable": true,
       "advanced": true,
-      "defaultValue": "v0.4.4",
+      "defaultValue": "v0.4.5",
       "group": "release"
     },
     {
@@ -221,7 +221,7 @@
       "required": true,
       "editable": true,
       "advanced": true,
-      "defaultValue": "v2.2.4",
+      "defaultValue": "v2.2.5",
       "group": "release"
     },
     {

@@ -54,10 +54,10 @@ bash <(curl -fsSL https://raw.githubusercontent.com/FutureDecade/fd-headless-wp-
 
 当前测试机使用的关键版本：
 
-- `fd-theme`: `v1.1.0`
+- `fd-theme`: `v1.1.1`
 - `fd-admin-ui`: `v1.3.2`
-- `fd-content-types`: `v0.4.4`
-- `fd-ai-router`: `v2.2.4`
+- `fd-content-types`: `v0.4.5`
+- `fd-ai-router`: `v2.2.5`
 - `fd-frontend`: `crpi-8y82lbqoc1haiday.cn-beijing.personal.cr.aliyuncs.com/futuredecade/fd-frontend:futuredecade-https-8862356`
 - `fd-websocket`: `crpi-8y82lbqoc1haiday.cn-beijing.personal.cr.aliyuncs.com/futuredecade/fd-websocket:248efba2800ce856e043d673233bc5f5205e2a40`
 
@@ -253,15 +253,15 @@ bash scripts/configure-env.sh
 如果这台机器要自动拉 GitHub release 里的主题和插件，还要确认这些：
 
 - `WORDPRESS_FETCH_RELEASE_ASSETS=true`
-- `FD_THEME_RELEASE_TAG=v1.0.7`
+- `FD_THEME_RELEASE_TAG=v1.1.1`
 - `FD_ADMIN_UI_RELEASE_TAG=v1.3.2`
-- `FD_MEMBER_RELEASE_TAG=...`
-- `FD_PAYMENT_RELEASE_TAG=...`
+- `FD_MEMBER_RELEASE_TAG=v1.0.6`
+- `FD_PAYMENT_RELEASE_TAG=v1.0.3`
 - `FD_COMMERCE_RELEASE_TAG=...`
-- `FD_CONTENT_TYPES_RELEASE_TAG=v0.4.4`
+- `FD_CONTENT_TYPES_RELEASE_TAG=v0.4.5`
 - `FD_FORMS_RELEASE_TAG=v0.1.0`
-- `FD_AI_ROUTER_RELEASE_TAG=v2.2`
-- `FD_WEBSOCKET_PUSH_RELEASE_TAG=v1.0.3`
+- `FD_AI_ROUTER_RELEASE_TAG=v2.2.5`
+- `FD_WEBSOCKET_PUSH_RELEASE_TAG=v1.0.5`
 - `WPGRAPHQL_JWT_AUTH_RELEASE_TAG=v0.7.2`
 - `WPGRAPHQL_TAX_QUERY_REF=v0.2.0`
 
