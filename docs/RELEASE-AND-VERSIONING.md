@@ -29,7 +29,7 @@
 - `fd-content-types`：`v0.4.4`
 - `fd-forms`：`v0.1.0`
 - `fd-ai-router`：`v2.2.4`
-- `fd-websocket-push`：`v1.0.4`
+- `fd-websocket-push`：`v1.0.5`
 
 对应 release asset：
 
