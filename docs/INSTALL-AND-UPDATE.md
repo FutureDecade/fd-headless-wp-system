@@ -54,7 +54,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/FutureDecade/fd-headless-wp-
 
 当前测试机使用的关键版本：
 
-- `fd-theme`: `v1.1.2`
+- `fd-theme`: `v1.1.3`
 - `fd-admin-ui`: `v1.3.2`
 - `fd-content-types`: `v0.4.5`
 - `fd-ai-router`: `v2.2.5`
@@ -253,7 +253,7 @@ bash scripts/configure-env.sh
 如果这台机器要自动拉 GitHub release 里的主题和插件，还要确认这些：
 
 - `WORDPRESS_FETCH_RELEASE_ASSETS=true`
-- `FD_THEME_RELEASE_TAG=v1.1.2`
+- `FD_THEME_RELEASE_TAG=v1.1.3`
 - `FD_ADMIN_UI_RELEASE_TAG=v1.3.2`
 - `FD_MEMBER_RELEASE_TAG=v1.0.6`
 - `FD_PAYMENT_RELEASE_TAG=v1.0.3`
@@ -261,7 +261,7 @@ bash scripts/configure-env.sh
 - `FD_CONTENT_TYPES_RELEASE_TAG=v0.4.5`
 - `FD_FORMS_RELEASE_TAG=v0.1.0`
 - `FD_AI_ROUTER_RELEASE_TAG=v2.2.5`
-- `FD_WEBSOCKET_PUSH_RELEASE_TAG=v1.0.6`
+- `FD_WEBSOCKET_PUSH_RELEASE_TAG=v1.0.7`
 - `WPGRAPHQL_JWT_AUTH_RELEASE_TAG=v0.7.2`
 - `WPGRAPHQL_TAX_QUERY_REF=v0.2.0`
 

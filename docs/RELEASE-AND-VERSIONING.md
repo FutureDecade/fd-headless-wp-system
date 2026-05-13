@@ -22,14 +22,14 @@
 
 ## 当前推荐默认版本
 
-- `fd-theme`：`v1.1.2`
+- `fd-theme`：`v1.1.3`
 - `fd-member`：`v1.0.6`
 - `fd-payment`：`v1.0.3`
 - `fd-commerce`：`v1.0.0`
 - `fd-content-types`：`v0.4.5`
 - `fd-forms`：`v0.1.0`
 - `fd-ai-router`：`v2.2.5`
-- `fd-websocket-push`：`v1.0.6`
+- `fd-websocket-push`：`v1.0.7`
 
 对应 release asset：
 
