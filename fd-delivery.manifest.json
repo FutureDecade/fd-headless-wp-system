@@ -166,7 +166,7 @@
       "required": true,
       "editable": true,
       "advanced": true,
-      "defaultValue": "v1.0.7",
+      "defaultValue": "v1.0.6",
       "group": "release"
     },
     {
@@ -232,7 +232,7 @@
       "required": true,
       "editable": true,
       "advanced": true,
-      "defaultValue": "v1.0.6",
+      "defaultValue": "v1.0.7",
       "group": "release"
     },
     {
