@@ -80,6 +80,10 @@
 - `install-deployment-action-timer.sh`
   - 把 `run-pending-deployment-action.sh` 安装成 systemd timer
   - 让服务器自动轮询控制台里的待执行更新动作
+- `health-check.sh`
+  - 部署后输出健康结论
+  - 默认检查前端、WebSocket、GraphQL
+  - 如果开启 `FD_DEBUG_CONSOLE_ENABLED=true` 并配置 `FD_DEBUG_TOKEN`，会调用前端系统健康 API，输出服务、GraphQL、模块数据和页面路由的完整结论
 
 目前 `quick-install.sh` 负责再往前收一层：
 

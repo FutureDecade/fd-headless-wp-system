@@ -200,6 +200,9 @@ validate_runtime_endpoints
 echo "Warming frontend cache..."
 ENV_FILE="${ENV_FILE}" bash "${ROOT_DIR}/scripts/warm-frontend-cache.sh"
 
+echo "Running deployment health check..."
+ENV_FILE="${ENV_FILE}" bash "${ROOT_DIR}/scripts/health-check.sh"
+
 show_summary
 echo
 echo "Runtime-only service update finished."
