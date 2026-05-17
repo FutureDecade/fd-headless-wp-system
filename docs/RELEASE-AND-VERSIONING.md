@@ -22,18 +22,20 @@
 
 ## 当前推荐默认版本
 
-- `fd-theme`：`v1.1.3`
+- `fd-theme`：`v1.1.4`
+- `fd-page-composer`：`v0.2.1`
 - `fd-member`：`v1.0.6`
 - `fd-payment`：`v1.0.3`
 - `fd-commerce`：`v1.0.0`
 - `fd-content-types`：`v0.4.5`
 - `fd-forms`：`v0.1.0`
 - `fd-ai-router`：`v2.2.5`
-- `fd-websocket-push`：`v1.0.11`
+- `fd-websocket-push`：`v1.0.12`
 
 对应 release asset：
 
 - `fd-theme.zip`
+- `fd-page-composer.zip`
 - `fd-member.zip`
 - `fd-payment.zip`
 - `fd-commerce.zip`
