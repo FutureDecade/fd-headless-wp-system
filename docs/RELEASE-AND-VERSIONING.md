@@ -23,7 +23,7 @@
 ## 当前推荐默认版本
 
 - `fd-theme`：`v1.1.4`
-- `fd-page-composer`：`v0.2.4`
+- `fd-page-composer`：`v0.2.5`
 - `fd-member`：`v1.0.6`
 - `fd-payment`：`v1.0.3`
 - `fd-commerce`：`v1.0.0`

@@ -55,7 +55,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/FutureDecade/fd-headless-wp-
 当前测试机使用的关键版本：
 
 - `fd-theme`: `v1.1.4`
-- `fd-page-composer`: `v0.2.4`
+- `fd-page-composer`: `v0.2.5`
 - `fd-admin-ui`: `v1.3.2`
 - `fd-content-types`: `v0.4.5`
 - `fd-ai-router`: `v2.2.5`
