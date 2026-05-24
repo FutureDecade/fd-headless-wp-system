@@ -65,7 +65,7 @@ compose_tools=(
 desired_assets_lock() {
   cat <<EOF
 fd-theme=${FD_THEME_RELEASE_TAG:-v1.1.4}
-fd-page-composer=${FD_PAGE_COMPOSER_RELEASE_TAG:-v0.2.5}
+fd-page-composer=${FD_PAGE_COMPOSER_RELEASE_TAG:-v0.2.6}
 fd-admin-ui=${FD_ADMIN_UI_RELEASE_TAG:-v1.3.2}
 fd-member=${FD_MEMBER_RELEASE_TAG:-v1.0.6}
 fd-payment=${FD_PAYMENT_RELEASE_TAG:-v1.0.3}
