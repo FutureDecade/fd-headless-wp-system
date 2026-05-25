@@ -202,7 +202,7 @@ should_apply_bootstrap_default() {
     LETSENCRYPT_EMAIL|WORDPRESS_ADMIN_EMAIL)
       is_placeholder_email "${current}"
       ;;
-    WORDPRESS_ADMIN_PASSWORD|MYSQL_PASSWORD|MYSQL_ROOT_PASSWORD|JWT_SECRET|PUSH_SECRET|REVALIDATE_SECRET)
+    WORDPRESS_ADMIN_PASSWORD|MYSQL_PASSWORD|MYSQL_ROOT_PASSWORD|JWT_SECRET|PUSH_SECRET|REVALIDATE_SECRET|FD_PREVIEW_SECRET)
       is_placeholder_secret "${current}"
       ;;
     *)
@@ -468,6 +468,7 @@ ensure_secret_value "MYSQL_ROOT_PASSWORD" "${MYSQL_ROOT_PASSWORD:-}"
 ensure_secret_value "JWT_SECRET" "${JWT_SECRET:-}"
 ensure_secret_value "PUSH_SECRET" "${PUSH_SECRET:-}"
 ensure_secret_value "REVALIDATE_SECRET" "${REVALIDATE_SECRET:-}"
+ensure_secret_value "FD_PREVIEW_SECRET" "${FD_PREVIEW_SECRET:-}"
 
 if [[ "${wordpress_fetch_release_assets}" == "true" ]]; then
   if [[ "${stack_bootstrap_mode}" == "true" ]]; then

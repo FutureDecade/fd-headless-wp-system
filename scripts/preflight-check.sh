@@ -53,6 +53,7 @@ required_keys=(
   JWT_SECRET
   PUSH_SECRET
   REVALIDATE_SECRET
+  FD_PREVIEW_SECRET
 )
 
 for key in "${required_keys[@]}"; do
@@ -134,6 +135,7 @@ check_not_blank "MYSQL_ROOT_PASSWORD"
 check_not_blank "JWT_SECRET"
 check_not_blank "PUSH_SECRET"
 check_not_blank "REVALIDATE_SECRET"
+check_not_blank "FD_PREVIEW_SECRET"
 
 check_exact_placeholder "FRONTEND_DOMAIN" "www.example.com"
 check_exact_placeholder "ADMIN_DOMAIN" "admin.example.com"
@@ -145,6 +147,7 @@ check_pattern_placeholder "MYSQL_ROOT_PASSWORD" "CHANGE_ME*"
 check_pattern_placeholder "JWT_SECRET" "CHANGE_ME*"
 check_pattern_placeholder "PUSH_SECRET" "CHANGE_ME*"
 check_pattern_placeholder "REVALIDATE_SECRET" "CHANGE_ME*"
+check_pattern_placeholder "FD_PREVIEW_SECRET" "CHANGE_ME*"
 
 check_allowed_value "PUBLIC_SCHEME" "http" "https"
 check_allowed_value "WEBSOCKET_PUBLIC_SCHEME" "ws" "wss"

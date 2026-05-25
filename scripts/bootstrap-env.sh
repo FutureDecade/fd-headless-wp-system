@@ -27,6 +27,7 @@ replace_value "MYSQL_ROOT_PASSWORD" "$(generate_secret)"
 replace_value "JWT_SECRET" "$(generate_secret)"
 replace_value "PUSH_SECRET" "$(generate_secret)"
 replace_value "REVALIDATE_SECRET" "$(generate_secret)"
+replace_value "FD_PREVIEW_SECRET" "$(generate_secret)"
 
 if [[ "${BOOTSTRAP_ENV_SILENT:-false}" != "true" ]]; then
   echo "Generated ${ENV_FILE}"
