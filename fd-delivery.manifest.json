@@ -155,7 +155,7 @@
       "required": true,
       "editable": true,
       "advanced": true,
-      "defaultValue": "v1.3.2",
+      "defaultValue": "v1.3.3",
       "group": "release"
     },
     {

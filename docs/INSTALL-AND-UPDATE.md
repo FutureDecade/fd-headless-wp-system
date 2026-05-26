@@ -56,7 +56,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/FutureDecade/fd-headless-wp-
 
 - `fd-theme`: `v1.1.4`
 - `fd-page-composer`: `v0.2.9`
-- `fd-admin-ui`: `v1.3.2`
+- `fd-admin-ui`: `v1.3.3`
 - `fd-content-types`: `v0.5.0`
 - `fd-ai-router`: `v2.2.5`
 - `fd-frontend`: `crpi-8y82lbqoc1haiday.cn-beijing.personal.cr.aliyuncs.com/futuredecade/fd-frontend:futuredecade-https-8862356`
