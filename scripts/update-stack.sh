@@ -65,12 +65,12 @@ compose_tools=(
 desired_assets_lock() {
   cat <<EOF
 fd-theme=${FD_THEME_RELEASE_TAG:-v1.1.4}
-fd-page-composer=${FD_PAGE_COMPOSER_RELEASE_TAG:-v0.2.9}
-fd-admin-ui=${FD_ADMIN_UI_RELEASE_TAG:-v1.3.3}
+fd-page-composer=${FD_PAGE_COMPOSER_RELEASE_TAG:-v0.2.10}
+fd-admin-ui=${FD_ADMIN_UI_RELEASE_TAG:-v1.3.4}
 fd-member=${FD_MEMBER_RELEASE_TAG:-v1.0.6}
 fd-payment=${FD_PAYMENT_RELEASE_TAG:-v1.0.3}
 fd-commerce=${FD_COMMERCE_RELEASE_TAG:-v1.0.0}
-fd-content-types=${FD_CONTENT_TYPES_RELEASE_TAG:-v0.5.0}
+fd-content-types=${FD_CONTENT_TYPES_RELEASE_TAG:-v0.5.1}
 fd-forms=${FD_FORMS_RELEASE_TAG:-v0.1.0}
 fd-ai-router=${FD_AI_ROUTER_RELEASE_TAG:-v2.2.5}
 fd-websocket-push=${FD_WEBSOCKET_PUSH_RELEASE_TAG:-v1.0.12}

@@ -23,11 +23,11 @@
 ## 当前推荐默认版本
 
 - `fd-theme`：`v1.1.4`
-- `fd-page-composer`：`v0.2.9`
+- `fd-page-composer`：`v0.2.10`
 - `fd-member`：`v1.0.6`
 - `fd-payment`：`v1.0.3`
 - `fd-commerce`：`v1.0.0`
-- `fd-content-types`：`v0.5.0`
+- `fd-content-types`：`v0.5.1`
 - `fd-forms`：`v0.1.0`
 - `fd-ai-router`：`v2.2.5`
 - `fd-websocket-push`：`v1.0.12`
